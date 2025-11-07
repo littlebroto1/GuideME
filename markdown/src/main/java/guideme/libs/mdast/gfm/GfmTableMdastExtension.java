@@ -7,6 +7,7 @@ import guideme.libs.mdast.gfm.model.GfmTable;
 import guideme.libs.mdast.gfm.model.GfmTableCell;
 import guideme.libs.mdast.gfm.model.GfmTableRow;
 import guideme.libs.mdast.model.MdAstInlineCode;
+import guideme.libs.micromark.StringUtils;
 import guideme.libs.micromark.Token;
 import guideme.libs.micromark.extensions.gfm.GfmTableSyntax;
 import java.util.regex.MatchResult;
@@ -66,7 +67,7 @@ public final class GfmTableMdastExtension {
         var value = context.resume();
 
         if (Boolean.TRUE.equals(context.get(IN_TABLE))) {
-            value = ESCAPED_PIPE_PATERN.matcher(value).replaceAll(GfmTableMdastExtension::replace);
+            value = StringUtils.replaceAll(value, ESCAPED_PIPE_PATERN, GfmTableMdastExtension::replace);
         }
 
         var stack = context.getStack();

@@ -1,12 +1,14 @@
 package guideme.libs.mdast;
 
 import guideme.libs.mdast.model.MdAstRoot;
+import guideme.libs.micromark.ListUtils;
 import guideme.libs.micromark.Token;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * An mdast extension changes how markdown tokens are turned into mdast.
@@ -31,10 +33,10 @@ public class MdastExtension {
             List<Transform> transforms,
             Map<String, Handler> enter,
             Map<String, Handler> exit) {
-        this.canContainEols = List.copyOf(canContainEols);
-        this.transforms = List.copyOf(transforms);
-        this.enter = Map.copyOf(enter);
-        this.exit = Map.copyOf(exit);
+        this.canContainEols = Collections.unmodifiableList(new ArrayList<>(canContainEols));
+        this.transforms = Collections.unmodifiableList(new ArrayList<>(transforms));
+        this.enter = Collections.unmodifiableMap(new HashMap<>(enter));;
+        this.exit = Collections.unmodifiableMap(new HashMap<>(exit));;
     }
 
     public static Builder builder() {

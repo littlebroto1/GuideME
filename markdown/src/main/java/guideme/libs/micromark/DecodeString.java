@@ -4,7 +4,9 @@ import guideme.libs.micromark.html.NumericCharacterReference;
 import guideme.libs.micromark.symbol.Codes;
 import guideme.libs.micromark.symbol.Constants;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class DecodeString {
@@ -17,7 +19,7 @@ public final class DecodeString {
      * and titles). The “string” content type allows character escapes and -references. This decodes those.
      */
     public static String decodeString(String text) {
-        return characterEscapeOrReference.matcher(text).replaceAll(DecodeString::decode);
+        return StringUtils.replaceAll(text, characterEscapeOrReference, DecodeString::decode);
     }
 
     private static String decode(MatchResult result) {
@@ -41,8 +43,8 @@ public final class DecodeString {
                     hex ? Constants.numericBaseHexadecimal : Constants.numericBaseDecimal);
         }
 
-        return Objects.requireNonNullElse(
-                NamedCharacterEntities.decodeNamedCharacterReference(charRef),
-                result.group());
+        return Optional.ofNullable(
+            NamedCharacterEntities.decodeNamedCharacterReference(charRef))
+            .orElse(result.group());
     }
 }

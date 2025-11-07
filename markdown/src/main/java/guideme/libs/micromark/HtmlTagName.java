@@ -1,5 +1,6 @@
 package guideme.libs.micromark;
 
+import java.util.Collections;
 import java.util.Set;
 
 public final class HtmlTagName {
@@ -14,7 +15,7 @@ public final class HtmlTagName {
      * <p>
      * This is copied from: <https://spec.commonmark.org/0.30/#html-blocks>.
      */
-    public static final Set<String> htmlBlockNames = Set.of(
+    public static final Set<String> htmlBlockNames = SetUtils.of(
             "address",
             "article",
             "aside",
@@ -85,6 +86,6 @@ public final class HtmlTagName {
      * <p>
      * Note that `textarea` was added in `CommonMark@0.30`.
      */
-    public static final Set<String> htmlRawNames = Set.of("pre", "script", "style", "textarea");
+    public static final Set<String> htmlRawNames = SetUtils.of("pre", "script", "style", "textarea");
 
 }

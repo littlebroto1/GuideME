@@ -40,11 +40,8 @@ import guideme.libs.micromark.html.NumericCharacterReference;
 import guideme.libs.micromark.symbol.Codes;
 import guideme.libs.micromark.symbol.Constants;
 import guideme.libs.unist.UnistPoint;
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -228,7 +225,7 @@ final class MdastCompiler implements MdastContext {
 
         if (!tokenStack.isEmpty()) {
             var tail = tokenStack.get(tokenStack.size() - 1);
-            var handler = Objects.requireNonNullElse(tail.onError(), this::defaultOnError);
+            var handler = Optional.ofNullable(tail.onError()).orElse(this::defaultOnError);
             handler.error(this, null, tail.token());
         }
 
@@ -343,8 +340,8 @@ final class MdastCompiler implements MdastContext {
                     listItem.end = (lineIndex != null && lineIndex != 0) ? events.get(lineIndex).token().start
                             : event.token().end;
 
-                    ListUtils.splice(events, Objects.requireNonNullElse(lineIndex, index), 0,
-                            List.of(Tokenizer.Event.exit(listItem, event.context())));
+                    ListUtils.splice(events, Optional.ofNullable(lineIndex).orElse(index), 0,
+                            Collections.singletonList(Tokenizer.Event.exit(listItem, event.context())));
                     index++;
                     length++;
                 }
@@ -357,7 +354,7 @@ final class MdastCompiler implements MdastContext {
                     listItem.start = event.token().start;
 
                     // @ts-expect-error: `listItem` is most definitely defined, TS...
-                    ListUtils.splice(events, index, 0, List.of(Tokenizer.Event.enter(listItem, event.context())));
+                    ListUtils.splice(events, index, 0, Collections.singletonList(Tokenizer.Event.enter(listItem, event.context())));
                     index++;
                     length++;
                     firstBlankLineIndex = null;
@@ -488,7 +485,7 @@ final class MdastCompiler implements MdastContext {
             if (onExitError != null) {
                 onExitError.error(this, token, open.token());
             } else {
-                var handler = Objects.requireNonNullElse(open.onError(), this::defaultOnError);
+                var handler = Optional.ofNullable(open.onError()).orElse(this::defaultOnError);
                 handler.error(this, token, open.token());
             }
         }
@@ -712,7 +709,7 @@ final class MdastCompiler implements MdastContext {
         MdAstParent<?> replacement;
         if (inReference) {
             var ref = new MdAstLinkReference();
-            ref.referenceType = Objects.requireNonNullElse(referenceType, MdAstReferenceType.SHORTCUT);
+            ref.referenceType = Optional.ofNullable(referenceType).orElse(MdAstReferenceType.SHORTCUT);
             ref.identifier = context.identifier;
             ref.label = context.label;
             replacement = ref;
@@ -743,7 +740,7 @@ final class MdastCompiler implements MdastContext {
         MdAstNode replacement;
         if (inReference) {
             var imgRef = new MdAstImageReference();
-            imgRef.referenceType = Objects.requireNonNullElse(referenceType, MdAstReferenceType.SHORTCUT);
+            imgRef.referenceType = Optional.ofNullable(referenceType).orElse(MdAstReferenceType.SHORTCUT);
             imgRef.identifier = closedImageOrRef.identifier;
             imgRef.label = closedImageOrRef.label;
             imgRef.alt = closedImageOrRef.alt;

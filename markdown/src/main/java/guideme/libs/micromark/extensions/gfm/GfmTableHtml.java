@@ -1,5 +1,6 @@
 package guideme.libs.micromark.extensions.gfm;
 
+import guideme.libs.micromark.StringUtils;
 import guideme.libs.micromark.Token;
 import guideme.libs.micromark.html.HtmlContext;
 import guideme.libs.micromark.html.HtmlContextProperty;
@@ -89,7 +90,7 @@ public final class GfmTableHtml {
         var value = context.sliceSerialize(token);
 
         if (context.has(TABLE_ALIGN)) {
-            value = PIPE_PATTERN.matcher(value).replaceAll(mr -> {
+            value = StringUtils.replaceAll(value, PIPE_PATTERN, mr -> {
                 // Pipes work, backslashes don’t (but can’t escape pipes).
                 var g = mr.group(1);
                 return Matcher.quoteReplacement(g.equals("|") ? g : mr.group());

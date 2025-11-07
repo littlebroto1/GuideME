@@ -134,7 +134,7 @@ public final class LabelEnd {
         media = ListUtils.push(media, events.subList(open + 1, open + offset + 3));
 
         // Text open.
-        media = ListUtils.push(media, List.of(Tokenizer.Event.enter(text, context)));
+        media = ListUtils.push(media, ListUtils.of(Tokenizer.Event.enter(text, context)));
 
         // Between.
         media = ListUtils.push(
@@ -145,7 +145,7 @@ public final class LabelEnd {
                         context));
 
         // Text close, marker close, label close.
-        media = ListUtils.push(media, List.of(
+        media = ListUtils.push(media, ListUtils.of(
                 Tokenizer.Event.exit(text, context),
                 events.get(close - 2),
                 events.get(close - 1),
@@ -155,7 +155,7 @@ public final class LabelEnd {
         media = ListUtils.push(media, events.subList(close + 1, events.size()));
 
         // Media close.
-        media = ListUtils.push(media, List.of(Tokenizer.Event.exit(group, context)));
+        media = ListUtils.push(media, ListUtils.of(Tokenizer.Event.exit(group, context)));
 
         ListUtils.splice(events, open, events.size(), media);
 

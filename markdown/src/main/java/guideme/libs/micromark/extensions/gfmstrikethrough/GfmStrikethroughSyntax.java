@@ -1,5 +1,6 @@
 package guideme.libs.micromark.extensions.gfmstrikethrough;
 
+import com.github.bsideup.jabel.Desugar;
 import guideme.libs.micromark.Assert;
 import guideme.libs.micromark.ClassifyCharacter;
 import guideme.libs.micromark.Construct;
@@ -38,7 +39,7 @@ public class GfmStrikethroughSyntax extends Extension {
         tokenizer.resolveAll = this::resolveAllStrikethrough;
 
         // Set up the extension configuration
-        text.put(Codes.tilde, List.of(tokenizer));
+        text.put(Codes.tilde, ListUtils.of(tokenizer));
         nullInsideSpan.add(tokenizer.resolveAll);
         nullAttentionMarkers.add(Codes.tilde);
     }
@@ -134,7 +135,7 @@ public class GfmStrikethroughSyntax extends Extension {
                 Assert.check(code == Codes.tilde, "expected `~`");
 
                 if (previous == Codes.tilde &&
-                        !events.getLast().token().type.equals(Types.characterEscape)) {
+                        !ListUtils.getLast(events).token().type.equals(Types.characterEscape)) {
                     return nok.step(code);
                 }
 
@@ -174,6 +175,7 @@ public class GfmStrikethroughSyntax extends Extension {
         return new StateMachine()::start;
     }
 
+    @Desugar
     public record Options(boolean singleTilde) {
         public static Options DEFAULT = new Options(true);
     }

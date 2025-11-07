@@ -1,5 +1,6 @@
 package guideme.libs.mdast;
 
+import com.github.bsideup.jabel.Desugar;
 import guideme.libs.mdast.model.MdAstNode;
 import guideme.libs.micromark.Token;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
  * mdast compiler context
  */
 public interface MdastContext {
+    @Desugar
     record TokenStackEntry(Token token, @Nullable OnEnterError onError) {
     }
 

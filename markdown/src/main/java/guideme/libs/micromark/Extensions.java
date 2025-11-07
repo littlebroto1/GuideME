@@ -48,7 +48,7 @@ public final class Extensions {
 
         for (var code : right.keySet()) {
             if (!left.containsKey(code)) {
-                left.put(code, List.of());
+                left.put(code, ListUtils.of());
             }
 
             left.put(code, constructs(

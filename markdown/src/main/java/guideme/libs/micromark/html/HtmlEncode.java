@@ -1,11 +1,14 @@
 package guideme.libs.micromark.html;
 
+import guideme.libs.micromark.MapUtils;
+import guideme.libs.micromark.StringUtils;
+
 import java.util.Map;
 import java.util.regex.Pattern;
 
 public class HtmlEncode {
 
-    private static final Map<String, String> characterReferences = Map.of(
+    private static final Map<String, String> characterReferences = MapUtils.of(
             "\"", "quot",
             "&", "amp",
             "<", "lt",
@@ -23,7 +26,7 @@ public class HtmlEncode {
      * `>` and `"` in many cases, but CM includes them.
      */
     public static String encode(String value) {
-        return ESCAPE_PATTERN.matcher(value).replaceAll(match -> {
+        return StringUtils.replaceAll(value, ESCAPE_PATTERN, match -> {
             return "&" + characterReferences.get(match.group()) + ";";
         });
     }

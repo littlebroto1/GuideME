@@ -1,12 +1,6 @@
 package guideme.libs.micromark.extensions;
 
-import guideme.libs.micromark.CharUtil;
-import guideme.libs.micromark.Construct;
-import guideme.libs.micromark.Extension;
-import guideme.libs.micromark.State;
-import guideme.libs.micromark.TokenizeContext;
-import guideme.libs.micromark.Tokenizer;
-import guideme.libs.micromark.Types;
+import guideme.libs.micromark.*;
 import guideme.libs.micromark.symbol.Codes;
 import java.util.List;
 
@@ -45,7 +39,7 @@ public class YamlFrontmatterSyntax {
         construct.tokenize = YamlFrontmatterSyntax::tokenizeFrontmatter;
 
         INSTANCE = new Extension();
-        INSTANCE.flow.put((int) FENCE.charAt(0), List.of(construct));
+        INSTANCE.flow.put((int) FENCE.charAt(0), ListUtils.of(construct));
     }
 
     private static State tokenizeFrontmatter(TokenizeContext context, Tokenizer.Effects effects, State ok, State nok) {

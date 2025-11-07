@@ -1,5 +1,6 @@
 package guideme.libs.micromark;
 
+import com.github.bsideup.jabel.Desugar;
 import guideme.libs.unist.UnistPoint;
 
 /**
@@ -11,5 +12,6 @@ import guideme.libs.unist.UnistPoint;
  * @param _index       Position in a list of chunks
  * @param _bufferIndex Position in a string chunk (or `-1` when pointing to a numeric chunk).
  */
+@Desugar
 public record Point(int line, int column, int offset, int _index, int _bufferIndex) implements UnistPoint {
 }

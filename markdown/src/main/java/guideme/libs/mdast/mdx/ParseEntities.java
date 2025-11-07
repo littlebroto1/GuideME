@@ -2,6 +2,8 @@ package guideme.libs.mdast.mdx;
 
 import guideme.libs.micromark.CharUtil;
 import guideme.libs.micromark.NamedCharacterEntities;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,9 +104,7 @@ final class ParseEntities {
                     // When terminated and numerical, parse as either hexadecimal or
                     // decimal.
                     var referenceCode = Integer.parseInt(
-                            charBuffer,
-                            0,
-                            charBuffer.length(),
+                            charBuffer.toString(),
                             type == CharRefType.hexadecimal ? 16 : 10);
 
                     // Emit a warning when the parsed number is prohibited, and replace with
@@ -201,7 +201,7 @@ final class ParseEntities {
         codes.put(156, "œ");
         codes.put(158, "ž");
         codes.put(159, "Ÿ");
-        characterReferenceInvalid = Map.copyOf(codes);
+        characterReferenceInvalid = Collections.unmodifiableMap(codes);
     }
 
 }

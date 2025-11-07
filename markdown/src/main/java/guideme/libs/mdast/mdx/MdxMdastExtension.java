@@ -17,6 +17,8 @@ import guideme.libs.micromark.Token;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+
 import org.jetbrains.annotations.Nullable;
 
 public final class MdxMdastExtension {
@@ -285,7 +287,7 @@ public final class MdxMdastExtension {
      * Serialize a tag, excluding attributes. `self-closing` is not supported, because we don’t need it yet.
      */
     private static String serializeAbbreviatedTag(Tag tag) {
-        return "<" + (tag.close ? '/' : "") + (Objects.requireNonNullElse(tag.name, "")) + ">";
+        return "<" + (tag.close ? '/' : "") + (Optional.ofNullable(tag.name).orElse("")) + ">";
     }
 
     private static class Tag {

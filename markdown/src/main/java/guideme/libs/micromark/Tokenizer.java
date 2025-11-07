@@ -1,13 +1,11 @@
 package guideme.libs.micromark;
 
+import com.github.bsideup.jabel.Desugar;
 import guideme.libs.micromark.symbol.Codes;
 import guideme.libs.unist.UnistPoint;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Stack;
+
+import java.util.*;
+
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -205,7 +203,7 @@ public class Tokenizer {
         /**
          * Interrupt is used for stuff right after a line of content.
          */
-        public Hook interrupt = constructFactory(Tokenizer.this::onsuccessfulcheck, Map.of("interrupt", true));
+        public Hook interrupt = constructFactory(Tokenizer.this::onsuccessfulcheck, Collections.singletonMap("interrupt", true));
     }
 
     /**
@@ -292,13 +290,13 @@ public class Tokenizer {
         State hook(List<Construct> constructs, State returnState, State bogusState);
 
         default State hook(Construct construct, State returnState, State bogusState) {
-            return hook(List.of(construct), returnState, bogusState);
+            return hook(Collections.singletonList(construct), returnState, bogusState);
         }
 
         default State hook(Map<Integer, List<Construct>> map, State returnState, State bogusState) {
             return code -> {
-                List<Construct> def = code != Codes.eof ? map.getOrDefault(code, List.of()) : List.of();
-                List<Construct> all = code != Codes.eof ? map.getOrDefault(Codes.eof, List.of()) : List.of();
+                List<Construct> def = code != Codes.eof ? map.getOrDefault(code, Collections.emptyList()) : Collections.emptyList();
+                List<Construct> all = code != Codes.eof ? map.getOrDefault(Codes.eof, Collections.emptyList()) : Collections.emptyList();
                 var list = new ArrayList<Construct>();
                 list.addAll(def);
                 list.addAll(all);
@@ -316,6 +314,7 @@ public class Tokenizer {
         void handle(Construct construct, Info info);
     }
 
+    @Desugar
     record Info(Runnable restore, int from) {
     }
 
@@ -484,6 +483,7 @@ public class Tokenizer {
     public static class ContainerState extends HashMap<String, Object> {
     }
 
+    @Desugar
     public record Event(EventType type, Token token, TokenizeContext context) {
         public static Event enter(Token token, TokenizeContext context) {
             return new Event(EventType.ENTER, token, context);

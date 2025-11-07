@@ -12,6 +12,8 @@ import guideme.libs.micromark.Types;
 import guideme.libs.micromark.symbol.Codes;
 import guideme.libs.micromark.symbol.Constants;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public final class Attention {
@@ -117,13 +119,13 @@ public final class Attention {
 
                         // If there are more markers in the opening, add them before.
                         if (openEvent.token().end.offset() - openEvent.token().start.offset() != 0) {
-                            nextEvents = ListUtils.push(nextEvents, List.of(
+                            nextEvents = ListUtils.push(nextEvents, ListUtils.of(
                                     Tokenizer.Event.enter(openEvent.token(), context),
                                     Tokenizer.Event.exit(openEvent.token(), context)));
                         }
 
                         // Opening.
-                        nextEvents = ListUtils.push(nextEvents, List.of(
+                        nextEvents = ListUtils.push(nextEvents, ListUtils.of(
                                 Tokenizer.Event.enter(group, context),
                                 Tokenizer.Event.enter(openingSequence, context),
                                 Tokenizer.Event.exit(openingSequence, context),
@@ -138,7 +140,7 @@ public final class Attention {
                                         context));
 
                         // Closing.
-                        nextEvents = ListUtils.push(nextEvents, List.of(
+                        nextEvents = ListUtils.push(nextEvents, ListUtils.of(
                                 Tokenizer.Event.exit(text, context),
                                 Tokenizer.Event.enter(closingSequence, context),
                                 Tokenizer.Event.exit(closingSequence, context),
@@ -147,7 +149,7 @@ public final class Attention {
                         // If there are more markers in the closing, add them after.
                         if (event.token().end.offset() - event.token().start.offset() != 0) {
                             offset = 2;
-                            nextEvents = ListUtils.push(nextEvents, List.of(
+                            nextEvents = ListUtils.push(nextEvents, ListUtils.of(
                                     Tokenizer.Event.enter(event.token(), context),
                                     Tokenizer.Event.exit(event.token(), context)));
                         } else {
@@ -214,7 +216,7 @@ public final class Attention {
 
         /**
          * Before a sequence.
-         * 
+         *
          * <pre>
          * > | **
          *     ^
@@ -231,7 +233,7 @@ public final class Attention {
 
         /**
          * In a sequence.
-         * 
+         *
          * <pre>
          * > | **
          *     ^^

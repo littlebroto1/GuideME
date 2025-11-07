@@ -1,16 +1,14 @@
 package guideme.libs.micromark.commonmark;
 
+import com.github.bsideup.jabel.Desugar;
 import guideme.libs.micromark.Assert;
 import guideme.libs.micromark.ListUtils;
 import guideme.libs.micromark.Token;
 import guideme.libs.micromark.Tokenizer;
 import guideme.libs.micromark.Types;
 import guideme.libs.micromark.symbol.Codes;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+
+import java.util.*;
 
 public final class Subtokenize {
     private Subtokenize() {
@@ -110,6 +108,7 @@ public final class Subtokenize {
         return !more;
     }
 
+    @Desugar
     record Jump(int first, int second) {
     }
 
@@ -122,7 +121,7 @@ public final class Subtokenize {
         var startPosition = eventIndex - 1;
         List<Integer> startPositions = new ArrayList<>();
         Assert.check(token.contentType != null, "expected 'contentType' on subtokens");
-        var tokenizer = Objects.requireNonNullElse(token._tokenizer,
+        var tokenizer = Optional.ofNullable(token._tokenizer).orElse(
                 context.getParser().get(token.contentType).create(token.start));
         var childEvents = tokenizer.getEvents();
         List<Jump> jumps = new ArrayList<>();

@@ -29,7 +29,7 @@ public class GfmTableSyntax extends Extension {
         var construct = new Construct();
         construct.tokenize = this::tokenizeTable;
         construct.resolve = this::resolveTable;
-        flow.put(Codes.eof, List.of(construct));
+        flow.put(Codes.eof, ListUtils.of(construct));
 
         this.nextPrefixedOrBlank = new Construct();
         this.nextPrefixedOrBlank.tokenize = this::tokenizeNextPrefixedOrBlank;
@@ -83,7 +83,7 @@ public class GfmTableSyntax extends Extension {
                     ListUtils.splice(events,
                             contentStart,
                             contentEnd - contentStart + 1,
-                            List.of(
+                            ListUtils.of(
                                     Tokenizer.Event.enter(content, context),
                                     Tokenizer.Event.enter(text, context),
                                     Tokenizer.Event.exit(text, context),
@@ -112,12 +112,12 @@ public class GfmTableSyntax extends Extension {
                         events,
                         index + (token.type.equals("tableCellDivider") ? 1 : 0),
                         0,
-                        List.of(Tokenizer.Event.exit(cell, context)));
+                        ListUtils.of(Tokenizer.Event.exit(cell, context)));
                 ListUtils.splice(
                         events,
                         cellStart,
                         0,
-                        List.of(Tokenizer.Event.enter(cell, context)));
+                        ListUtils.of(Tokenizer.Event.enter(cell, context)));
                 index += 2;
                 cellStart = index + 1;
                 seenCellInRow = true;

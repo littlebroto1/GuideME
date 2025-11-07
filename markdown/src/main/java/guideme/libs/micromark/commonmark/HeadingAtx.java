@@ -61,7 +61,7 @@ public final class HeadingAtx {
             text.end = events.get(contentEnd).token().end;
             text.contentType = ContentType.TEXT;
 
-            ListUtils.splice(events, contentStart, contentEnd - contentStart + 1, List.of(
+            ListUtils.splice(events, contentStart, contentEnd - contentStart + 1, ListUtils.of(
                     Tokenizer.Event.enter(content, context),
                     Tokenizer.Event.enter(text, context),
                     Tokenizer.Event.exit(text, context),

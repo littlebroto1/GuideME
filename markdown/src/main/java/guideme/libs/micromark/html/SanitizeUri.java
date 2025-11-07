@@ -2,9 +2,12 @@ package guideme.libs.micromark.html;
 
 import guideme.libs.micromark.CharUtil;
 import guideme.libs.micromark.symbol.Codes;
+
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +32,7 @@ public final class SanitizeUri {
      * @returns {string}
      */
     public static String sanitizeUri(String url, @Nullable Pattern protocol) {
-        var value = HtmlEncode.encode(normalizeUri(Objects.requireNonNullElse(url, "")));
+        var value = HtmlEncode.encode(normalizeUri(Optional.ofNullable(url).orElse("")));
 
         if (protocol == null) {
             return value;
@@ -55,7 +58,7 @@ public final class SanitizeUri {
         return "";
     }
 
-    private static final Predicate<String> ASCII_PATTERN = Pattern.compile("[!#$&-;=?-Z_a-z~]").asMatchPredicate();
+    private static final Predicate<String> ASCII_PATTERN = s -> s.matches("[!#$&-;=?-Z_a-z~]");
 
     /**
      * Normalize a URL (such as used in definitions).
@@ -106,7 +109,11 @@ public final class SanitizeUri {
 
             if (replace != null) {
                 result.append(value, start, index);
-                result.append(URLEncoder.encode(replace, StandardCharsets.UTF_8).replace("+", "%20"));
+                try {
+                    result.append(URLEncoder.encode(replace, StandardCharsets.UTF_8.name()).replace("+", "%20"));
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
                 start = index + skip + 1;
                 replace = null;
             }

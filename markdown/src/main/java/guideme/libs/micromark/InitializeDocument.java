@@ -1,5 +1,6 @@
 package guideme.libs.micromark;
 
+import com.github.bsideup.jabel.Desugar;
 import guideme.libs.micromark.factory.FactorySpace;
 import guideme.libs.micromark.symbol.Codes;
 import guideme.libs.micromark.symbol.Constants;
@@ -22,6 +23,7 @@ public final class InitializeDocument {
         containerConstruct.tokenize = InitializeDocument::tokenizeContainer;
     }
 
+    @Desugar
     record StackItem(Construct construct, Tokenizer.ContainerState stackState) {
     }
 
@@ -378,7 +380,7 @@ public final class InitializeDocument {
             if (childFlow == null) {
                 throw new IllegalStateException("expected 'childFlow' to be defined when closing it");
             }
-            childFlow.write(List.of(Codes.eof));
+            childFlow.write(ListUtils.of(Codes.eof));
             childToken = null;
             childFlow = null;
             context.getContainerState().remove("_closeFlow");

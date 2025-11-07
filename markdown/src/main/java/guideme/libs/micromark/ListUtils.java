@@ -1,8 +1,13 @@
 package guideme.libs.micromark;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 public final class ListUtils {
     private ListUtils() {
@@ -66,4 +71,23 @@ public final class ListUtils {
         }
         return listStack.remove(listStack.size() - 1);
     }
+
+    /**
+     * Returns an immutable empty list
+     */
+    public static <T> @UnmodifiableView @NotNull List<T> of() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Returns immutable list of arguments
+     */
+    public static <T> @UnmodifiableView @NotNull List<T> of(T... items) {
+        return Collections.unmodifiableList(Arrays.asList(items));
+    }
+
+    public static <T> T getLast(List<T> list) {
+        return list.get(list.size() - 1);
+    }
+
 }

@@ -5,12 +5,8 @@ import guideme.libs.micromark.NamedCharacterEntities;
 import guideme.libs.micromark.NormalizeIdentifier;
 import guideme.libs.micromark.Token;
 import guideme.libs.micromark.Tokenizer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+
+import java.util.*;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,7 +57,7 @@ public class HtmlCompiler {
      * that by tracking a stack of buffers, that can be opened (with `buffer`) and closed (with `resume`) to access
      * them.
      */
-    private final List<List<String>> buffers = new ArrayList<>(List.of(new ArrayList<>()));
+    private final List<List<String>> buffers = new ArrayList<>(ListUtils.of(new ArrayList<>()));
 
     /**
      * As we can have links in images and the other way around, where the deepest ones are closed first, we need to
@@ -450,7 +446,7 @@ public class HtmlCompiler {
     }
 
     private void lineEnding() {
-        raw(Objects.requireNonNullElse(lineEndingStyle, "\n"));
+        raw(Optional.ofNullable(lineEndingStyle).orElse("\n"));
     }
 
     private void lineEndingIfNeeded() {
@@ -570,7 +566,7 @@ public class HtmlCompiler {
     }
 
     private void onexitcodefencedfence() {
-        int count = Objects.requireNonNullElse(data.fencesCount, 0);
+        int count = Optional.ofNullable(data.fencesCount).orElse(0);
         if (count == 0) {
             tag(">");
             data.slurpOneLineEnding = true;
@@ -656,7 +652,7 @@ public class HtmlCompiler {
     private void onexitmedia() {
         var index = mediaStack.size() - 1; // Skip current.
         var media = mediaStack.get(index);
-        var id = Objects.requireNonNullElse(media.referenceId, media.labelId);
+        var id = Optional.ofNullable(media.referenceId).orElse(media.labelId);
         var context = media.destination == null ? definitions.get(NormalizeIdentifier.normalizeIdentifier(id)) : media;
         tags = true;
         while (index-- > 0) {
