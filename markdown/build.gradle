@@ -1,13 +1,33 @@
 
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
-group = "appeng.libs"
+group = "guideme.libs"
+version = "${markdown_version}"
 
-apply plugin: ProjectDefaultsPlugin
+
+
+//apply plugin: ProjectDefaultsPlugin
+
+repositories {
+    mavenCentral()
+}
+
+configure([tasks.compileJava]) {
+    sourceCompatibility = 16 // for the IDE support
+    options.release = 8
+
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(16)
+    }
+}
 
 dependencies {
+    annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.4.2'
+    compileOnly 'com.github.bsideup.jabel:jabel-javac-plugin:0.4.2'
+
     implementation 'org.slf4j:slf4j-api:1.7.36'
 
     compileOnly 'org.jetbrains:annotations:23.0.0'
@@ -23,6 +43,9 @@ dependencies {
     testRuntimeOnly "org.slf4j:slf4j-simple:1.7.36"
 }
 
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
 jar {
     manifest {
         attributes('FMLModType': 'LIBRARY')
@@ -31,4 +54,18 @@ jar {
 
 test {
     useJUnitPlatform()
+}
+
+//////////////////
+// Maven publish
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = "markdown"
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
 }
