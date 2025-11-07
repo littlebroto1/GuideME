@@ -1,5 +1,22 @@
 package guideme.internal.screen;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec2;
+
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
+
 import guideme.color.SymbolicColor;
 import guideme.document.LytPoint;
 import guideme.document.LytRect;
@@ -13,22 +30,9 @@ import guideme.navigation.NavigationNode;
 import guideme.navigation.NavigationTree;
 import guideme.render.SimpleRenderContext;
 import guideme.ui.GuideUiHost;
-import java.util.ArrayList;
-import java.util.List;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec2;
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 public class GuideNavBar extends AbstractWidget {
+
     public static final int WIDTH_OPEN = 150;
     public static final int WIDTH_CLOSED = 15;
     private static final int CHILD_ROW_INDENT = 10;
@@ -36,11 +40,11 @@ public class GuideNavBar extends AbstractWidget {
     private static boolean neverInteracted = true;
 
     private final Transition widthTransition = new Transition(
-            WIDTH_CLOSED,
-            WIDTH_OPEN,
-            0.1,
-            () -> width,
-            value -> width = (int) Math.round(value));
+        WIDTH_CLOSED,
+        WIDTH_OPEN,
+        0.1,
+        () -> width,
+        value -> width = (int) Math.round(value));
 
     private NavigationTree navTree;
 
@@ -59,8 +63,7 @@ public class GuideNavBar extends AbstractWidget {
     }
 
     @Override
-    public void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
+    public void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     @Override
     public void onClick(MouseButtonEvent event, boolean doubleClick) {
@@ -73,7 +76,8 @@ public class GuideNavBar extends AbstractWidget {
             row.expanded = !row.expanded;
             updateLayout();
 
-            var handler = Minecraft.getInstance().getSoundManager();
+            var handler = Minecraft.getInstance()
+                .getSoundManager();
             handler.play(SimpleSoundInstance.forUI(GuideMEClient.GUIDE_CLICK_EVENT, 1.0F));
             if (row.node.pageId() != null) {
                 screen.navigateTo(row.node.pageId());
@@ -108,7 +112,9 @@ public class GuideNavBar extends AbstractWidget {
 
     private void setScrollOffset(int offset) {
         var maxScrollOffset = 0;
-        var visibleRows = rows.stream().filter(Row::isVisible).toList();
+        var visibleRows = rows.stream()
+            .filter(Row::isVisible)
+            .toList();
         if (!visibleRows.isEmpty()) {
             var contentHeight = visibleRows.getLast().bottom - visibleRows.getFirst().top;
             maxScrollOffset = Math.max(0, contentHeight - height);
@@ -120,7 +126,8 @@ public class GuideNavBar extends AbstractWidget {
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
 
         // Check if we need to re-layout
-        var currentNavTree = screen.getGuide().getNavigationTree();
+        var currentNavTree = screen.getGuide()
+            .getNavigationTree();
         if (currentNavTree != this.navTree) {
             recreateRows();
         }
@@ -142,8 +149,9 @@ public class GuideNavBar extends AbstractWidget {
 
         double currentTime = GLFW.glfwGetTime();
 
-        boolean containsMouse = (mouseX >= getX() && mouseY >= getY() && mouseX < getX() + width
-                && mouseY <= getY() + height);
+        boolean containsMouse = (mouseX >= getX() && mouseY >= getY()
+            && mouseX < getX() + width
+            && mouseY <= getY() + height);
         switch (state) {
             case CLOSED -> {
                 if (containsMouse) {
@@ -192,8 +200,13 @@ public class GuideNavBar extends AbstractWidget {
         updateMousePos(mouseX, mouseY);
 
         if (state == State.CLOSED) {
-            renderContext.fillGradientHorizontal(getX(), getY(), width, height, SymbolicColor.NAVBAR_BG_TOP,
-                    SymbolicColor.NAVBAR_BG_BOTTOM);
+            renderContext.fillGradientHorizontal(
+                getX(),
+                getY(),
+                width,
+                height,
+                SymbolicColor.NAVBAR_BG_TOP,
+                SymbolicColor.NAVBAR_BG_BOTTOM);
 
             var p1 = new Vec2(width - WIDTH_CLOSED + WIDTH_CLOSED - 4, height / 2f);
             var p2 = new Vec2(width - WIDTH_CLOSED + 4, height / 2f - 5);
@@ -201,8 +214,13 @@ public class GuideNavBar extends AbstractWidget {
 
             renderContext.fillTriangle(p1, p2, p3, SymbolicColor.NAVBAR_EXPAND_ARROW);
         } else if (!isPinned()) {
-            renderContext.fillGradientVertical(getX(), getY(), width, height, SymbolicColor.NAVBAR_BG_TOP,
-                    SymbolicColor.NAVBAR_BG_BOTTOM);
+            renderContext.fillGradientVertical(
+                getX(),
+                getY(),
+                width,
+                height,
+                SymbolicColor.NAVBAR_BG_TOP,
+                SymbolicColor.NAVBAR_BG_BOTTOM);
         }
 
         if (state != State.CLOSED) {
@@ -229,9 +247,11 @@ public class GuideNavBar extends AbstractWidget {
                 row.paragraph.render(renderContext);
 
                 if (row.hasChildren) {
-                    float x = row.getBounds().x();
+                    float x = row.getBounds()
+                        .x();
                     x += 5;
-                    float y = row.getBounds().y();
+                    float y = row.getBounds()
+                        .y();
                     y += 2f;
                     Vec2 p1, p2, p3;
                     if (row.expanded) {
@@ -252,9 +272,15 @@ public class GuideNavBar extends AbstractWidget {
 
                 var icon = row.node.icon();
                 if (!icon.isEmpty()) {
-                    renderContext.renderItem(icon, row.paragraph.getBounds().x() - 9, row.paragraph.getBounds().y(), 1,
-                            8,
-                            8);
+                    renderContext.renderItem(
+                        icon,
+                        row.paragraph.getBounds()
+                            .x() - 9,
+                        row.paragraph.getBounds()
+                            .y(),
+                        1,
+                        8,
+                        8);
                 }
             }
 
@@ -297,7 +323,8 @@ public class GuideNavBar extends AbstractWidget {
     }
 
     private void recreateRows() {
-        this.navTree = screen.getGuide().getNavigationTree();
+        this.navTree = screen.getGuide()
+            .getNavigationTree();
         // Save Freeze expanded / scroll position
         this.rows.clear();
 
@@ -336,7 +363,8 @@ public class GuideNavBar extends AbstractWidget {
                 indent = 0;
             }
 
-            if (!row.node.icon().isEmpty()) {
+            if (!row.node.icon()
+                .isEmpty()) {
                 indent += 8; // Indent for icon;
             }
 
@@ -358,8 +386,7 @@ public class GuideNavBar extends AbstractWidget {
             return null;
         }
 
-        if (screenX >= getX() && screenX < getX() + width
-                && screenY >= getY() && screenY < getY() + height) {
+        if (screenX >= getX() && screenX < getX() + width && screenY >= getY() && screenY < getY() + height) {
             var vpX = (int) Math.round(screenX - getX());
             var vpY = (int) Math.round(screenY + scrollOffset - getY());
             return new LytPoint(vpX, vpY);
@@ -382,6 +409,7 @@ public class GuideNavBar extends AbstractWidget {
     }
 
     private class Row {
+
         private final NavigationNode node;
         private final LytParagraph paragraph = new LytParagraph();
         public final LytFlowSpan span;

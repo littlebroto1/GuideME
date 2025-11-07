@@ -1,10 +1,12 @@
 package guideme.layout;
 
-import guideme.style.ResolvedTextStyle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 
+import guideme.style.ResolvedTextStyle;
+
 public class MinecraftFontMetrics implements FontMetrics {
+
     private final Font font;
 
     public MinecraftFontMetrics() {
@@ -16,8 +18,10 @@ public class MinecraftFontMetrics implements FontMetrics {
     }
 
     public float getAdvance(int codePoint, ResolvedTextStyle style) {
-        return font.getGlyphSource(style.font()).getGlyph(codePoint)
-                .info().getAdvance(style.bold());
+        return font.getGlyphSource(style.font())
+            .getGlyph(codePoint)
+            .info()
+            .getAdvance(style.bold());
     }
 
     public int getLineHeight(ResolvedTextStyle style) {

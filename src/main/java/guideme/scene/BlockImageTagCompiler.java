@@ -1,5 +1,9 @@
 package guideme.scene;
 
+import java.util.Set;
+
+import net.minecraft.core.BlockPos;
+
 import guideme.compiler.PageCompiler;
 import guideme.compiler.tags.BlockTagCompiler;
 import guideme.compiler.tags.MdxAttrs;
@@ -7,8 +11,6 @@ import guideme.document.block.LytBlockContainer;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
 import guideme.libs.mdast.model.MdAstNode;
 import guideme.scene.level.GuidebookLevel;
-import java.util.Set;
-import net.minecraft.core.BlockPos;
 
 /**
  * Handles tags like <code>&lt;BlockImage id="mod:blockid" /&gt;</code> and renders a 3D block image in its place.
@@ -35,7 +37,8 @@ public class BlockImageTagCompiler extends BlockTagCompiler {
             return;
         }
 
-        var state = pair.getRight().defaultBlockState();
+        var state = pair.getRight()
+            .defaultBlockState();
         state = MdxAttrs.applyBlockStateProperties(compiler, parent, el, state);
 
         var level = new GuidebookLevel();

@@ -1,17 +1,21 @@
 package guideme.internal.screen;
 
-import guideme.Guide;
-import guideme.PageAnchor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import net.minecraft.resources.ResourceLocation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import guideme.Guide;
+import guideme.PageAnchor;
+
 public class GlobalInMemoryHistory implements GuideScreenHistory {
+
     private static final int HISTORY_SIZE = 100;
     private static final Logger LOG = LoggerFactory.getLogger(GlobalInMemoryHistory.class);
 
@@ -39,7 +43,9 @@ public class GlobalInMemoryHistory implements GuideScreenHistory {
         LOG.debug("Pushing {} to history of {}", anchor, guideId);
 
         // If we're on the same page, replace the anchor
-        if (historyPosition < history.size() && history.get(historyPosition).pageId().equals(anchor.pageId())) {
+        if (historyPosition < history.size() && history.get(historyPosition)
+            .pageId()
+            .equals(anchor.pageId())) {
             LOG.debug("Replacing {} with {}", history.get(historyPosition), anchor);
             history.set(historyPosition, anchor);
             return; // Don't duplicate entries

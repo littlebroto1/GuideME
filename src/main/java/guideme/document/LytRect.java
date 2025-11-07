@@ -1,6 +1,7 @@
 package guideme.document;
 
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+
 import org.joml.Matrix3x2fc;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
@@ -26,11 +27,7 @@ public record LytRect(int x, int y, int width, int height) {
     }
 
     public LytRect shrink(int left, int top, int right, int bottom) {
-        return new LytRect(
-                x + left,
-                y + top,
-                Math.max(width - left - right, 0),
-                Math.max(height - top - bottom, 0));
+        return new LytRect(x + left, y + top, Math.max(width - left - right, 0), Math.max(height - top - bottom, 0));
     }
 
     public LytRect expand(int amount) {
@@ -38,11 +35,7 @@ public record LytRect(int x, int y, int width, int height) {
     }
 
     public LytRect expand(int left, int top, int right, int bottom) {
-        return new LytRect(
-                x - left,
-                y - top,
-                Math.max(width + left + right, 0),
-                Math.max(height + top + bottom, 0));
+        return new LytRect(x - left, y - top, Math.max(width + left + right, 0), Math.max(height + top + bottom, 0));
     }
 
     public LytRect withWidth(int width) {
@@ -85,20 +78,15 @@ public record LytRect(int x, int y, int width, int height) {
         int right = Math.max(a.right(), b.right());
         int bottom = Math.max(a.bottom(), b.bottom());
 
-        return new LytRect(
-                x, y,
-                right - x,
-                bottom - y);
+        return new LytRect(x, y, right - x, bottom - y);
     }
 
     public boolean contains(LytPoint point) {
-        return point.x() >= this.x && point.x() < right() &&
-                point.y() >= this.y && point.y() < bottom();
+        return point.x() >= this.x && point.x() < right() && point.y() >= this.y && point.y() < bottom();
     }
 
     public boolean contains(int x, int y) {
-        return x >= this.x && x < right() &&
-                y >= this.y && y < bottom();
+        return x >= this.x && x < right() && y >= this.y && y < bottom();
     }
 
     public boolean intersects(LytRect other) {
@@ -125,10 +113,10 @@ public record LytRect(int x, int y, int width, int height) {
         var width = Math.ceil(tmp.x - left);
         var height = Math.ceil(tmp.y - top);
         return new LytRect(
-                (int) Math.floor(left),
-                (int) Math.floor(top),
-                (int) Math.ceil(width),
-                (int) Math.ceil(height));
+            (int) Math.floor(left),
+            (int) Math.floor(top),
+            (int) Math.ceil(width),
+            (int) Math.ceil(height));
     }
 
     public LytSize size() {

@@ -1,5 +1,24 @@
 package guideme.compiler;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+
+import net.minecraft.ResourceLocationException;
+import net.minecraft.resources.ResourceLocation;
+
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import guideme.GuidePage;
 import guideme.PageAnchor;
 import guideme.PageCollection;
@@ -67,24 +86,9 @@ import guideme.libs.micromark.extensions.gfmstrikethrough.GfmStrikethroughSyntax
 import guideme.libs.unist.UnistNode;
 import guideme.style.TextAlignment;
 import guideme.style.WhiteSpaceMode;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import net.minecraft.ResourceLocationException;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class PageCompiler {
+
     private static final Logger LOG = LoggerFactory.getLogger(PageCompiler.class);
 
     /**
@@ -105,8 +109,7 @@ public final class PageCompiler {
     private final Map<State<?>, Object> compilerState = new IdentityHashMap<>();
 
     public PageCompiler(PageCollection pages, ExtensionCollection extensions, String sourcePack,
-            ResourceLocation pageId,
-            String pageContent) {
+        ResourceLocation pageId, String pageContent) {
         this.pages = pages;
         this.extensions = extensions;
         this.sourcePack = sourcePack;
@@ -127,7 +130,7 @@ public final class PageCompiler {
     }
 
     public static ParsedGuidePage parse(String sourcePack, String language, ResourceLocation id, InputStream in)
-            throws IOException {
+        throws IOException {
         String pageContent = new String(in.readAllBytes(), StandardCharsets.UTF_8);
         return parse(sourcePack, language, id, pageContent);
     }
@@ -141,15 +144,14 @@ public final class PageCompiler {
         // Normalize line ending
         pageContent = pageContent.replaceAll("\\r\\n?", "\n");
 
-        var options = new MdastOptions()
-                .withSyntaxExtension(MdxSyntax.INSTANCE)
-                .withSyntaxExtension(YamlFrontmatterSyntax.INSTANCE)
-                .withSyntaxExtension(GfmTableSyntax.INSTANCE)
-                .withSyntaxExtension(GfmStrikethroughSyntax.INSTANCE)
-                .withMdastExtension(MdxMdastExtension.INSTANCE)
-                .withMdastExtension(YamlFrontmatterExtension.INSTANCE)
-                .withMdastExtension(GfmTableMdastExtension.INSTANCE)
-                .withMdastExtension(GfmStrikethroughMdastExtension.INSTANCE);
+        var options = new MdastOptions().withSyntaxExtension(MdxSyntax.INSTANCE)
+            .withSyntaxExtension(YamlFrontmatterSyntax.INSTANCE)
+            .withSyntaxExtension(GfmTableSyntax.INSTANCE)
+            .withSyntaxExtension(GfmStrikethroughSyntax.INSTANCE)
+            .withMdastExtension(MdxMdastExtension.INSTANCE)
+            .withMdastExtension(YamlFrontmatterExtension.INSTANCE)
+            .withMdastExtension(GfmTableMdastExtension.INSTANCE)
+            .withMdastExtension(GfmStrikethroughMdastExtension.INSTANCE);
 
         MdAstRoot astRoot;
         try {
@@ -157,11 +159,19 @@ public final class PageCompiler {
         } catch (ParseException e) {
             var position = "";
             if (e.getFrom() != null) {
-                position = " at line " + e.getFrom().line() + " column " + e.getFrom().column();
+                position = " at line " + e.getFrom()
+                    .line()
+                    + " column "
+                    + e.getFrom()
+                        .column();
             }
-            var errorMessage = String.format(Locale.ROOT,
-                    "Failed to parse GuideME page %s (lang: %s)%s from resource pack %s",
-                    id, language, position, sourcePack);
+            var errorMessage = String.format(
+                Locale.ROOT,
+                "Failed to parse GuideME page %s (lang: %s)%s from resource pack %s",
+                id,
+                language,
+                position,
+                sourcePack);
             LOG.error("{}", errorMessage, e);
             astRoot = buildErrorPage(errorMessage + ": \n" + e);
         }
@@ -196,7 +206,7 @@ public final class PageCompiler {
     public static GuidePage compile(PageCollection pages, ExtensionCollection extensions, ParsedGuidePage parsedPage) {
         // Translate page tree over to layout pages
         var document = new PageCompiler(pages, extensions, parsedPage.sourcePack, parsedPage.id, parsedPage.source)
-                .compile(parsedPage.astRoot);
+            .compile(parsedPage.astRoot);
 
         return new GuidePage(parsedPage.sourcePack, parsedPage.id, document);
     }
@@ -251,7 +261,9 @@ public final class PageCompiler {
                 layoutChild = compileList(astList);
             } else if (child instanceof MdAstCode astCode) {
                 var paragraph = new LytParagraph();
-                paragraph.modifyStyle(style -> style.italic(true).whiteSpace(WhiteSpaceMode.PRE));
+                paragraph.modifyStyle(
+                    style -> style.italic(true)
+                        .whiteSpace(WhiteSpaceMode.PRE));
                 paragraph.setMarginLeft(5);
                 paragraph.appendText(astCode.value);
                 layoutChild = paragraph;
@@ -395,7 +407,9 @@ public final class PageCompiler {
         } else if (content instanceof MdAstInlineCode astCode) {
             var text = new LytFlowText();
             text.setText(astCode.value);
-            text.modifyStyle(style -> style.italic(true).whiteSpace(WhiteSpaceMode.PRE));
+            text.modifyStyle(
+                style -> style.italic(true)
+                    .whiteSpace(WhiteSpaceMode.PRE));
             layoutChild = text;
         } else if (content instanceof MdAstStrong astStrong) {
             var span = new LytFlowSpan();
@@ -444,6 +458,7 @@ public final class PageCompiler {
         }
         if (astLink.url != null && !astLink.url.isEmpty()) {
             LinkParser.parseLink(this, astLink.url, new LinkParser.Visitor() {
+
                 @Override
                 public void handlePage(PageAnchor page) {
                     link.setPageLink(page);
@@ -492,9 +507,11 @@ public final class PageCompiler {
 
     public LytFlowContent createErrorFlowContent(String text, UnistNode child) {
         LytFlowSpan span = new LytFlowSpan();
-        span.modifyStyle(style -> {
-            style.color(SymbolicColor.ERROR_TEXT).whiteSpace(WhiteSpaceMode.PRE);
-        });
+        span.modifyStyle(
+            style -> {
+                style.color(SymbolicColor.ERROR_TEXT)
+                    .whiteSpace(WhiteSpaceMode.PRE);
+            });
 
         // Find the position in the source
         var position = child.position();
@@ -562,6 +579,5 @@ public final class PageCompiler {
         compilerState.remove(state);
     }
 
-    public record State<T>(String name, Class<T> dataClass, T defaultValue) {
-    }
+    public record State<T> (String name, Class<T> dataClass, T defaultValue) {}
 }

@@ -1,27 +1,31 @@
 package guideme.style;
 
-import guideme.color.ColorValue;
 import net.minecraft.network.chat.FontDescription;
+
 import org.jetbrains.annotations.Nullable;
+
+import guideme.color.ColorValue;
 
 /**
  * A text style that only contains a subset of properties found in {@link ResolvedTextStyle}.
  */
-public record TextStyle(
-        @Nullable Float fontScale,
-        @Nullable Boolean bold,
-        @Nullable Boolean italic,
-        @Nullable Boolean underlined,
-        @Nullable Boolean strikethrough,
-        @Nullable Boolean obfuscated,
-        @Nullable FontDescription font,
-        @Nullable ColorValue color,
-        @Nullable WhiteSpaceMode whiteSpace,
-        @Nullable TextAlignment alignment,
-        @Nullable Boolean dropShadow) {
+public record TextStyle(@Nullable Float fontScale, @Nullable Boolean bold, @Nullable Boolean italic,
+    @Nullable Boolean underlined, @Nullable Boolean strikethrough, @Nullable Boolean obfuscated,
+    @Nullable FontDescription font, @Nullable ColorValue color, @Nullable WhiteSpaceMode whiteSpace,
+    @Nullable TextAlignment alignment, @Nullable Boolean dropShadow) {
 
-    public static final TextStyle EMPTY = new TextStyle(null, null, null, null, null, null, null, null, null, null,
-            null);
+    public static final TextStyle EMPTY = new TextStyle(
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null);
 
     public ResolvedTextStyle mergeWith(ResolvedTextStyle base) {
         var fontScale = this.fontScale != null ? this.fontScale : base.fontScale();
@@ -36,17 +40,17 @@ public record TextStyle(
         var alignment = this.alignment != null ? this.alignment : base.alignment();
         var dropShadow = this.dropShadow != null ? this.dropShadow : base.dropShadow();
         return new ResolvedTextStyle(
-                fontScale,
-                bold,
-                italic,
-                underlined,
-                strikethrough,
-                obfuscated,
-                font,
-                color,
-                whiteSpace,
-                alignment,
-                dropShadow);
+            fontScale,
+            bold,
+            italic,
+            underlined,
+            strikethrough,
+            obfuscated,
+            font,
+            color,
+            whiteSpace,
+            alignment,
+            dropShadow);
     }
 
     public Builder toBuilder() {
@@ -70,6 +74,7 @@ public record TextStyle(
     }
 
     public static class Builder {
+
         private Float fontScale;
         private Boolean bold;
         private Boolean italic;
@@ -175,17 +180,18 @@ public record TextStyle(
         }
 
         public TextStyle build() {
-            return new TextStyle(fontScale,
-                    bold,
-                    italic,
-                    underlined,
-                    strikethrough,
-                    obfuscated,
-                    font,
-                    color,
-                    whiteSpace,
-                    alignment,
-                    dropShadow);
+            return new TextStyle(
+                fontScale,
+                bold,
+                italic,
+                underlined,
+                strikethrough,
+                obfuscated,
+                font,
+                color,
+                whiteSpace,
+                alignment,
+                dropShadow);
         }
     }
 }

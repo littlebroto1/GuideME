@@ -1,5 +1,21 @@
 package guideme.scene;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.HitResult;
+
+import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix3x2f;
+import org.joml.Vector2i;
+
 import guideme.color.ColorValue;
 import guideme.color.LightDarkMode;
 import guideme.color.SymbolicColor;
@@ -25,24 +41,12 @@ import guideme.scene.annotation.InWorldAnnotation;
 import guideme.scene.annotation.InWorldBoxAnnotation;
 import guideme.scene.annotation.SceneAnnotation;
 import guideme.ui.GuideUiHost;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.input.MouseButtonInfo;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.HitResult;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix3x2f;
-import org.joml.Vector2i;
 
 /**
  * Shows a pseudo-in-world scene within the guidebook.
  */
 public class LytGuidebookScene extends LytBox {
+
     @Nullable
     private GuidebookScene scene;
     private boolean interactive;
@@ -82,21 +86,26 @@ public class LytGuidebookScene extends LytBox {
         }));
         zoomInButton = new LytWidget(new GuideIconButton(0, 0, GuideIconButton.Role.ZOOM_IN, () -> {
             if (scene != null) {
-                var currentZoom = scene.getCameraSettings().getZoom();
+                var currentZoom = scene.getCameraSettings()
+                    .getZoom();
                 currentZoom = Mth.clamp(currentZoom + 0.5f, 0.1f, 8f);
-                scene.getCameraSettings().setZoom(currentZoom);
+                scene.getCameraSettings()
+                    .setZoom(currentZoom);
             }
         }));
         zoomOutButton = new LytWidget(new GuideIconButton(0, 0, GuideIconButton.Role.ZOOM_OUT, () -> {
             if (scene != null) {
-                var currentZoom = scene.getCameraSettings().getZoom();
+                var currentZoom = scene.getCameraSettings()
+                    .getZoom();
                 currentZoom = Mth.clamp(currentZoom - 0.5f, 0.1f, 8f);
-                scene.getCameraSettings().setZoom(currentZoom);
+                scene.getCameraSettings()
+                    .setZoom(currentZoom);
             }
         }));
         resetViewButton = new LytWidget(new GuideIconButton(0, 0, GuideIconButton.Role.RESET_VIEW, () -> {
             if (scene != null) {
-                scene.getCameraSettings().restore(initialCameraSettings);
+                scene.getCameraSettings()
+                    .restore(initialCameraSettings);
             }
         }));
     }
@@ -110,7 +119,8 @@ public class LytGuidebookScene extends LytBox {
         this.scene = scene;
         viewport.setHoveredAnnotation(null);
         if (scene != null) {
-            initialCameraSettings = scene.getCameraSettings().save();
+            initialCameraSettings = scene.getCameraSettings()
+                .save();
         } else {
             initialCameraSettings = new SavedCameraSettings();
         }
@@ -124,7 +134,10 @@ public class LytGuidebookScene extends LytBox {
             return;
         }
 
-        if (!scene.getInWorldAnnotations().isEmpty() || !scene.getOverlayAnnotations().isEmpty()) {
+        if (!scene.getInWorldAnnotations()
+            .isEmpty()
+            || !scene.getOverlayAnnotations()
+                .isEmpty()) {
             this.toolbar.append(hideAnnotationsButton);
         }
         this.toolbar.append(zoomInButton);
@@ -137,8 +150,8 @@ public class LytGuidebookScene extends LytBox {
         var prefSceneSize = viewport.getPreferredSize();
 
         prefSceneSize = new LytSize(
-                prefSceneSize.width() + paddingLeft + paddingRight,
-                prefSceneSize.height() + paddingTop + paddingBottom);
+            prefSceneSize.width() + paddingLeft + paddingRight,
+            prefSceneSize.height() + paddingTop + paddingBottom);
 
         // Clamp width to available width
         var sceneWidth = fullWidth ? availableWidth : Math.min(prefSceneSize.width(), availableWidth);
@@ -163,9 +176,7 @@ public class LytGuidebookScene extends LytBox {
         var viewportBounds = new LytRect(x, y, sceneWidth, sceneHeight);
         viewport.setBounds(viewportBounds);
 
-        return LytRect.union(
-                viewportBounds,
-                toolbarBounds);
+        return LytRect.union(viewportBounds, toolbarBounds);
     }
 
     public void setInteractive(boolean interactive) {
@@ -214,12 +225,19 @@ public class LytGuidebookScene extends LytBox {
         try (var osr = new OffScreenRenderer(width, height)) {
             return osr.captureAsPng(() -> {
                 var renderer = GuidebookLevelRenderer.getInstance();
-                scene.getCameraSettings().setViewportSize(prefSize);
+                scene.getCameraSettings()
+                    .setViewportSize(prefSize);
                 var annotations = hideAnnotations ? Collections.<InWorldAnnotation>emptyList()
-                        : scene.getInWorldAnnotations();
-                var buffers = Minecraft.getInstance().renderBuffers().bufferSource();
-                renderer.render(scene.getLevel(), scene.getCameraSettings(), buffers, annotations,
-                        LightDarkMode.LIGHT_MODE);
+                    : scene.getInWorldAnnotations();
+                var buffers = Minecraft.getInstance()
+                    .renderBuffers()
+                    .bufferSource();
+                renderer.render(
+                    scene.getLevel(),
+                    scene.getCameraSettings(),
+                    buffers,
+                    annotations,
+                    LightDarkMode.LIGHT_MODE);
                 buffers.endBatch();
             });
         }
@@ -251,7 +269,8 @@ public class LytGuidebookScene extends LytBox {
     private LytVisitor.Result visitAnnotations(Collection<? extends SceneAnnotation> annotations, LytVisitor visitor) {
         for (var annotation : annotations) {
             if (annotation.getTooltip() instanceof ContentTooltip contentTooltip) {
-                if (contentTooltip.getContent().visit(visitor, true) == LytVisitor.Result.STOP) {
+                if (contentTooltip.getContent()
+                    .visit(visitor, true) == LytVisitor.Result.STOP) {
                     return LytVisitor.Result.STOP;
                 }
             }
@@ -261,6 +280,7 @@ public class LytGuidebookScene extends LytBox {
     }
 
     class Viewport extends LytBlock implements InteractiveElement {
+
         @Nullable
         private SceneAnnotation hoveredAnnotation;
 
@@ -283,8 +303,7 @@ public class LytGuidebookScene extends LytBox {
         }
 
         @Override
-        protected void onLayoutMoved(int deltaX, int deltaY) {
-        }
+        protected void onLayoutMoved(int deltaX, int deltaY) {}
 
         @Override
         public void render(RenderContext context) {
@@ -296,13 +315,16 @@ public class LytGuidebookScene extends LytBox {
                 return;
             }
 
-            var screenBounds = bounds.toScreenRectangle().transformMaxBounds(context.poseStack());
-            var scissorArea = context.guiGraphics().peekScissorStack();
+            var screenBounds = bounds.toScreenRectangle()
+                .transformMaxBounds(context.poseStack());
+            var scissorArea = context.guiGraphics()
+                .peekScissorStack();
             // Pre-apply scissor area
             screenBounds = scissorArea != null ? scissorArea.intersection(screenBounds) : screenBounds;
             if (screenBounds != null) {
                 GuiGraphics guiGraphics = context.guiGraphics();
-                guiGraphics.submitPictureInPictureRenderState(new ScenePictureInPictureRenderer.State(
+                guiGraphics.submitPictureInPictureRenderState(
+                    new ScenePictureInPictureRenderer.State(
                         context.lightDarkMode(),
                         new Matrix3x2f(context.poseStack()),
                         bounds.x(),
@@ -320,15 +342,14 @@ public class LytGuidebookScene extends LytBox {
             }
         }
 
-        private void renderViewport(LightDarkMode lightDarkMode,
-                MultiBufferSource.BufferSource buffers) {
+        private void renderViewport(LightDarkMode lightDarkMode, MultiBufferSource.BufferSource buffers) {
             var renderer = GuidebookLevelRenderer.getInstance();
 
             Collection<InWorldAnnotation> inWorldAnnotations;
             if (hideAnnotations) {
                 // We still show transient annotations even if static annotations are hidden
                 if (transientHoveredAnnotation
-                        && hoveredAnnotation instanceof InWorldAnnotation hoveredInWorldAnnotation) {
+                    && hoveredAnnotation instanceof InWorldAnnotation hoveredInWorldAnnotation) {
                     inWorldAnnotations = Collections.singletonList(hoveredInWorldAnnotation);
                 } else {
                     inWorldAnnotations = Collections.emptyList();
@@ -336,8 +357,7 @@ public class LytGuidebookScene extends LytBox {
             } else {
                 inWorldAnnotations = scene.getInWorldAnnotations();
             }
-            renderer.render(scene.getLevel(), scene.getCameraSettings(), buffers, inWorldAnnotations,
-                    lightDarkMode);
+            renderer.render(scene.getLevel(), scene.getCameraSettings(), buffers, inWorldAnnotations, lightDarkMode);
 
             renderDebugCrosshairs();
         }
@@ -346,7 +366,8 @@ public class LytGuidebookScene extends LytBox {
          * Render one in 3D space at 0,0,0.
          */
         private void renderDebugCrosshairs() {
-            if (!GuideMEClient.instance().isShowDebugGuiOverlays()) {
+            if (!GuideMEClient.instance()
+                .isShowDebugGuiOverlays()) {
                 return;
             }
 
@@ -384,7 +405,8 @@ public class LytGuidebookScene extends LytBox {
 
             var hitResult = scene.pickBlock(docPoint, bounds);
             if (hitResult.getType() == HitResult.Type.BLOCK) {
-                var blockState = scene.getLevel().getBlockState(hitResult.getBlockPos());
+                var blockState = scene.getLevel()
+                    .getBlockState(hitResult.getBlockPos());
 
                 for (var strategy : extensions.get(ImplicitAnnotationStrategy.EXTENSION_POINT)) {
                     annotation = strategy.getAnnotation(scene.getLevel(), blockState, hitResult);
@@ -394,9 +416,12 @@ public class LytGuidebookScene extends LytBox {
                 }
 
                 if (annotation == null) {
-                    annotation = InWorldBoxAnnotation.forBlock(hitResult.getBlockPos(),
-                            SymbolicColor.IN_WORLD_BLOCK_HIGHLIGHT);
-                    annotation.setTooltipContent(Component.translatable(blockState.getBlock().getDescriptionId()));
+                    annotation = InWorldBoxAnnotation
+                        .forBlock(hitResult.getBlockPos(), SymbolicColor.IN_WORLD_BLOCK_HIGHLIGHT);
+                    annotation.setTooltipContent(
+                        Component.translatable(
+                            blockState.getBlock()
+                                .getDescriptionId()));
                 }
                 setTransientHoveredAnnotation(annotation);
 
@@ -445,11 +470,15 @@ public class LytGuidebookScene extends LytBox {
                 var dx = x - pointDown.x;
                 var dy = y - pointDown.y;
                 if (buttonDown == 0) {
-                    scene.getCameraSettings().setRotationY(initialRotY + dx);
-                    scene.getCameraSettings().setRotationX(initialRotX + dy);
+                    scene.getCameraSettings()
+                        .setRotationY(initialRotY + dx);
+                    scene.getCameraSettings()
+                        .setRotationX(initialRotX + dy);
                 } else if (buttonDown == 1) {
-                    scene.getCameraSettings().setOffsetX(initialTransX + dx);
-                    scene.getCameraSettings().setOffsetY(initialTransY - dy);
+                    scene.getCameraSettings()
+                        .setOffsetX(initialTransX + dx);
+                    scene.getCameraSettings()
+                        .setOffsetY(initialTransY - dy);
                 }
 
                 return true;
@@ -503,7 +532,8 @@ public class LytGuidebookScene extends LytBox {
         public void setBounds(LytRect bounds) {
             this.bounds = bounds;
             if (scene != null) {
-                scene.getCameraSettings().setViewportSize(bounds.size());
+                scene.getCameraSettings()
+                    .setViewportSize(bounds.size());
             }
         }
 
@@ -513,10 +543,13 @@ public class LytGuidebookScene extends LytBox {
             }
 
             // Compute bounds using the *initial* camera settings
-            var current = scene.getCameraSettings().save();
-            scene.getCameraSettings().restore(initialCameraSettings);
+            var current = scene.getCameraSettings()
+                .save();
+            scene.getCameraSettings()
+                .restore(initialCameraSettings);
             var screenBounds = scene.getScreenBounds();
-            scene.getCameraSettings().restore(current);
+            scene.getCameraSettings()
+                .restore(current);
 
             var width = (int) Math.ceil(Math.abs(screenBounds.z - screenBounds.x));
             var height = (int) Math.ceil(Math.abs(screenBounds.w - screenBounds.y));
@@ -524,7 +557,8 @@ public class LytGuidebookScene extends LytBox {
         }
 
         private void renderOverlayAnnotations(GuidebookScene scene, RenderContext context) {
-            if (scene.getOverlayAnnotations().isEmpty()) {
+            if (scene.getOverlayAnnotations()
+                .isEmpty()) {
                 return;
             }
 

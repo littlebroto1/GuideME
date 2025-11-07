@@ -1,5 +1,11 @@
 package guideme.document.block;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.LytRect;
 import guideme.document.flow.LytFlowContainer;
 import guideme.document.flow.LytFlowContent;
@@ -8,16 +14,13 @@ import guideme.layout.LayoutContext;
 import guideme.layout.Layouts;
 import guideme.render.RenderContext;
 import guideme.render.SimpleRenderContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Layout document. Has a viewport and an overall size which may exceed the document size vertically, but not
  * horizontally.
  */
 public class LytDocument extends LytNode implements LytBlockContainer {
+
     private final List<LytBlock> blocks = new ArrayList<>();
 
     @Nullable
@@ -94,17 +97,7 @@ public class LytDocument extends LytNode implements LytBlockContainer {
     }
 
     private Layout createLayout(LayoutContext context, int availableWidth) {
-        var bounds = Layouts.verticalLayout(context,
-                blocks,
-                0,
-                0,
-                availableWidth,
-                5,
-                5,
-                5,
-                5,
-                0,
-                AlignItems.START);
+        var bounds = Layouts.verticalLayout(context, blocks, 0, 0, availableWidth, 5, 5, 5, 5, 0, AlignItems.START);
 
         return new Layout(availableWidth, bounds.height());
     }
@@ -162,12 +155,9 @@ public class LytDocument extends LytNode implements LytBlockContainer {
     }
 
     @Override
-    public void onMouseEnter(@Nullable LytFlowContent hoveredContent) {
-    }
+    public void onMouseEnter(@Nullable LytFlowContent hoveredContent) {}
 
-    public record Layout(int availableWidth, int contentHeight) {
-    }
+    public record Layout(int availableWidth, int contentHeight) {}
 
-    public record HitTestResult(LytNode node, @Nullable LytFlowContent content) {
-    }
+    public record HitTestResult(LytNode node, @Nullable LytFlowContent content) {}
 }

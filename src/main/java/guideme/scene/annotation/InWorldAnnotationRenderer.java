@@ -1,15 +1,5 @@
 package guideme.scene.annotation;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.DepthTestFunction;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import guideme.color.LightDarkMode;
-import guideme.color.MutableColor;
-import guideme.internal.GuideME;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -23,36 +13,50 @@ import net.minecraft.core.Direction;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.util.ARGB;
 import net.neoforged.neoforge.client.RenderTypeHelper;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Vector3f;
+
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.DepthTestFunction;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
+
+import guideme.color.LightDarkMode;
+import guideme.color.MutableColor;
+import guideme.internal.GuideME;
 
 @ApiStatus.Internal
 public final class InWorldAnnotationRenderer {
 
     public static final RenderPipeline OCCLUDED_PIPELINE = RenderPipelines.TRANSLUCENT.toBuilder()
-            .withLocation(GuideME.makeId("pipeline/annotation_occluded"))
-            .withBlend(BlendFunction.TRANSLUCENT)
-            .withDepthTestFunction(DepthTestFunction.GREATER_DEPTH_TEST)
-            .withDepthWrite(false)
-            .withVertexFormat(DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS)
-            .build();
+        .withLocation(GuideME.makeId("pipeline/annotation_occluded"))
+        .withBlend(BlendFunction.TRANSLUCENT)
+        .withDepthTestFunction(DepthTestFunction.GREATER_DEPTH_TEST)
+        .withDepthWrite(false)
+        .withVertexFormat(DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS)
+        .build();
 
     private static final RenderType OCCLUDED = RenderType.create(
-            "guideme_annotation_occluded",
-            0x1000,
-            OCCLUDED_PIPELINE,
-            RenderType.CompositeState.builder()
-                    .setLightmapState(RenderType.LIGHTMAP)
-                    .setTextureState(RenderStateShard.BLOCK_SHEET_MIPPED)
-                    .createCompositeState(false));
+        "guideme_annotation_occluded",
+        0x1000,
+        OCCLUDED_PIPELINE,
+        RenderType.CompositeState.builder()
+            .setLightmapState(RenderType.LIGHTMAP)
+            .setTextureState(RenderStateShard.BLOCK_SHEET_MIPPED)
+            .createCompositeState(false));
 
-    private InWorldAnnotationRenderer() {
-    }
+    private InWorldAnnotationRenderer() {}
 
     public static void render(MultiBufferSource.BufferSource buffers, Iterable<InWorldAnnotation> annotations,
-            LightDarkMode lightDarkMode) {
-        var sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS)
-                .getSprite(GuideME.makeId("block/noise"));
+        LightDarkMode lightDarkMode) {
+        var sprite = Minecraft.getInstance()
+            .getAtlasManager()
+            .getAtlasOrThrow(AtlasIds.BLOCKS)
+            .getSprite(GuideME.makeId("block/noise"));
 
         var occludedConsumer = buffers.getBuffer(OCCLUDED);
         for (var annotation : annotations) {
@@ -62,30 +66,34 @@ public final class InWorldAnnotationRenderer {
 
             if (annotation instanceof InWorldBoxAnnotation boxAnnotation) {
                 var color = MutableColor.of(boxAnnotation.color(), lightDarkMode);
-                color.darker(50).setAlpha(color.alpha() * 0.5f);
+                color.darker(50)
+                    .setAlpha(color.alpha() * 0.5f);
                 if (boxAnnotation.isHovered()) {
                     color.lighter(50);
                 }
-                render(occludedConsumer,
-                        boxAnnotation.min(),
-                        boxAnnotation.max(),
-                        color.toArgb32(),
-                        boxAnnotation.thickness(),
-                        sprite);
+                render(
+                    occludedConsumer,
+                    boxAnnotation.min(),
+                    boxAnnotation.max(),
+                    color.toArgb32(),
+                    boxAnnotation.thickness(),
+                    sprite);
             } else if (annotation instanceof InWorldLineAnnotation lineAnnotation) {
                 var color = MutableColor.of(lineAnnotation.color(), lightDarkMode);
-                color.darker(50).setAlpha(color.alpha() * 0.5f);
+                color.darker(50)
+                    .setAlpha(color.alpha() * 0.5f);
                 if (lineAnnotation.isHovered()) {
                     color.lighter(50);
                 }
-                strut(occludedConsumer,
-                        lineAnnotation.min(),
-                        lineAnnotation.max(),
-                        color.toArgb32(),
-                        lineAnnotation.thickness(),
-                        true,
-                        true,
-                        sprite);
+                strut(
+                    occludedConsumer,
+                    lineAnnotation.min(),
+                    lineAnnotation.max(),
+                    color.toArgb32(),
+                    lineAnnotation.thickness(),
+                    true,
+                    true,
+                    sprite);
             }
         }
         buffers.endBatch(OCCLUDED);
@@ -93,10 +101,14 @@ public final class InWorldAnnotationRenderer {
         // Render two passes to support annotations that are always on top of other annotations
         for (var pass = 1; pass <= 2; pass++) {
             if (pass == 2) {
-                RenderSystem.getDevice().createCommandEncoder().clearDepthTexture(
+                RenderSystem.getDevice()
+                    .createCommandEncoder()
+                    .clearDepthTexture(
                         RenderSystem.outputDepthTextureOverride != null
-                                ? RenderSystem.outputDepthTextureOverride.texture()
-                                : Minecraft.getInstance().getMainRenderTarget().getDepthTexture(),
+                            ? RenderSystem.outputDepthTextureOverride.texture()
+                            : Minecraft.getInstance()
+                                .getMainRenderTarget()
+                                .getDepthTexture(),
                         1.0);
             }
 
@@ -113,25 +125,27 @@ public final class InWorldAnnotationRenderer {
                     if (boxAnnotation.isHovered()) {
                         color.lighter(50);
                     }
-                    render(consumer,
-                            boxAnnotation.min(),
-                            boxAnnotation.max(),
-                            color.toArgb32(),
-                            boxAnnotation.thickness(),
-                            sprite);
+                    render(
+                        consumer,
+                        boxAnnotation.min(),
+                        boxAnnotation.max(),
+                        color.toArgb32(),
+                        boxAnnotation.thickness(),
+                        sprite);
                 } else if (annotation instanceof InWorldLineAnnotation lineAnnotation) {
                     var color = MutableColor.of(lineAnnotation.color(), lightDarkMode);
                     if (lineAnnotation.isHovered()) {
                         color.lighter(50);
                     }
-                    strut(consumer,
-                            lineAnnotation.min(),
-                            lineAnnotation.max(),
-                            color.toArgb32(),
-                            lineAnnotation.thickness(),
-                            true,
-                            true,
-                            sprite);
+                    strut(
+                        consumer,
+                        lineAnnotation.min(),
+                        lineAnnotation.max(),
+                        color.toArgb32(),
+                        lineAnnotation.thickness(),
+                        true,
+                        true,
+                        sprite);
                 }
             }
 
@@ -140,12 +154,8 @@ public final class InWorldAnnotationRenderer {
         buffers.endBatch();
     }
 
-    public static void render(VertexConsumer consumer,
-            Vector3f min,
-            Vector3f max,
-            int color,
-            float thickness,
-            TextureAtlasSprite sprite) {
+    public static void render(VertexConsumer consumer, Vector3f min, Vector3f max, int color, float thickness,
+        TextureAtlasSprite sprite) {
         var thickHalf = thickness * 0.5f;
 
         var u = new Vector3f(max.x - min.x, 0, 0);
@@ -167,39 +177,124 @@ public final class InWorldAnnotationRenderer {
 
         // Along X-Axis
         // Extend these out to cover past the corner (half the extrude thickness)
-        strut(consumer, new Vector3f(uNorm).mulAdd(-thickHalf, corners[0]),
-                new Vector3f(uNorm).mulAdd(thickHalf, corners[1]), color, thickness, true, true, sprite);
-        strut(consumer, new Vector3f(uNorm).mulAdd(-thickHalf, corners[2]),
-                new Vector3f(uNorm).mulAdd(thickHalf, corners[7]), color, thickness, true, true, sprite);
-        strut(consumer, new Vector3f(uNorm).mulAdd(-thickHalf, corners[3]),
-                new Vector3f(uNorm).mulAdd(thickHalf, corners[6]), color, thickness, true, true, sprite);
-        strut(consumer, new Vector3f(uNorm).mulAdd(-thickHalf, corners[5]),
-                new Vector3f(uNorm).mulAdd(thickHalf, corners[4]), color, thickness, true, true, sprite);
+        strut(
+            consumer,
+            new Vector3f(uNorm).mulAdd(-thickHalf, corners[0]),
+            new Vector3f(uNorm).mulAdd(thickHalf, corners[1]),
+            color,
+            thickness,
+            true,
+            true,
+            sprite);
+        strut(
+            consumer,
+            new Vector3f(uNorm).mulAdd(-thickHalf, corners[2]),
+            new Vector3f(uNorm).mulAdd(thickHalf, corners[7]),
+            color,
+            thickness,
+            true,
+            true,
+            sprite);
+        strut(
+            consumer,
+            new Vector3f(uNorm).mulAdd(-thickHalf, corners[3]),
+            new Vector3f(uNorm).mulAdd(thickHalf, corners[6]),
+            color,
+            thickness,
+            true,
+            true,
+            sprite);
+        strut(
+            consumer,
+            new Vector3f(uNorm).mulAdd(-thickHalf, corners[5]),
+            new Vector3f(uNorm).mulAdd(thickHalf, corners[4]),
+            color,
+            thickness,
+            true,
+            true,
+            sprite);
 
         // Along Y-Axis
-        strut(consumer, new Vector3f(vNorm).mulAdd(thickHalf, corners[0]),
-                new Vector3f(vNorm).mulAdd(-thickHalf, corners[2]), color, thickness, false, false, sprite);
-        strut(consumer, new Vector3f(vNorm).mulAdd(thickHalf, corners[1]),
-                new Vector3f(vNorm).mulAdd(-thickHalf, corners[7]), color, thickness, false, false, sprite);
-        strut(consumer, new Vector3f(vNorm).mulAdd(thickHalf, corners[3]),
-                new Vector3f(vNorm).mulAdd(-thickHalf, corners[5]), color, thickness, false, false, sprite);
-        strut(consumer, new Vector3f(vNorm).mulAdd(thickHalf, corners[6]),
-                new Vector3f(vNorm).mulAdd(-thickHalf, corners[4]), color, thickness, false, false, sprite);
+        strut(
+            consumer,
+            new Vector3f(vNorm).mulAdd(thickHalf, corners[0]),
+            new Vector3f(vNorm).mulAdd(-thickHalf, corners[2]),
+            color,
+            thickness,
+            false,
+            false,
+            sprite);
+        strut(
+            consumer,
+            new Vector3f(vNorm).mulAdd(thickHalf, corners[1]),
+            new Vector3f(vNorm).mulAdd(-thickHalf, corners[7]),
+            color,
+            thickness,
+            false,
+            false,
+            sprite);
+        strut(
+            consumer,
+            new Vector3f(vNorm).mulAdd(thickHalf, corners[3]),
+            new Vector3f(vNorm).mulAdd(-thickHalf, corners[5]),
+            color,
+            thickness,
+            false,
+            false,
+            sprite);
+        strut(
+            consumer,
+            new Vector3f(vNorm).mulAdd(thickHalf, corners[6]),
+            new Vector3f(vNorm).mulAdd(-thickHalf, corners[4]),
+            color,
+            thickness,
+            false,
+            false,
+            sprite);
 
         // Along Z-Axis
-        strut(consumer, new Vector3f(tNorm).mulAdd(thickHalf, corners[0]),
-                new Vector3f(tNorm).mulAdd(-thickHalf, corners[3]), color, thickness, false, false, sprite);
-        strut(consumer, new Vector3f(tNorm).mulAdd(thickHalf, corners[1]),
-                new Vector3f(tNorm).mulAdd(-thickHalf, corners[6]), color, thickness, false, false, sprite);
-        strut(consumer, new Vector3f(tNorm).mulAdd(thickHalf, corners[2]),
-                new Vector3f(tNorm).mulAdd(-thickHalf, corners[5]), color, thickness, false, false, sprite);
-        strut(consumer, new Vector3f(tNorm).mulAdd(thickHalf, corners[7]),
-                new Vector3f(tNorm).mulAdd(-thickHalf, corners[4]), color, thickness, false, false, sprite);
+        strut(
+            consumer,
+            new Vector3f(tNorm).mulAdd(thickHalf, corners[0]),
+            new Vector3f(tNorm).mulAdd(-thickHalf, corners[3]),
+            color,
+            thickness,
+            false,
+            false,
+            sprite);
+        strut(
+            consumer,
+            new Vector3f(tNorm).mulAdd(thickHalf, corners[1]),
+            new Vector3f(tNorm).mulAdd(-thickHalf, corners[6]),
+            color,
+            thickness,
+            false,
+            false,
+            sprite);
+        strut(
+            consumer,
+            new Vector3f(tNorm).mulAdd(thickHalf, corners[2]),
+            new Vector3f(tNorm).mulAdd(-thickHalf, corners[5]),
+            color,
+            thickness,
+            false,
+            false,
+            sprite);
+        strut(
+            consumer,
+            new Vector3f(tNorm).mulAdd(thickHalf, corners[7]),
+            new Vector3f(tNorm).mulAdd(-thickHalf, corners[4]),
+            color,
+            thickness,
+            false,
+            false,
+            sprite);
     }
 
     private static void strut(VertexConsumer consumer, Vector3f from, Vector3f to, int color, float thickness,
-            boolean startCap, boolean endCap, TextureAtlasSprite sprite) {
-        var norm = new Vector3f(to).sub(from).normalize();
+        boolean startCap, boolean endCap, TextureAtlasSprite sprite) {
+        var norm = new Vector3f(to).sub(from)
+            .normalize();
         Vector3f prefUp;
         if (Math.abs(from.x - to.x) < 0.01f && Math.abs(from.z - to.z) < 0.01f) {
             prefUp = new Vector3f(1, 0, 0);
@@ -207,9 +302,11 @@ public final class InWorldAnnotationRenderer {
             prefUp = new Vector3f(0, 1, 0);
         }
 
-        var rightNorm = new Vector3f(norm).cross(prefUp).normalize();
+        var rightNorm = new Vector3f(norm).cross(prefUp)
+            .normalize();
         var leftNorm = new Vector3f(rightNorm).negate();
-        var upNorm = new Vector3f(rightNorm).cross(norm).normalize();
+        var upNorm = new Vector3f(rightNorm).cross(norm)
+            .normalize();
         var downNorm = new Vector3f(upNorm).negate();
 
         var up = new Vector3f(upNorm).mul(thickness * 0.5f);
@@ -217,57 +314,92 @@ public final class InWorldAnnotationRenderer {
 
         if (startCap) {
             quad(
-                    consumer, downNorm, color,
-                    new Vector3f(from).add(up).sub(right),
-                    new Vector3f(from).sub(up).sub(right),
-                    new Vector3f(from).sub(up).add(right),
-                    new Vector3f(from).add(up).add(right),
-                    sprite);
+                consumer,
+                downNorm,
+                color,
+                new Vector3f(from).add(up)
+                    .sub(right),
+                new Vector3f(from).sub(up)
+                    .sub(right),
+                new Vector3f(from).sub(up)
+                    .add(right),
+                new Vector3f(from).add(up)
+                    .add(right),
+                sprite);
         }
 
         if (endCap) {
             quad(
-                    consumer, norm, color,
-                    new Vector3f(to).add(up).add(right),
-                    new Vector3f(to).sub(up).add(right),
-                    new Vector3f(to).sub(up).sub(right),
-                    new Vector3f(to).add(up).sub(right),
-                    sprite);
+                consumer,
+                norm,
+                color,
+                new Vector3f(to).add(up)
+                    .add(right),
+                new Vector3f(to).sub(up)
+                    .add(right),
+                new Vector3f(to).sub(up)
+                    .sub(right),
+                new Vector3f(to).add(up)
+                    .sub(right),
+                sprite);
         }
 
         quad(
-                consumer, leftNorm, color,
-                new Vector3f(from).sub(right).add(up),
-                new Vector3f(to).sub(right).add(up),
-                new Vector3f(to).sub(right).sub(up),
-                new Vector3f(from).sub(right).sub(up),
-                sprite);
+            consumer,
+            leftNorm,
+            color,
+            new Vector3f(from).sub(right)
+                .add(up),
+            new Vector3f(to).sub(right)
+                .add(up),
+            new Vector3f(to).sub(right)
+                .sub(up),
+            new Vector3f(from).sub(right)
+                .sub(up),
+            sprite);
         quad(
-                consumer, rightNorm, color,
-                new Vector3f(to).add(right).sub(up),
-                new Vector3f(to).add(right).add(up),
-                new Vector3f(from).add(right).add(up),
-                new Vector3f(from).add(right).sub(up),
-                sprite);
+            consumer,
+            rightNorm,
+            color,
+            new Vector3f(to).add(right)
+                .sub(up),
+            new Vector3f(to).add(right)
+                .add(up),
+            new Vector3f(from).add(right)
+                .add(up),
+            new Vector3f(from).add(right)
+                .sub(up),
+            sprite);
         quad(
-                consumer, upNorm, color,
-                new Vector3f(from).add(up).sub(right),
-                new Vector3f(from).add(up).add(right),
-                new Vector3f(to).add(up).add(right),
-                new Vector3f(to).add(up).sub(right),
-                sprite);
+            consumer,
+            upNorm,
+            color,
+            new Vector3f(from).add(up)
+                .sub(right),
+            new Vector3f(from).add(up)
+                .add(right),
+            new Vector3f(to).add(up)
+                .add(right),
+            new Vector3f(to).add(up)
+                .sub(right),
+            sprite);
         quad(
-                consumer, downNorm, color,
-                new Vector3f(to).sub(up).sub(right),
-                new Vector3f(to).sub(up).add(right),
-                new Vector3f(from).sub(up).add(right),
-                new Vector3f(from).sub(up).sub(right),
-                sprite);
+            consumer,
+            downNorm,
+            color,
+            new Vector3f(to).sub(up)
+                .sub(right),
+            new Vector3f(to).sub(up)
+                .add(right),
+            new Vector3f(from).sub(up)
+                .add(right),
+            new Vector3f(from).sub(up)
+                .sub(right),
+            sprite);
     }
 
-    private static void quad(VertexConsumer consumer, Vector3f faceNormal, int color,
-            Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4,
-            TextureAtlasSprite sprite) {
+    private static void quad(VertexConsumer consumer, Vector3f faceNormal, int color, Vector3f v1, Vector3f v2,
+        Vector3f v3, Vector3f v4, TextureAtlasSprite sprite) {
         var d = Direction.getApproximateNearest(faceNormal.x, faceNormal.y, faceNormal.z);
         var shade = switch (d) {
             case DOWN -> 0.5F;
@@ -275,9 +407,7 @@ public final class InWorldAnnotationRenderer {
             case WEST, EAST -> 0.6F;
             default -> 1.0F;
         };
-        color = ARGB.multiply(
-                ARGB.color(255, (int) (shade * 255), (int) (shade * 255), (int) (shade * 255)),
-                color);
+        color = ARGB.multiply(ARGB.color(255, (int) (shade * 255), (int) (shade * 255), (int) (shade * 255)), color);
 
         vertex(consumer, faceNormal, color, v1, sprite.getU0(), sprite.getV1());
         vertex(consumer, faceNormal, color, v2, sprite.getU0(), sprite.getV0());
@@ -285,16 +415,13 @@ public final class InWorldAnnotationRenderer {
         vertex(consumer, faceNormal, color, v4, sprite.getU1(), sprite.getV1());
     }
 
-    private static void vertex(VertexConsumer consumer,
-            Vector3f faceNormal,
-            int color,
-            Vector3f bottomLeft,
-            float u, float v) {
+    private static void vertex(VertexConsumer consumer, Vector3f faceNormal, int color, Vector3f bottomLeft, float u,
+        float v) {
         consumer.addVertex(bottomLeft.x, bottomLeft.y, bottomLeft.z)
-                .setColor(color)
-                .setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setNormal(faceNormal.x(), faceNormal.y(), faceNormal.z());
+            .setColor(color)
+            .setUv(u, v)
+            .setOverlay(OverlayTexture.NO_OVERLAY)
+            .setLight(LightTexture.FULL_BRIGHT)
+            .setNormal(faceNormal.x(), faceNormal.y(), faceNormal.z());
     }
 }

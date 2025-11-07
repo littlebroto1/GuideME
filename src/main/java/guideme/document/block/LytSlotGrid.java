@@ -1,17 +1,21 @@
 package guideme.document.block;
 
+import java.util.List;
+import java.util.Optional;
+
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.LytRect;
 import guideme.layout.LayoutContext;
 import guideme.render.GuiAssets;
 import guideme.render.RenderContext;
-import java.util.List;
-import java.util.Optional;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
-import org.jetbrains.annotations.Nullable;
 
 public class LytSlotGrid extends LytBox {
+
     private final int width;
     private final int height;
     private final LytSlot[] slots;
@@ -24,11 +28,19 @@ public class LytSlotGrid extends LytBox {
     }
 
     public static LytSlotGrid columnFromStacks(List<ItemStack> items, boolean skipEmpty) {
-        return columnFromDisplays(items.stream().map(SlotDisplay.ItemStackSlotDisplay::new).toList(), skipEmpty);
+        return columnFromDisplays(
+            items.stream()
+                .map(SlotDisplay.ItemStackSlotDisplay::new)
+                .toList(),
+            skipEmpty);
     }
 
     public static LytSlotGrid rowFromStacks(List<ItemStack> items, boolean skipEmpty) {
-        return rowFromDisplays(items.stream().map(SlotDisplay.ItemStackSlotDisplay::new).toList(), skipEmpty);
+        return rowFromDisplays(
+            items.stream()
+                .map(SlotDisplay.ItemStackSlotDisplay::new)
+                .toList(),
+            skipEmpty);
     }
 
     public static LytSlotGrid columnFromIngredients(List<@Nullable Ingredient> ingredients, boolean skipEmpty) {
@@ -42,7 +54,9 @@ public class LytSlotGrid extends LytBox {
             return grid;
         }
 
-        var nonEmptyIngredients = ingredients.stream().filter(i -> i != null && !i.isEmpty()).toList();
+        var nonEmptyIngredients = ingredients.stream()
+            .filter(i -> i != null && !i.isEmpty())
+            .toList();
         var grid = new LytSlotGrid(1, nonEmptyIngredients.size());
         var index = 0;
         for (var ingredient : nonEmptyIngredients) {
@@ -62,7 +76,9 @@ public class LytSlotGrid extends LytBox {
             return grid;
         }
 
-        var nonEmptyIngredients = ingredients.stream().filter(i -> i != null && !i.isEmpty()).toList();
+        var nonEmptyIngredients = ingredients.stream()
+            .filter(i -> i != null && !i.isEmpty())
+            .toList();
         var grid = new LytSlotGrid(nonEmptyIngredients.size(), 1);
         var index = 0;
         for (var ingredient : nonEmptyIngredients) {
@@ -80,7 +96,9 @@ public class LytSlotGrid extends LytBox {
             return grid;
         }
 
-        var nonEmptyDisplays = (int) displays.stream().filter(d -> !isEmpty(d)).count();
+        var nonEmptyDisplays = (int) displays.stream()
+            .filter(d -> !isEmpty(d))
+            .count();
         var grid = new LytSlotGrid(1, nonEmptyDisplays);
         var index = 0;
         for (var display : displays) {
@@ -100,7 +118,9 @@ public class LytSlotGrid extends LytBox {
             return grid;
         }
 
-        var nonEmptyDisplays = (int) displays.stream().filter(d -> !isEmpty(d)).count();
+        var nonEmptyDisplays = (int) displays.stream()
+            .filter(d -> !isEmpty(d))
+            .count();
         var grid = new LytSlotGrid(nonEmptyDisplays, 1);
         var index = 0;
         for (var display : displays) {
@@ -129,10 +149,10 @@ public class LytSlotGrid extends LytBox {
                     var slot = slots[index];
                     if (slot != null) {
                         slot.layout(
-                                context,
-                                x + col * LytSlot.OUTER_SIZE,
-                                y + row * LytSlot.OUTER_SIZE,
-                                availableWidth);
+                            context,
+                            x + col * LytSlot.OUTER_SIZE,
+                            y + row * LytSlot.OUTER_SIZE,
+                            availableWidth);
                     }
                 }
             }
@@ -185,9 +205,9 @@ public class LytSlotGrid extends LytBox {
                     var index = getSlotIndex(x, y);
                     if (index >= slots.length || slots[index] == null) {
                         context.drawIcon(
-                                bounds.x() + guideme.document.block.LytSlot.OUTER_SIZE * x,
-                                bounds.y() + guideme.document.block.LytSlot.OUTER_SIZE * y,
-                                GuiAssets.SLOT_BACKGROUND);
+                            bounds.x() + guideme.document.block.LytSlot.OUTER_SIZE * x,
+                            bounds.y() + guideme.document.block.LytSlot.OUTER_SIZE * y,
+                            GuiAssets.SLOT_BACKGROUND);
                     }
                 }
             }

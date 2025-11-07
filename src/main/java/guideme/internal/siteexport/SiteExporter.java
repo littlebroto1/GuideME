@@ -1,21 +1,5 @@
 package guideme.internal.siteexport;
 
-import com.google.common.io.MoreFiles;
-import com.google.common.io.RecursiveDeleteOption;
-import guideme.Guide;
-import guideme.GuidePage;
-import guideme.compiler.PageCompiler;
-import guideme.compiler.ParsedGuidePage;
-import guideme.indices.CategoryIndex;
-import guideme.indices.ItemIndex;
-import guideme.internal.GuideME;
-import guideme.internal.GuideOnStartup;
-import guideme.internal.siteexport.mdastpostprocess.PageExportPostProcessor;
-import guideme.internal.util.Platform;
-import guideme.navigation.NavigationNode;
-import guideme.siteexport.ExportableResourceProvider;
-import guideme.siteexport.RecipeExporter;
-import guideme.siteexport.ResourceExporter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -32,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.IntUnaryOperator;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.DetectedVersion;
 import net.minecraft.client.Minecraft;
@@ -75,12 +60,31 @@ import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtension
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.display.FluidStackContentsFactory;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.io.MoreFiles;
+import com.google.common.io.RecursiveDeleteOption;
+
+import guideme.Guide;
+import guideme.GuidePage;
+import guideme.compiler.PageCompiler;
+import guideme.compiler.ParsedGuidePage;
+import guideme.indices.CategoryIndex;
+import guideme.indices.ItemIndex;
+import guideme.internal.GuideME;
+import guideme.internal.GuideOnStartup;
+import guideme.internal.siteexport.mdastpostprocess.PageExportPostProcessor;
+import guideme.internal.util.Platform;
+import guideme.navigation.NavigationNode;
+import guideme.siteexport.ExportableResourceProvider;
+import guideme.siteexport.RecipeExporter;
+import guideme.siteexport.ResourceExporter;
 
 /**
  * Exports a data package for use by the website.
@@ -130,6 +134,7 @@ public class SiteExporter implements ResourceExporter {
     public void exportOnNextTickAndExit(Runnable completionCallback, Consumer<Exception> errorCallback) {
         var exportDone = new MutableBoolean();
         Consumer<ClientTickEvent.Post> listener = new Consumer<>() {
+
             @Override
             public void accept(ClientTickEvent.Post post) {
                 NeoForge.EVENT_BUS.unregister(this);
@@ -157,13 +162,16 @@ public class SiteExporter implements ResourceExporter {
         try {
             export();
 
-            feedback.sendFeedback(Component.literal("Guide data exported to ")
-                    .append(Component.literal("[" + outputFolder.getFileName().toString() + "]")
-                            .withStyle(style -> style
-                                    .withClickEvent(
-                                            new ClickEvent.OpenFile(outputFolder.toString()))
+            feedback.sendFeedback(
+                Component.literal("Guide data exported to ")
+                    .append(
+                        Component.literal(
+                            "[" + outputFolder.getFileName()
+                                .toString() + "]")
+                            .withStyle(
+                                style -> style.withClickEvent(new ClickEvent.OpenFile(outputFolder.toString()))
                                     .withHoverEvent(
-                                            new HoverEvent.ShowText(Component.literal("Click to open export folder")))
+                                        new HoverEvent.ShowText(Component.literal("Click to open export folder")))
                                     .applyFormats(ChatFormatting.UNDERLINE, ChatFormatting.GREEN))));
         } catch (Exception e) {
             e.printStackTrace();
@@ -175,7 +183,8 @@ public class SiteExporter implements ResourceExporter {
     public void referenceItem(ItemStack stack) {
         if (!stack.isEmpty()) {
             items.add(stack.getItem());
-            if (!stack.getComponentsPatch().isEmpty()) {
+            if (!stack.getComponentsPatch()
+                .isEmpty()) {
                 LOG.error("Couldn't handle stack with NBT tag: {}", stack);
             }
         }
@@ -199,7 +208,8 @@ public class SiteExporter implements ResourceExporter {
 
     @Override
     public void referenceIngredient(Ingredient ingredient) {
-        for (var stack : ingredient.items().toList()) {
+        for (var stack : ingredient.items()
+            .toList()) {
             referenceItem(stack.value());
         }
     }
@@ -211,12 +221,13 @@ public class SiteExporter implements ResourceExporter {
         }
 
         // we use displays to discover items we need to reference
-        for (var recipeDisplay : holder.value().display()) {
+        for (var recipeDisplay : holder.value()
+            .display()) {
             visitDisplays(recipeDisplay, display -> {
                 display.resolve(Platform.getSlotDisplayContext(), SlotDisplay.ItemStackContentsFactory.INSTANCE)
-                        .forEach(this::referenceItem);
+                    .forEach(this::referenceItem);
                 display.resolve(Platform.getSlotDisplayContext(), FluidStackContentsFactory.INSTANCE)
-                        .forEach(this::referenceFluid);
+                    .forEach(this::referenceFluid);
             });
         }
     }
@@ -267,7 +278,8 @@ public class SiteExporter implements ResourceExporter {
             var recipe = holder.value();
 
             boolean handled = false;
-            for (var recipeExporter : guide.getExtensions().get(RecipeExporter.EXTENSION_POINT)) {
+            for (var recipeExporter : guide.getExtensions()
+                .get(RecipeExporter.EXTENSION_POINT)) {
                 var recipeData = recipeExporter.convertToJson(id, recipe, this);
                 if (recipeData != null) {
                     writer.addRecipe(id, recipe, recipeData);
@@ -344,18 +356,23 @@ public class SiteExporter implements ResourceExporter {
 
     @Override
     public ResourceLocation getPageSpecificResourceLocation(String suffix) {
-        var path = currentPage.getId().getPath();
+        var path = currentPage.getId()
+            .getPath();
         var idx = path.lastIndexOf('.');
         if (idx != -1) {
             path = path.substring(0, idx);
         }
-        return ResourceLocation.fromNamespaceAndPath(currentPage.getId().getNamespace(), path + "_" + suffix);
+        return ResourceLocation.fromNamespaceAndPath(
+            currentPage.getId()
+                .getNamespace(),
+            path + "_" + suffix);
     }
 
     @Override
     public Path getPageSpecificPathForWriting(String suffix) {
         // Build filename
-        var pageFilename = currentPage.getId().getPath();
+        var pageFilename = currentPage.getId()
+            .getPath();
         var filename = FilenameUtils.getBaseName(pageFilename) + "_" + suffix;
 
         var pagePath = resolvePath(currentPage.getId());
@@ -390,7 +407,9 @@ public class SiteExporter implements ResourceExporter {
         }
 
         // Reference all navigation node icons
-        guide.getNavigationTree().getRootNodes().forEach(this::visitNavigationNodeIcons);
+        guide.getNavigationTree()
+            .getRootNodes()
+            .forEach(this::visitNavigationNodeIcons);
 
         var indexWriter = new SiteExportWriter(guide);
 
@@ -420,7 +439,9 @@ public class SiteExporter implements ResourceExporter {
         guideContent = CacheBusting.writeAsset(guideContent, content);
 
         // Write an uncompressed summary
-        writeSummary(guideContent.getFileName().toString());
+        writeSummary(
+            guideContent.getFileName()
+                .toString());
 
         cleanupCallbacks.forEach(Runnable::run);
         cleanupCallbacks.clear();
@@ -428,12 +449,11 @@ public class SiteExporter implements ResourceExporter {
 
     private void visitNavigationNodeIcons(NavigationNode navigationNode) {
         referenceItem(navigationNode.icon());
-        navigationNode.children().forEach(this::visitNavigationNodeIcons);
+        navigationNode.children()
+            .forEach(this::visitNavigationNodeIcons);
     }
 
-    private void processPage(SiteExportWriter exportWriter,
-            ParsedGuidePage page,
-            GuidePage compiledPage) {
+    private void processPage(SiteExportWriter exportWriter, ParsedGuidePage page, GuidePage compiledPage) {
 
         // Run post-processors on the AST
         PageExportPostProcessor.postprocess(this, page, compiledPage);
@@ -444,19 +464,27 @@ public class SiteExporter implements ResourceExporter {
     private void writeSummary(String guideDataFilename) throws IOException {
         var modVersion = getModVersion();
         var guideMeVersion = getGuideMeVersion();
-        var generated = Instant.now().toEpochMilli();
-        var gameVersion = DetectedVersion.tryDetectVersion().name();
+        var generated = Instant.now()
+            .toEpochMilli();
+        var gameVersion = DetectedVersion.tryDetectVersion()
+            .name();
 
         // This file is not accessed via the CDN and thus doesn't need a cache-busting name
         try (var writer = Files.newBufferedWriter(outputFolder.resolve("index.json"), StandardCharsets.UTF_8)) {
             var jsonWriter = SiteExportWriter.GSON.newJsonWriter(writer);
             jsonWriter.beginObject();
-            jsonWriter.name("format").value(1);
-            jsonWriter.name("generated").value(generated);
-            jsonWriter.name("gameVersion").value(gameVersion);
-            jsonWriter.name("modVersion").value(modVersion);
-            jsonWriter.name("guideMeVersion").value(guideMeVersion);
-            jsonWriter.name("guideDataPath").value(guideDataFilename);
+            jsonWriter.name("format")
+                .value(1);
+            jsonWriter.name("generated")
+                .value(generated);
+            jsonWriter.name("gameVersion")
+                .value(gameVersion);
+            jsonWriter.name("modVersion")
+                .value(modVersion);
+            jsonWriter.name("guideMeVersion")
+                .value(guideMeVersion);
+            jsonWriter.name("guideDataPath")
+                .value(guideDataFilename);
             jsonWriter.endObject();
         }
     }
@@ -464,27 +492,40 @@ public class SiteExporter implements ResourceExporter {
     private String getModVersion() {
         // Prefer the use of a version set via system propert
         var modVersion = System.getProperty(
-                "guideme.exportModVersion." + guide.getId().getNamespace() + "." + guide.getId().getPath());
+            "guideme.exportModVersion." + guide.getId()
+                .getNamespace()
+                + "."
+                + guide.getId()
+                    .getPath());
         if (modVersion != null) {
             return modVersion;
         }
 
-        return ModList.get().getModContainerById(guide.getId().getNamespace())
-                .map(mc -> mc.getModInfo().getVersion().toString())
-                .orElse("unknown");
+        return ModList.get()
+            .getModContainerById(
+                guide.getId()
+                    .getNamespace())
+            .map(
+                mc -> mc.getModInfo()
+                    .getVersion()
+                    .toString())
+            .orElse("unknown");
     }
 
     private String getGuideMeVersion() {
-        return ModList.get().getModContainerById(GuideME.MOD_ID).get().getModInfo().getVersion().toString();
+        return ModList.get()
+            .getModContainerById(GuideME.MOD_ID)
+            .get()
+            .getModInfo()
+            .getVersion()
+            .toString();
     }
 
     private Path resolvePath(ResourceLocation id) {
         return outputFolder.resolve(id.getNamespace() + "/" + id.getPath());
     }
 
-    private void processItems(Minecraft client,
-            SiteExportWriter siteExport,
-            Path outputFolder) throws IOException {
+    private void processItems(Minecraft client, SiteExportWriter siteExport, Path outputFolder) throws IOException {
         var iconsFolder = outputFolder.resolve("!items");
         if (Files.exists(iconsFolder)) {
             MoreFiles.deleteRecursively(iconsFolder, RecursiveDeleteOption.ALLOW_INSECURE);
@@ -492,7 +533,8 @@ public class SiteExporter implements ResourceExporter {
 
         // Set the GUI scale accordingly to get GuiGraphics to render out items full-screen, filling the scaled up
         // buffer
-        var window = Minecraft.getInstance().getWindow();
+        var window = Minecraft.getInstance()
+            .getWindow();
         var previousWindowWidth = window.getWidth();
         var previousWindowHeight = window.getHeight();
         var previousWindowScale = window.getGuiScale();
@@ -512,8 +554,8 @@ public class SiteExporter implements ResourceExporter {
 
                 // Guess used sprites from item model
                 var renderState = new ItemStackRenderState();
-                client.getItemModelResolver().appendItemLayers(renderState, stack, ItemDisplayContext.GUI, null, null,
-                        0);
+                client.getItemModelResolver()
+                    .appendItemLayers(renderState, stack, ItemDisplayContext.GUI, null, null, 0);
 
                 var quadLists = new HashSet<List<BakedQuad>>();
                 for (var layer : renderState.layers) {
@@ -527,10 +569,12 @@ public class SiteExporter implements ResourceExporter {
                     guiGraphics.renderItem(stack, 0, 0);
                     guiGraphics.renderItemDecorations(client.font, stack, 0, 0, "");
                     client.gameRenderer.guiRenderer
-                            .render(client.gameRenderer.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
+                        .render(client.gameRenderer.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
                 }, sprites, true);
 
-                String absIconUrl = "/" + outputFolder.relativize(iconPath).toString().replace('\\', '/');
+                String absIconUrl = "/" + outputFolder.relativize(iconPath)
+                    .toString()
+                    .replace('\\', '/');
                 siteExport.addItem(itemId, stack, absIconUrl);
             }
         } finally {
@@ -552,9 +596,7 @@ public class SiteExporter implements ResourceExporter {
         return result;
     }
 
-    private void processFluids(Minecraft client,
-            SiteExportWriter siteExport,
-            Path outputFolder) throws IOException {
+    private void processFluids(Minecraft client, SiteExportWriter siteExport, Path outputFolder) throws IOException {
         var fluidsFolder = outputFolder.resolve("!fluids");
         if (Files.exists(fluidsFolder)) {
             MoreFiles.deleteRecursively(fluidsFolder, RecursiveDeleteOption.ALLOW_INSECURE);
@@ -562,7 +604,8 @@ public class SiteExporter implements ResourceExporter {
 
         // Set the GUI scale accordingly to get GuiGraphics to render out items full-screen, filling the scaled up
         // buffer
-        var window = Minecraft.getInstance().getWindow();
+        var window = Minecraft.getInstance()
+            .getWindow();
         var previousWindowWidth = window.getWidth();
         var previousWindowHeight = window.getHeight();
         var previousWindowScale = window.getGuiScale();
@@ -576,36 +619,36 @@ public class SiteExporter implements ResourceExporter {
             LOG.info("Exporting fluids...");
             for (var fluid : fluids) {
                 var fluidVariant = new FluidStack(fluid, 1);
-                String fluidId = BuiltInRegistries.FLUID.getKey(fluid).toString();
+                String fluidId = BuiltInRegistries.FLUID.getKey(fluid)
+                    .toString();
 
                 var props = IClientFluidTypeExtensions.of(fluidVariant.getFluid());
 
                 var sprite = Minecraft.getInstance()
-                        .getAtlasManager()
-                        .getAtlasOrThrow(AtlasIds.BLOCKS)
-                        .getSprite(props.getStillTexture(fluidVariant));
+                    .getAtlasManager()
+                    .getAtlasOrThrow(AtlasIds.BLOCKS)
+                    .getSprite(props.getStillTexture(fluidVariant));
                 var color = props.getTintColor(fluidVariant);
 
                 var baseName = "!fluids/" + fluidId.replace(':', '/');
-                var iconPath = renderAndWrite(
-                        renderer,
-                        baseName,
-                        () -> {
-                            if (sprite != null) {
-                                client.gameRenderer.guiRenderState.reset();
-                                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, 0, 0, 16, 16, color);
-                                client.gameRenderer.guiRenderer
-                                        .render(client.gameRenderer.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
-                            }
-                        },
-                        sprite != null ? Set.of(sprite) : Set.of(),
-                        false /*
-                               * no alpha for fluids since water is translucent but there's nothing behind it in our
-                               * icons
-                               */
+                var iconPath = renderAndWrite(renderer, baseName, () -> {
+                    if (sprite != null) {
+                        client.gameRenderer.guiRenderState.reset();
+                        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, 0, 0, 16, 16, color);
+                        client.gameRenderer.guiRenderer
+                            .render(client.gameRenderer.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
+                    }
+                },
+                    sprite != null ? Set.of(sprite) : Set.of(),
+                    false /*
+                           * no alpha for fluids since water is translucent but there's nothing behind it in our
+                           * icons
+                           */
                 );
 
-                String absIconUrl = "/" + outputFolder.relativize(iconPath).toString().replace('\\', '/');
+                String absIconUrl = "/" + outputFolder.relativize(iconPath)
+                    .toString()
+                    .replace('\\', '/');
                 siteExport.addFluid(fluidId, fluidVariant, absIconUrl);
             }
         } finally {
@@ -616,19 +659,16 @@ public class SiteExporter implements ResourceExporter {
 
     }
 
-    public Path renderAndWrite(OffScreenRenderer renderer,
-            String baseName,
-            Runnable renderRunnable,
-            Collection<TextureAtlasSprite> sprites,
-            boolean withAlpha) throws IOException {
+    public Path renderAndWrite(OffScreenRenderer renderer, String baseName, Runnable renderRunnable,
+        Collection<TextureAtlasSprite> sprites, boolean withAlpha) throws IOException {
         String extension;
         byte[] content;
         if (renderer.isAnimated(sprites)) {
             extension = ".webp";
             content = renderer.captureAsWebp(
-                    renderRunnable,
-                    sprites,
-                    withAlpha ? WebPExporter.Format.LOSSLESS_ALPHA : WebPExporter.Format.LOSSLESS);
+                renderRunnable,
+                sprites,
+                withAlpha ? WebPExporter.Format.LOSSLESS_ALPHA : WebPExporter.Format.LOSSLESS);
         } else {
             extension = ".png";
             content = renderer.captureAsPng(renderRunnable);
@@ -647,17 +687,20 @@ public class SiteExporter implements ResourceExporter {
         }
 
         ResourceLocation id = textureId;
-        if (!id.getPath().endsWith(".png")) {
+        if (!id.getPath()
+            .endsWith(".png")) {
             id = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath() + ".png");
         }
 
         var outputPath = getPathForWriting(id);
 
-        var texture = Minecraft.getInstance().getTextureManager().getTexture(textureId);
+        var texture = Minecraft.getInstance()
+            .getTextureManager()
+            .getTexture(textureId);
 
         byte[] imageContent;
-        try (var nativeImage = TextureDownloader.downloadTexture(texture.getTexture(), 0,
-                IntUnaryOperator.identity())) {
+        try (
+            var nativeImage = TextureDownloader.downloadTexture(texture.getTexture(), 0, IntUnaryOperator.identity())) {
             imageContent = Platform.exportAsPng(nativeImage);
         } catch (IOException e) {
             throw new RuntimeException(e);

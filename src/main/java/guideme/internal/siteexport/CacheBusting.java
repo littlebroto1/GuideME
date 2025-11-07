@@ -1,10 +1,11 @@
 package guideme.internal.siteexport;
 
-import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import com.google.common.hash.Hashing;
 
 /**
  * We mark all of our assets as "immutable" when we upload them. That means the browser can cache them indefinitely
@@ -13,15 +14,17 @@ import java.nio.file.Path;
  * the filename, essentially "busting" the cache.
  */
 public final class CacheBusting {
+
     private static final char[] BASE64_SYMBOLS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-            .toCharArray();
+        .toCharArray();
     private static final BigInteger BASE_62 = BigInteger.valueOf(62);
 
-    private CacheBusting() {
-    }
+    private CacheBusting() {}
 
     public static String create(byte[] content) {
-        var contentHash = Hashing.sha256().hashBytes(content).asBytes();
+        var contentHash = Hashing.sha256()
+            .hashBytes(content)
+            .asBytes();
         return encodeBase62(contentHash).substring(0, 12);
     }
 
@@ -30,7 +33,8 @@ public final class CacheBusting {
 
         // Insert the cache busting suffix into the filename such that
         // blah.txt becomes blah.<hash>.txt
-        var filename = originalPath.getFileName().toString();
+        var filename = originalPath.getFileName()
+            .toString();
         var idx = filename.indexOf('.');
         if (idx == -1) {
             filename += "." + suffix;
@@ -50,9 +54,12 @@ public final class CacheBusting {
         var val = new BigInteger(1, data);
         var sb = new StringBuilder();
         while (val.compareTo(BigInteger.ZERO) > 0) {
-            sb.append(BASE64_SYMBOLS[val.mod(BASE_62).intValue()]);
+            sb.append(
+                BASE64_SYMBOLS[val.mod(BASE_62)
+                    .intValue()]);
             val = val.divide(BASE_62);
         }
-        return sb.reverse().toString();
+        return sb.reverse()
+            .toString();
     }
 }

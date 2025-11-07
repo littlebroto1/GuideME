@@ -1,5 +1,9 @@
 package guideme.document.block;
 
+import java.util.Objects;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.color.ColorValue;
 import guideme.color.ConstantColor;
 import guideme.document.LytRect;
@@ -8,8 +12,6 @@ import guideme.document.interaction.InteractiveElement;
 import guideme.layout.LayoutContext;
 import guideme.render.GuiSprite;
 import guideme.render.RenderContext;
-import java.util.Objects;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Render a {@link GuiSprite}.
@@ -23,8 +25,7 @@ public class LytGuiSprite extends LytBlock implements InteractiveElement {
 
     private LytSize size = new LytSize(16, 16);
 
-    public LytGuiSprite() {
-    }
+    public LytGuiSprite() {}
 
     public LytGuiSprite(GuiSprite sprite, LytSize size) {
         this.sprite = sprite;
@@ -75,8 +76,7 @@ public class LytGuiSprite extends LytBlock implements InteractiveElement {
     }
 
     @Override
-    protected void onLayoutMoved(int deltaX, int deltaY) {
-    }
+    protected void onLayoutMoved(int deltaX, int deltaY) {}
 
     @Override
     public void render(RenderContext context) {

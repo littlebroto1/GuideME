@@ -1,15 +1,10 @@
 package guideme.scene.element;
 
-import guideme.compiler.IdUtils;
-import guideme.compiler.PageCompiler;
-import guideme.compiler.tags.MdxAttrs;
-import guideme.document.LytErrorSink;
-import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
-import guideme.scene.GuidebookScene;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Set;
+
 import net.minecraft.ResourceLocationException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -22,20 +17,25 @@ import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
+import guideme.compiler.IdUtils;
+import guideme.compiler.PageCompiler;
+import guideme.compiler.tags.MdxAttrs;
+import guideme.document.LytErrorSink;
+import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
+import guideme.scene.GuidebookScene;
+
 /**
  * Imports a structure into the scene.
  */
 public class ImportStructureElementCompiler implements SceneElementTagCompiler {
+
     @Override
     public Set<String> getTagNames() {
         return Set.of("ImportStructure");
     }
 
     @Override
-    public void compile(GuidebookScene scene,
-            PageCompiler compiler,
-            LytErrorSink errorSink,
-            MdxJsxElementFields el) {
+    public void compile(GuidebookScene scene, PageCompiler compiler, LytErrorSink errorSink, MdxJsxElementFields el) {
         var structureSrc = el.getAttributeString("src", null);
         if (structureSrc == null) {
             errorSink.appendError(compiler, "Missing src attribute", el);
@@ -60,12 +60,13 @@ public class ImportStructureElementCompiler implements SceneElementTagCompiler {
 
         CompoundTag compoundTag;
         try {
-            if (absStructureSrc.getPath().toLowerCase(Locale.ROOT).endsWith(".snbt")) {
-                compoundTag = NbtUtils.snbtToStructure(
-                        new String(structureNbtData, StandardCharsets.UTF_8));
+            if (absStructureSrc.getPath()
+                .toLowerCase(Locale.ROOT)
+                .endsWith(".snbt")) {
+                compoundTag = NbtUtils.snbtToStructure(new String(structureNbtData, StandardCharsets.UTF_8));
             } else {
-                compoundTag = NbtIo.readCompressed(new ByteArrayInputStream(structureNbtData),
-                        NbtAccounter.unlimitedHeap());
+                compoundTag = NbtIo
+                    .readCompressed(new ByteArrayInputStream(structureNbtData), NbtAccounter.unlimitedHeap());
             }
         } catch (Exception e) {
             errorSink.appendError(compiler, "Couldn't read structure: " + e.getMessage(), el);
@@ -73,7 +74,9 @@ public class ImportStructureElementCompiler implements SceneElementTagCompiler {
         }
 
         var template = new StructureTemplate();
-        var blocks = scene.getLevel().registryAccess().lookupOrThrow(Registries.BLOCK);
+        var blocks = scene.getLevel()
+            .registryAccess()
+            .lookupOrThrow(Registries.BLOCK);
         template.load(blocks, compoundTag);
         var random = new SingleThreadedRandomSource(0L);
         var settings = new StructurePlaceSettings();

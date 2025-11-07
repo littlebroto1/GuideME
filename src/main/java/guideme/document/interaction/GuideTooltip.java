@@ -1,9 +1,11 @@
 package guideme.document.interaction;
 
-import guideme.siteexport.ExportableResourceProvider;
 import java.util.List;
+
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.world.item.ItemStack;
+
+import guideme.siteexport.ExportableResourceProvider;
 
 public interface GuideTooltip extends ExportableResourceProvider {
 

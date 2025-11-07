@@ -1,15 +1,18 @@
 package guideme.document.block;
 
+import java.util.stream.Stream;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.LytRect;
 import guideme.document.flow.LytFlowContainer;
 import guideme.document.flow.LytFlowContent;
 import guideme.layout.LayoutContext;
 import guideme.layout.flow.FlowBuilder;
 import guideme.render.RenderContext;
-import java.util.stream.Stream;
-import org.jetbrains.annotations.Nullable;
 
 public class LytParagraph extends LytBlock implements LytFlowContainer {
+
     protected final FlowBuilder content = new FlowBuilder();
 
     protected int paddingLeft;

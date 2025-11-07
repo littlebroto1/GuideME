@@ -1,11 +1,13 @@
 package guideme.render;
 
-import guideme.color.LightDarkMode;
-import guideme.document.LytRect;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Rect2i;
+
+import guideme.color.LightDarkMode;
+import guideme.document.LytRect;
 
 class PanelBlitter {
 
@@ -170,24 +172,15 @@ class PanelBlitter {
                 cornerStyle.addQuad(layer, x, y, width, height, color);
             }
 
-            CENTER.addQuad(layer, innerLeft, innerTop,
-                    innerRight - innerLeft, innerBottom - innerTop,
-                    color);
+            CENTER.addQuad(layer, innerLeft, innerTop, innerRight - innerLeft, innerBottom - innerTop, color);
         }
     }
 
     /**
      * Rendering an edge potentially involves rendering a start or end cap if the edge hits an adjacent rectangle.
      */
-    private void renderEdge(
-            SpriteLayer layer,
-            EdgeStyle style,
-            int side,
-            int left,
-            int top,
-            int right,
-            int bottom,
-            int color) {
+    private void renderEdge(SpriteLayer layer, EdgeStyle style, int side, int left, int top, int right, int bottom,
+        int color) {
         if (right <= left || bottom <= top) {
             return;
         }
@@ -232,51 +225,55 @@ class PanelBlitter {
             if (side == 1 || side == 3) {
                 // Vertical
                 if (innerStartCorner != null) {
-                    innerStartCorner.addQuad(layer, left, top, innerStartCorner.width(),
-                            innerStartCorner.height(), color);
+                    innerStartCorner
+                        .addQuad(layer, left, top, innerStartCorner.width(), innerStartCorner.height(), color);
                     top += innerStartCorner.height();
                 }
                 if (innerEndCorner != null) {
-                    innerEndCorner.addQuad(layer, left, bottom - innerEndCorner.height(),
-                            innerEndCorner.width(), innerEndCorner.height(), color);
+                    innerEndCorner.addQuad(
+                        layer,
+                        left,
+                        bottom - innerEndCorner.height(),
+                        innerEndCorner.width(),
+                        innerEndCorner.height(),
+                        color);
                     bottom -= innerEndCorner.height();
                 }
             } else {
                 // Horizontal
                 if (innerStartCorner != null) {
-                    innerStartCorner.addQuad(layer, left, top, innerStartCorner.width(),
-                            innerStartCorner.height(), color);
+                    innerStartCorner
+                        .addQuad(layer, left, top, innerStartCorner.width(), innerStartCorner.height(), color);
                     left += innerStartCorner.width();
                 }
                 if (innerEndCorner != null) {
-                    innerEndCorner.addQuad(layer, right - innerEndCorner.width(), top,
-                            innerEndCorner.width(), innerEndCorner.height(), color);
+                    innerEndCorner.addQuad(
+                        layer,
+                        right - innerEndCorner.width(),
+                        top,
+                        innerEndCorner.width(),
+                        innerEndCorner.height(),
+                        color);
                     right -= innerEndCorner.width();
                 }
             }
             if (right - left > 0 && bottom - top > 0) {
-                CENTER.addQuad(
-                        layer,
-                        left, top,
-                        right - left, bottom - top,
-                        color);
+                CENTER.addQuad(layer, left, top, right - left, bottom - top, color);
             }
         }
     }
 
     private record Edge(EdgeStyle style, int start, int end) {
+
         public Edge(int start, int end) {
             this(EdgeStyle.NORMAL, start, end);
         }
     }
 
     private final class Rectangle {
-        SpriteSlice[] corners = new SpriteSlice[] {
-                OUTER_TOP_LEFT,
-                OUTER_TOP_RIGHT,
-                OUTER_BOTTOM_RIGHT,
-                OUTER_BOTTOM_LEFT,
-        };
+
+        SpriteSlice[] corners = new SpriteSlice[] { OUTER_TOP_LEFT, OUTER_TOP_RIGHT, OUTER_BOTTOM_RIGHT,
+            OUTER_BOTTOM_LEFT, };
         private final List<Edge> leftEdges = new ArrayList<>();
         private final List<Edge> topEdges = new ArrayList<>();
         private final List<Edge> rightEdges = new ArrayList<>();
@@ -325,12 +322,13 @@ class PanelBlitter {
         }
 
         public Rectangle copy() {
-            var result = new Rectangle(
-                    x, y, width, height);
+            var result = new Rectangle(x, y, width, height);
             System.arraycopy(corners, 0, result.corners, 0, result.corners.length);
             for (int i = 0; i < 4; i++) {
-                result.getEdgesForSide(i).clear();
-                result.getEdgesForSide(i).addAll(getEdgesForSide(i));
+                result.getEdgesForSide(i)
+                    .clear();
+                result.getEdgesForSide(i)
+                    .addAll(getEdgesForSide(i));
             }
             return result;
         }
@@ -410,8 +408,7 @@ class PanelBlitter {
                         }
 
                         tempEdges.add(
-                                new Edge(fillType, edgeStart - ourStart + overhangStart,
-                                        edgeEnd - ourStart - overhangEnd));
+                            new Edge(fillType, edgeStart - ourStart + overhangStart, edgeEnd - ourStart - overhangEnd));
                         if (overhangStart <= 0) {
                             corners[startCorner] = switch (side) {
                                 case 0, 2 -> LEFT_BORDER;
@@ -459,12 +456,19 @@ class PanelBlitter {
      * left-to-right, then top-to-bottom starting at 0.
      */
     private record SpriteSlice(GuiAssets.NineSliceSprite nineSlice, int slice) {
+
         int height() {
-            return slice / 3 == 2 ? nineSlice.padding().bottom() : nineSlice.padding().top();
+            return slice / 3 == 2 ? nineSlice.padding()
+                .bottom()
+                : nineSlice.padding()
+                    .top();
         }
 
         int width() {
-            return slice % 3 == 2 ? nineSlice.padding().right() : nineSlice.padding().left();
+            return slice % 3 == 2 ? nineSlice.padding()
+                .right()
+                : nineSlice.padding()
+                    .left();
         }
 
         public void addQuad(SpriteLayer layer, float x, float y, float width, float height, int color) {

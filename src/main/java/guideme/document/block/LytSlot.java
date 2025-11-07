@@ -1,5 +1,15 @@
 package guideme.document.block;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
+
 import guideme.document.LytRect;
 import guideme.document.interaction.GuideTooltip;
 import guideme.document.interaction.InteractiveElement;
@@ -9,14 +19,6 @@ import guideme.layout.LayoutContext;
 import guideme.render.GuiAssets;
 import guideme.render.GuiSprite;
 import guideme.render.RenderContext;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import net.minecraft.core.Holder;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 
 /**
  * Renders a standard Minecraft GUI slot.
@@ -39,12 +41,19 @@ public class LytSlot extends LytBlock implements InteractiveElement {
     }
 
     public LytSlot(Ingredient ingredient) {
-        this.stacks = ingredient.items().map(Holder::value).map(Item::getDefaultInstance).toList();
+        this.stacks = ingredient.items()
+            .map(Holder::value)
+            .map(Item::getDefaultInstance)
+            .toList();
     }
 
     public LytSlot(Optional<Ingredient> ingredient) {
         if (ingredient.isPresent()) {
-            this.stacks = ingredient.get().items().map(Holder::value).map(Item::getDefaultInstance).toList();
+            this.stacks = ingredient.get()
+                .items()
+                .map(Holder::value)
+                .map(Item::getDefaultInstance)
+                .toList();
         } else {
             this.stacks = List.of();
         }
@@ -72,8 +81,7 @@ public class LytSlot extends LytBlock implements InteractiveElement {
     }
 
     @Override
-    protected void onLayoutMoved(int deltaX, int deltaY) {
-    }
+    protected void onLayoutMoved(int deltaX, int deltaY) {}
 
     @Override
     public void render(RenderContext context) {

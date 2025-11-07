@@ -57,18 +57,11 @@ public class LytListItem extends LytVBox {
             var bounds = getBounds();
             var x = bounds.x() + LEVEL_MARGIN - width - 2;
 
-            context.renderText(label,
-                    style,
-                    x, (float) bounds.y());
+            context.renderText(label, style, x, (float) bounds.y());
         } else {
             var bounds = getBounds();
 
-            context.fillRect(
-                    bounds.x() + 5,
-                    bounds.y() + 4,
-                    2,
-                    2,
-                    SymbolicColor.BODY_TEXT);
+            context.fillRect(bounds.x() + 5, bounds.y() + 4, 2, 2, SymbolicColor.BODY_TEXT);
         }
 
         super.render(context);

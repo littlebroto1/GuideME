@@ -6,6 +6,6 @@ package guideme.extensions;
  * @see ExtensionCollection
  */
 public interface Extension {
-    default void onExtensionsBuilt(ExtensionCollection extensions) {
-    }
+
+    default void onExtensionsBuilt(ExtensionCollection extensions) {}
 }

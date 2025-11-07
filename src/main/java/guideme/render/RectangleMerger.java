@@ -1,16 +1,17 @@
 package guideme.render;
 
-import guideme.document.LytRect;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import guideme.document.LytRect;
 
 /**
  * Remove overlapping rectangles and produce a list of equivalent non-overlapping rectangles.
  */
 final class RectangleMerger {
-    private RectangleMerger() {
-    }
+
+    private RectangleMerger() {}
 
     /**
      * This implements a line-sweep algorithm that ensures all rectangles are non-overlapping by merging or subdividing
@@ -97,7 +98,9 @@ final class RectangleMerger {
             events.add(new Event(i, CLOSING, rect.x() + rect.width(), rect.y(), rect.width()));
         }
 
-        events.sort(Comparator.comparingInt((Event e) -> e.x).thenComparingInt(e -> e.y));
+        events.sort(
+            Comparator.comparingInt((Event e) -> e.x)
+                .thenComparingInt(e -> e.y));
         return events;
     }
 
@@ -110,13 +113,14 @@ final class RectangleMerger {
             events.add(new Event(i, CLOSING, rect.x(), rect.y() + rect.height(), rect.height()));
         }
 
-        events.sort(Comparator.comparingInt((Event e) -> e.y).thenComparingInt(e -> e.x));
+        events.sort(
+            Comparator.comparingInt((Event e) -> e.y)
+                .thenComparingInt(e -> e.x));
         return events;
     }
 
     private static final int OPENING = 0;
     private static final int CLOSING = 1;
 
-    public record Event(int ind, int type, int x, int y, int length) {
-    }
+    public record Event(int ind, int type, int x, int y, int length) {}
 }

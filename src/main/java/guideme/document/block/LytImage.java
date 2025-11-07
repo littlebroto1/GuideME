@@ -1,5 +1,12 @@
 package guideme.document.block;
 
+import java.util.Optional;
+
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.LytRect;
 import guideme.document.interaction.GuideTooltip;
 import guideme.document.interaction.InteractiveElement;
@@ -8,10 +15,6 @@ import guideme.layout.LayoutContext;
 import guideme.render.GuiAssets;
 import guideme.render.GuidePageTexture;
 import guideme.render.RenderContext;
-import java.util.Optional;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 public class LytImage extends LytBlock implements InteractiveElement {
 
@@ -72,8 +75,7 @@ public class LytImage extends LytBlock implements InteractiveElement {
     }
 
     @Override
-    protected void onLayoutMoved(int deltaX, int deltaY) {
-    }
+    protected void onLayoutMoved(int deltaX, int deltaY) {}
 
     @Override
     public void render(RenderContext context) {

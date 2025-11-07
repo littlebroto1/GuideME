@@ -4,6 +4,7 @@ package guideme.document.block;
  * A box that just aligns its content along the vertical or horizontal axis.
  */
 public abstract class LytAxisBox extends LytBox {
+
     private int gap;
 
     private AlignItems alignItems = AlignItems.START;

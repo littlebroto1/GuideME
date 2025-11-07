@@ -1,13 +1,16 @@
 package guideme.style;
 
-import guideme.document.DefaultStyles;
 import java.util.function.Consumer;
+
 import org.jetbrains.annotations.Nullable;
+
+import guideme.document.DefaultStyles;
 
 /**
  * Interface implemented on layout elements that can be styled and inherit styling from their parents.
  */
 public interface Styleable {
+
     TextStyle getStyle();
 
     void setStyle(TextStyle style);

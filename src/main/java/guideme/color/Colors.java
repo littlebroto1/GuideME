@@ -1,10 +1,12 @@
 package guideme.color;
 
 import net.minecraft.util.ARGB;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class Colors {
+
     private static final Logger LOG = LoggerFactory.getLogger(Colors.class);
 
     /**
@@ -47,8 +49,13 @@ public final class Colors {
                     aHi = fromHexChar(hexColor.charAt(start + 6));
                     aLo = fromHexChar(hexColor.charAt(start + 7));
                 }
-                if (rHi != -1 && rLo != -1 && gHi != -1 && gLo != -1 && bHi != -1 && bLo != -1 && aHi != -1
-                        && aLo != -1) {
+                if (rHi != -1 && rLo != -1
+                    && gHi != -1
+                    && gLo != -1
+                    && bHi != -1
+                    && bLo != -1
+                    && aHi != -1
+                    && aLo != -1) {
                     return argb(aHi << 4 | aLo, rHi << 4 | rLo, gHi << 4 | gLo, bHi << 4 | bLo);
                 }
             }

@@ -6,18 +6,19 @@ import guideme.layout.LayoutContext;
 import guideme.render.RenderContext;
 
 public class LytThematicBreak extends LytBlock {
+
     @Override
     public LytRect computeLayout(LayoutContext context, int x, int y, int availableWidth) {
         return new LytRect(x, y, availableWidth, 6);
     }
 
     @Override
-    protected void onLayoutMoved(int deltaX, int deltaY) {
-    }
+    protected void onLayoutMoved(int deltaX, int deltaY) {}
 
     @Override
     public void render(RenderContext context) {
-        var line = bounds.withHeight(2).centerVerticallyIn(bounds);
+        var line = bounds.withHeight(2)
+            .centerVerticallyIn(bounds);
 
         context.fillRect(line, SymbolicColor.THEMATIC_BREAK);
     }

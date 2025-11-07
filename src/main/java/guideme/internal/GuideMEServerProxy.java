@@ -1,16 +1,20 @@
 package guideme.internal;
 
-import guideme.PageAnchor;
-import guideme.internal.network.OpenGuideRequest;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
+
 import org.jetbrains.annotations.Nullable;
 
+import guideme.PageAnchor;
+import guideme.internal.network.OpenGuideRequest;
+
 class GuideMEServerProxy implements GuideMEProxy {
+
     @Override
     public boolean openGuide(Player player, ResourceLocation id) {
         if (player instanceof ServerPlayer serverPlayer) {

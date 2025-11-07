@@ -1,9 +1,5 @@
 package guideme.scene.level;
 
-import guideme.internal.GuideME;
-import guideme.internal.util.Platform;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import it.unimi.dsi.fastutil.longs.LongSet;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import net.minecraft.Util;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -71,15 +68,22 @@ import net.minecraft.world.ticks.LevelTickAccess;
 import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.model.data.ModelDataManager;
+
 import org.jetbrains.annotations.Nullable;
+
+import guideme.internal.GuideME;
+import guideme.internal.util.Platform;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 
 public class GuidebookLevel extends Level {
 
-    private static final ResourceKey<Level> LEVEL_ID = ResourceKey.create(Registries.DIMENSION,
-            GuideME.makeId("guidebook"));
+    private static final ResourceKey<Level> LEVEL_ID = ResourceKey
+        .create(Registries.DIMENSION, GuideME.makeId("guidebook"));
 
     private final TransientEntitySectionManager<Entity> entityStorage = new TransientEntitySectionManager<>(
-            Entity.class, new EntityCallbacks());
+        Entity.class,
+        new EntityCallbacks());
 
     private final ChunkSource chunkSource = new GuidebookChunkSource(this);
     private final Holder<Biome> biome;
@@ -107,19 +111,20 @@ public class GuidebookLevel extends Level {
 
     private GuidebookLevel(ClientLevel.ClientLevelData levelData, RegistryAccess registryAccess) {
         super(
-                levelData,
-                LEVEL_ID,
-                registryAccess,
-                registryAccess.lookupOrThrow(Registries.DIMENSION_TYPE)
-                        .getOrThrow(BuiltinDimensionTypes.OVERWORLD),
-                true /* client-side */,
-                false /* debug */,
-                0 /* seed */,
-                1000000 /* max neighbor updates */
+            levelData,
+            LEVEL_ID,
+            registryAccess,
+            registryAccess.lookupOrThrow(Registries.DIMENSION_TYPE)
+                .getOrThrow(BuiltinDimensionTypes.OVERWORLD),
+            true /* client-side */,
+            false /* debug */,
+            0 /* seed */,
+            1000000 /* max neighbor updates */
         );
         this.clientLevelData = levelData;
         this.registryAccess = registryAccess;
-        this.biome = registryAccess.lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS);
+        this.biome = registryAccess.lookupOrThrow(Registries.BIOME)
+            .getOrThrow(Biomes.PLAINS);
 
         var nibbles = new byte[DataLayer.SIZE];
         Arrays.fill(nibbles, (byte) 0xFF);
@@ -180,26 +185,26 @@ public class GuidebookLevel extends Level {
     public void prepareLighting(BlockPos pos) {
         var minChunk = new ChunkPos(pos.offset(-1, -1, -1));
         var maxChunk = new ChunkPos(pos.offset(1, 1, 1));
-        ChunkPos.rangeClosed(minChunk, maxChunk).forEach(chunkPos -> {
-            if (litSections.add(chunkPos.toLong())) {
-                var lightEngine = getLightEngine();
-                for (int i = 0; i < getSectionsCount(); ++i) {
-                    int y = getSectionYFromSectionIndex(i);
-                    var sectionPos = SectionPos.of(chunkPos, y);
-                    lightEngine.updateSectionStatus(sectionPos, false);
-                    lightEngine.queueSectionData(LightLayer.BLOCK, sectionPos, defaultDataLayer);
-                    lightEngine.queueSectionData(LightLayer.SKY, sectionPos, defaultDataLayer);
+        ChunkPos.rangeClosed(minChunk, maxChunk)
+            .forEach(chunkPos -> {
+                if (litSections.add(chunkPos.toLong())) {
+                    var lightEngine = getLightEngine();
+                    for (int i = 0; i < getSectionsCount(); ++i) {
+                        int y = getSectionYFromSectionIndex(i);
+                        var sectionPos = SectionPos.of(chunkPos, y);
+                        lightEngine.updateSectionStatus(sectionPos, false);
+                        lightEngine.queueSectionData(LightLayer.BLOCK, sectionPos, defaultDataLayer);
+                        lightEngine.queueSectionData(LightLayer.SKY, sectionPos, defaultDataLayer);
+                    }
+
+                    lightEngine.setLightEnabled(chunkPos, true);
+                    lightEngine.propagateLightSources(chunkPos);
+                    lightEngine.retainData(chunkPos, false);
                 }
-
-                lightEngine.setLightEnabled(chunkPos, true);
-                lightEngine.propagateLightSources(chunkPos);
-                lightEngine.retainData(chunkPos, false);
-            }
-        });
+            });
     }
 
-    public record Bounds(BlockPos min, BlockPos max) {
-    }
+    public record Bounds(BlockPos min, BlockPos max) {}
 
     private static ClientLevel.ClientLevelData createLevelData() {
         var levelData = new ClientLevel.ClientLevelData(Difficulty.PEACEFUL, false /* hardcore */, false /* flat */);
@@ -240,21 +245,20 @@ public class GuidebookLevel extends Level {
     public Stream<BlockPos> getFilledBlocks() {
         var mutablePos = new BlockPos.MutableBlockPos();
         return filledBlocks.longStream()
-                .sequential()
-                .mapToObj(pos -> {
-                    mutablePos.set(pos);
-                    return mutablePos;
-                });
+            .sequential()
+            .mapToObj(pos -> {
+                mutablePos.set(pos);
+                return mutablePos;
+            });
     }
 
     /**
      * @return All block entities in the level.
      */
     public Set<BlockEntity> getBlockEntities() {
-        return getFilledBlocks()
-                .map(this::getBlockEntity)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(() -> Collections.newSetFromMap(new IdentityHashMap<>())));
+        return getFilledBlocks().map(this::getBlockEntity)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toCollection(() -> Collections.newSetFromMap(new IdentityHashMap<>())));
     }
 
     @Override
@@ -263,7 +267,8 @@ public class GuidebookLevel extends Level {
     }
 
     public Iterable<Entity> getEntitiesForRendering() {
-        return entityStorage.getEntityGetter().getAll();
+        return entityStorage.getEntityGetter()
+            .getAll();
     }
 
     public void addEntity(Entity entity) {
@@ -293,18 +298,17 @@ public class GuidebookLevel extends Level {
     }
 
     @Override
-    public void sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
-    }
+    public void sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags) {}
 
     @Override
     public void playSeededSound(@Nullable Entity p_394382_, double p_220364_, double p_220365_, double p_220366_,
-            Holder<SoundEvent> p_394088_, SoundSource p_220368_, float p_220369_, float p_220370_, long p_220371_) {
+        Holder<SoundEvent> p_394088_, SoundSource p_220368_, float p_220369_, float p_220370_, long p_220371_) {
 
     }
 
     @Override
     public void playSeededSound(@Nullable Entity p_394455_, Entity p_393481_, Holder<SoundEvent> p_263359_,
-            SoundSource p_263020_, float p_263055_, float p_262914_, long p_262991_) {
+        SoundSource p_263020_, float p_263055_, float p_262914_, long p_262991_) {
 
     }
 
@@ -320,8 +324,7 @@ public class GuidebookLevel extends Level {
     }
 
     @Override
-    public void destroyBlockProgress(int breakerId, BlockPos pos, int progress) {
-    }
+    public void destroyBlockProgress(int breakerId, BlockPos pos, int progress) {}
 
     @Override
     public Scoreboard getScoreboard() {
@@ -334,6 +337,7 @@ public class GuidebookLevel extends Level {
             return Minecraft.getInstance().level.recipeAccess();
         }
         return new RecipeAccess() {
+
             @Override
             public RecipePropertySet propertySet(ResourceKey<RecipePropertySet> propertySet) {
                 return RecipePropertySet.EMPTY;
@@ -367,12 +371,10 @@ public class GuidebookLevel extends Level {
     }
 
     @Override
-    public void levelEvent(@Nullable Entity player, int type, BlockPos pos, int data) {
-    }
+    public void levelEvent(@Nullable Entity player, int type, BlockPos pos, int data) {}
 
     @Override
-    public void gameEvent(Holder<GameEvent> gameEvent, Vec3 vec3, GameEvent.Context context) {
-    }
+    public void gameEvent(Holder<GameEvent> gameEvent, Vec3 vec3, GameEvent.Context context) {}
 
     @Override
     public float getShade(Direction direction, boolean shade) {
@@ -435,10 +437,9 @@ public class GuidebookLevel extends Level {
 
     @Override
     public void explode(@Nullable Entity source, @Nullable DamageSource damageSource,
-            @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius,
-            boolean fire, ExplosionInteraction explosionInteraction, ParticleOptions p_364907_,
-            ParticleOptions p_360946_, WeightedList<ExplosionParticleInfo> p_437262_, Holder<SoundEvent> p_363757_) {
-    }
+        @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire,
+        ExplosionInteraction explosionInteraction, ParticleOptions p_364907_, ParticleOptions p_360946_,
+        WeightedList<ExplosionParticleInfo> p_437262_, Holder<SoundEvent> p_363757_) {}
 
     @Override
     public Collection<PartEntity<?>> dragonParts() {
@@ -451,8 +452,7 @@ public class GuidebookLevel extends Level {
     }
 
     @Override
-    public void setRespawnData(LevelData.RespawnData p_451027_) {
-    }
+    public void setRespawnData(LevelData.RespawnData p_451027_) {}
 
     @Override
     public LevelData.RespawnData getRespawnData() {
@@ -465,32 +465,26 @@ public class GuidebookLevel extends Level {
     }
 
     private static class EntityCallbacks implements LevelCallback<Entity> {
-        @Override
-        public void onCreated(Entity entity) {
-        }
 
         @Override
-        public void onDestroyed(Entity entity) {
-        }
+        public void onCreated(Entity entity) {}
 
         @Override
-        public void onTickingStart(Entity entity) {
-        }
+        public void onDestroyed(Entity entity) {}
 
         @Override
-        public void onTickingEnd(Entity entity) {
-        }
+        public void onTickingStart(Entity entity) {}
 
         @Override
-        public void onTrackingStart(Entity entity) {
-        }
+        public void onTickingEnd(Entity entity) {}
 
         @Override
-        public void onTrackingEnd(Entity entity) {
-        }
+        public void onTrackingStart(Entity entity) {}
 
         @Override
-        public void onSectionChange(Entity object) {
-        }
+        public void onTrackingEnd(Entity entity) {}
+
+        @Override
+        public void onSectionChange(Entity object) {}
     }
 }

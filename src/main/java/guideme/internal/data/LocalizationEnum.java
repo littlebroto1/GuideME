@@ -18,11 +18,13 @@ public interface LocalizationEnum {
     }
 
     default MutableComponent withSuffix(String text) {
-        return text().copy().append(text);
+        return text().copy()
+            .append(text);
     }
 
     default MutableComponent withSuffix(Component text) {
-        return text().copy().append(text);
+        return text().copy()
+            .append(text);
     }
 
 }

@@ -1,13 +1,16 @@
 package guideme.document.flow;
 
-import guideme.compiler.PageCompiler;
-import guideme.document.LytErrorSink;
-import guideme.libs.unist.UnistNode;
 import java.util.Optional;
+
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 
+import guideme.compiler.PageCompiler;
+import guideme.document.LytErrorSink;
+import guideme.libs.unist.UnistNode;
+
 public interface LytFlowParent extends LytErrorSink {
+
     void append(LytFlowContent child);
 
     default LytFlowText appendText(String text) {

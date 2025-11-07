@@ -1,5 +1,7 @@
 package guideme.compiler.tags;
 
+import java.util.Set;
+
 import guideme.color.ColorValue;
 import guideme.color.SymbolicColorResolver;
 import guideme.compiler.PageCompiler;
@@ -7,9 +9,9 @@ import guideme.document.flow.LytFlowParent;
 import guideme.document.flow.LytFlowSpan;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
 import guideme.style.TextStyle;
-import java.util.Set;
 
 public class ColorTagCompiler extends FlowTagCompiler {
+
     @Override
     public Set<String> getTagNames() {
         return Set.of("Color");
@@ -37,7 +39,10 @@ public class ColorTagCompiler extends FlowTagCompiler {
         }
 
         var span = new LytFlowSpan();
-        span.setStyle(TextStyle.builder().color(color).build());
+        span.setStyle(
+            TextStyle.builder()
+                .color(color)
+                .build());
         parent.append(span);
         compiler.compileFlowContext(el.children(), span);
     }

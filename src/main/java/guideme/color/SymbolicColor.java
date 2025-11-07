@@ -4,6 +4,7 @@ package guideme.color;
  * Symbolic colors can be overridden more easily in styles and define both a light- and dark-themed color variant.
  */
 public enum SymbolicColor implements ColorValue {
+
     LINK(Colors.rgb(0, 213, 255), Colors.rgb(0, 213, 255)),
     BODY_TEXT(Colors.rgb(210, 210, 210), Colors.rgb(210, 210, 210)),
     ERROR_TEXT(Colors.rgb(255, 0, 0), Colors.rgb(255, 0, 0)),

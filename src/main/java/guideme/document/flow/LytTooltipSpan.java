@@ -1,16 +1,19 @@
 package guideme.document.flow;
 
+import java.util.Optional;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.interaction.GuideTooltip;
 import guideme.document.interaction.InteractiveElement;
 import guideme.siteexport.ExportableResourceProvider;
 import guideme.siteexport.ResourceExporter;
-import java.util.Optional;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * An inline span that allows a tooltip to be shown on hover.
  */
 public class LytTooltipSpan extends LytFlowSpan implements InteractiveElement, ExportableResourceProvider {
+
     @Nullable
     private GuideTooltip tooltip;
 

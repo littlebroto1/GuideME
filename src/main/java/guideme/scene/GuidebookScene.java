@@ -1,16 +1,11 @@
 package guideme.scene;
 
-import guideme.document.LytPoint;
-import guideme.document.LytRect;
-import guideme.scene.annotation.InWorldAnnotation;
-import guideme.scene.annotation.OverlayAnnotation;
-import guideme.scene.annotation.SceneAnnotation;
-import guideme.scene.level.GuidebookLevel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -22,6 +17,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
+
 import org.jetbrains.annotations.Nullable;
 import org.joml.Intersectionf;
 import org.joml.Matrix4f;
@@ -29,6 +25,13 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
+
+import guideme.document.LytPoint;
+import guideme.document.LytRect;
+import guideme.scene.annotation.InWorldAnnotation;
+import guideme.scene.annotation.OverlayAnnotation;
+import guideme.scene.annotation.SceneAnnotation;
+import guideme.scene.level.GuidebookLevel;
 
 public class GuidebookScene {
 
@@ -67,11 +70,7 @@ public class GuidebookScene {
             result.max().y = Math.max(result.max().y, bounds.getRight().y);
         }
 
-        return new Vector4f(
-                result.min().x,
-                result.min().y,
-                result.max().x,
-                result.max().y);
+        return new Vector4f(result.min().x, result.min().y, result.max().x, result.max().y);
     }
 
     public void centerScene() {
@@ -87,26 +86,27 @@ public class GuidebookScene {
         var tmpPos = new Vector3f();
         var min = new Vector3f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
         var max = new Vector3f(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
-        level.getFilledBlocks().forEach(pos -> {
-            var state = level.getBlockState(pos);
-            if (!state.hasBlockEntity() && state.getRenderShape() == RenderShape.INVISIBLE) {
-                return; // Skip invisible blocks (i.e. minecraft:light)
-            }
+        level.getFilledBlocks()
+            .forEach(pos -> {
+                var state = level.getBlockState(pos);
+                if (!state.hasBlockEntity() && state.getRenderShape() == RenderShape.INVISIBLE) {
+                    return; // Skip invisible blocks (i.e. minecraft:light)
+                }
 
-            for (var xCorner = 0; xCorner <= 1; xCorner++) {
-                for (var yCorner = 0; yCorner <= 1; yCorner++) {
-                    for (var zCorner = 0; zCorner <= 1; zCorner++) {
-                        viewMatrix.transformPosition(
+                for (var xCorner = 0; xCorner <= 1; xCorner++) {
+                    for (var yCorner = 0; yCorner <= 1; yCorner++) {
+                        for (var zCorner = 0; zCorner <= 1; zCorner++) {
+                            viewMatrix.transformPosition(
                                 pos.getX() + xCorner,
                                 pos.getY() + yCorner,
                                 pos.getZ() + zCorner,
                                 tmpPos);
-                        min.min(tmpPos);
-                        max.max(tmpPos);
+                            min.min(tmpPos);
+                            max.max(tmpPos);
+                        }
                     }
                 }
-            }
-        });
+            });
 
         for (var entity : level.getEntitiesForRendering()) {
             var bounds = entity.getBoundingBox();
@@ -115,10 +115,10 @@ public class GuidebookScene {
                 for (var yCorner = 0; yCorner <= 1; yCorner++) {
                     for (var zCorner = 0; zCorner <= 1; zCorner++) {
                         viewMatrix.transformPosition(
-                                (float) (xCorner == 0 ? bounds.minX : bounds.maxX),
-                                (float) (yCorner == 0 ? bounds.minY : bounds.maxY),
-                                (float) (zCorner == 0 ? bounds.minZ : bounds.maxZ),
-                                tmpPos);
+                            (float) (xCorner == 0 ? bounds.minX : bounds.maxX),
+                            (float) (yCorner == 0 ? bounds.minY : bounds.maxY),
+                            (float) (zCorner == 0 ? bounds.minZ : bounds.maxZ),
+                            tmpPos);
                         min.min(tmpPos);
                         max.max(tmpPos);
                     }
@@ -133,8 +133,7 @@ public class GuidebookScene {
         return new Bounds(min, max);
     }
 
-    private record Bounds(Vector3f min, Vector3f max) {
-    }
+    private record Bounds(Vector3f min, Vector3f max) {}
 
     /**
      * Return the given world position in normalized device coordinates.
@@ -164,15 +163,13 @@ public class GuidebookScene {
         var viewProj = new Matrix4f(cameraSettings.getProjectionMatrix());
         viewProj.mul(cameraSettings.getViewMatrix());
         viewProj.unprojectRay(
-                screenX, screenY,
-                // We already expect normalized device coordinates,
-                // so the viewport is set in such a way as to leave the coordinates alone
-                new int[] {
-                        -1, -1,
-                        2, 2
-                },
-                rayOrigin,
-                rayDir);
+            screenX,
+            screenY,
+            // We already expect normalized device coordinates,
+            // so the viewport is set in such a way as to leave the coordinates alone
+            new int[] { -1, -1, 2, 2 },
+            rayOrigin,
+            rayDir);
 
     }
 
@@ -182,7 +179,7 @@ public class GuidebookScene {
      */
     @Nullable
     public SceneAnnotation pickAnnotation(LytPoint point, LytRect viewport,
-            Predicate<? super SceneAnnotation> predicate) {
+        Predicate<? super SceneAnnotation> predicate) {
         var screenPos = documentToScreen(viewport, point);
 
         SceneAnnotation annotation = pickOverlayAnnotation(point, viewport, predicate);
@@ -195,9 +192,8 @@ public class GuidebookScene {
     }
 
     @Nullable
-    public OverlayAnnotation pickOverlayAnnotation(LytPoint point,
-            LytRect viewport,
-            Predicate<? super OverlayAnnotation> predicate) {
+    public OverlayAnnotation pickOverlayAnnotation(LytPoint point, LytRect viewport,
+        Predicate<? super OverlayAnnotation> predicate) {
         for (int i = overlayAnnotations.size() - 1; i >= 0; i--) {
             var annotation = overlayAnnotations.get(i);
             if (!predicate.test(annotation)) {
@@ -213,9 +209,8 @@ public class GuidebookScene {
     }
 
     @Nullable
-    public InWorldAnnotation pickInWorldAnnotation(float screenX,
-            float screenY,
-            Predicate<? super InWorldAnnotation> predicate) {
+    public InWorldAnnotation pickInWorldAnnotation(float screenX, float screenY,
+        Predicate<? super InWorldAnnotation> predicate) {
         // Check overlay annotations first
 
         var rayOrigin = new Vector3f();
@@ -251,11 +246,23 @@ public class GuidebookScene {
         var levelBounds = level.getBounds();
         var intersection = new Vector2f();
         if (!Intersectionf.intersectRayAab(
-                rayOrigin,
-                rayDir,
-                new Vector3f(levelBounds.min().getX(), levelBounds.min().getY(), levelBounds.min().getZ()),
-                new Vector3f(levelBounds.max().getX(), levelBounds.max().getY(), levelBounds.max().getZ()),
-                intersection)) {
+            rayOrigin,
+            rayDir,
+            new Vector3f(
+                levelBounds.min()
+                    .getX(),
+                levelBounds.min()
+                    .getY(),
+                levelBounds.min()
+                    .getZ()),
+            new Vector3f(
+                levelBounds.max()
+                    .getX(),
+                levelBounds.max()
+                    .getY(),
+                levelBounds.max()
+                    .getZ()),
+            intersection)) {
             return BlockHitResult.miss(Vec3.ZERO, Direction.UP, BlockPos.ZERO);
         }
 
@@ -275,7 +282,7 @@ public class GuidebookScene {
             var blockHit = level.clipWithInteractionOverride(fromVec3, toVec3, blockPos, blockShape, blockState);
 
             var fluidShape = fluidClipContext.canPick(fluidState) ? fluidState.getShape(level, blockPos)
-                    : Shapes.empty();
+                : Shapes.empty();
             var fluidHit = fluidShape.clip(fromVec3, toVec3, blockPos);
 
             double blockDist = blockHit == null ? Double.MAX_VALUE : fromVec3.distanceToSqr(blockHit.getLocation());
@@ -283,8 +290,8 @@ public class GuidebookScene {
             return blockDist <= fluidDist ? blockHit : fluidHit;
         }, ignored -> {
             Vec3 vec3 = fromVec3.subtract(toVec3);
-            return BlockHitResult.miss(toVec3, Direction.getApproximateNearest(vec3.x, vec3.y, vec3.z),
-                    BlockPos.containing(toVec3));
+            return BlockHitResult
+                .miss(toVec3, Direction.getApproximateNearest(vec3.x, vec3.y, vec3.z), BlockPos.containing(toVec3));
         });
     }
 
@@ -296,22 +303,23 @@ public class GuidebookScene {
         // This is doing more work than needed since touching blocks create unneeded corners
         var min = new Vector3f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
         var max = new Vector3f(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
-        level.getFilledBlocks().forEach(pos -> {
-            var tmp = new Vector3f();
-            for (var xCorner = 0; xCorner <= 1; xCorner++) {
-                for (var yCorner = 0; yCorner <= 1; yCorner++) {
-                    for (var zCorner = 0; zCorner <= 1; zCorner++) {
-                        tmp.set(pos.getX(), pos.getY(), pos.getZ());
-                        min.min(tmp);
-                        max.max(tmp);
+        level.getFilledBlocks()
+            .forEach(pos -> {
+                var tmp = new Vector3f();
+                for (var xCorner = 0; xCorner <= 1; xCorner++) {
+                    for (var yCorner = 0; yCorner <= 1; yCorner++) {
+                        for (var zCorner = 0; zCorner <= 1; zCorner++) {
+                            tmp.set(pos.getX(), pos.getY(), pos.getZ());
+                            min.min(tmp);
+                            max.max(tmp);
 
-                        tmp.add(1, 1, 1);
-                        min.min(tmp);
-                        max.max(tmp);
+                            tmp.add(1, 1, 1);
+                            min.min(tmp);
+                            max.max(tmp);
+                        }
                     }
                 }
-            }
-        });
+            });
         var tmp = new Vector3f();
         for (var entity : level.getEntitiesForRendering()) {
             var bounds = entity.getBoundingBox();

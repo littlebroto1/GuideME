@@ -1,13 +1,15 @@
 package guideme.compiler;
 
-import guideme.PageAnchor;
 import java.net.URI;
+
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 
+import guideme.PageAnchor;
+
 public final class LinkParser {
-    private LinkParser() {
-    }
+
+    private LinkParser() {}
 
     /**
      * Parses a textual reference found in a link.
@@ -23,7 +25,10 @@ public final class LinkParser {
 
         // External link
         if (uri != null && uri.isAbsolute()
-                && (uri.getScheme().equals("http") || uri.getScheme().equalsIgnoreCase("https"))) {
+            && (uri.getScheme()
+                .equals("http")
+                || uri.getScheme()
+                    .equalsIgnoreCase("https"))) {
             visitor.handleExternal(uri);
             return;
         }
@@ -44,7 +49,8 @@ public final class LinkParser {
             return;
         }
 
-        if (!compiler.getPageCollection().pageExists(pageId)) {
+        if (!compiler.getPageCollection()
+            .pageExists(pageId)) {
             visitor.handleError("Page does not exist");
             return;
         }
@@ -53,14 +59,12 @@ public final class LinkParser {
     }
 
     public interface Visitor {
-        default void handlePage(PageAnchor page) {
-        }
 
-        default void handleExternal(URI uri) {
-        }
+        default void handlePage(PageAnchor page) {}
 
-        default void handleError(String error) {
-        }
+        default void handleExternal(URI uri) {}
+
+        default void handleError(String error) {}
     }
 
 }

@@ -1,13 +1,16 @@
 package guideme.layout;
 
-import com.google.common.collect.Streams;
-import guideme.document.LytRect;
-import guideme.style.ResolvedTextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
 
+import com.google.common.collect.Streams;
+
+import guideme.document.LytRect;
+import guideme.style.ResolvedTextStyle;
+
 public class LayoutContext implements FontMetrics {
+
     private final FontMetrics fontMetrics;
 
     private final List<LytRect> leftFloats = new ArrayList<>();
@@ -27,30 +30,35 @@ public class LayoutContext implements FontMetrics {
 
     public OptionalInt getLeftFloatRightEdge() {
         return leftFloats.stream()
-                .mapToInt(LytRect::right)
-                .max();
+            .mapToInt(LytRect::right)
+            .max();
     }
 
     public OptionalInt getRightFloatLeftEdge() {
         return rightFloats.stream()
-                .mapToInt(LytRect::x)
-                .min();
+            .mapToInt(LytRect::x)
+            .min();
     }
 
     // Clears all pending floats and returns the lowest y level below the cleared floats
     public OptionalInt clearFloats(boolean left, boolean right) {
         if (left && right) {
             var result = Streams.concat(leftFloats.stream(), rightFloats.stream())
-                    .mapToInt(LytRect::bottom).max();
+                .mapToInt(LytRect::bottom)
+                .max();
             leftFloats.clear();
             rightFloats.clear();
             return result;
         } else if (left) {
-            var result = leftFloats.stream().mapToInt(LytRect::bottom).max();
+            var result = leftFloats.stream()
+                .mapToInt(LytRect::bottom)
+                .max();
             leftFloats.clear();
             return result;
         } else if (right) {
-            var result = rightFloats.stream().mapToInt(LytRect::bottom).max();
+            var result = rightFloats.stream()
+                .mapToInt(LytRect::bottom)
+                .max();
             rightFloats.clear();
             return result;
         } else {
@@ -79,8 +87,8 @@ public class LayoutContext implements FontMetrics {
      */
     public OptionalInt getNextFloatBottomEdge(int y) {
         return Streams.concat(leftFloats.stream(), rightFloats.stream())
-                .mapToInt(LytRect::bottom)
-                .filter(bottom -> bottom > y)
-                .min();
+            .mapToInt(LytRect::bottom)
+            .filter(bottom -> bottom > y)
+            .min();
     }
 }

@@ -9,10 +9,12 @@ import guideme.document.flow.LytFlowContent;
  * application. This is used to export item descriptions, item icons, etc.
  */
 public interface ExportableResourceProvider {
+
     void exportResources(ResourceExporter exporter);
 
     static void visit(LytNode node, ResourceExporter exporter) {
         node.visit(new LytVisitor() {
+
             @Override
             public Result beforeNode(LytNode node) {
                 if (node instanceof ExportableResourceProvider provider) {

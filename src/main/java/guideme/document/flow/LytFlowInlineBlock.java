@@ -1,5 +1,9 @@
 package guideme.document.flow;
 
+import java.util.Optional;
+
+import net.minecraft.client.input.MouseButtonInfo;
+
 import guideme.document.LytSize;
 import guideme.document.block.LytBlock;
 import guideme.document.block.LytVisitor;
@@ -8,8 +12,6 @@ import guideme.document.interaction.InteractiveElement;
 import guideme.layout.LayoutContext;
 import guideme.layout.MinecraftFontMetrics;
 import guideme.ui.GuideUiHost;
-import java.util.Optional;
-import net.minecraft.client.input.MouseButtonInfo;
 
 public class LytFlowInlineBlock extends LytFlowContent implements InteractiveElement {
 

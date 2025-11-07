@@ -1,5 +1,19 @@
 package guideme.document.block.recipes;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
+import net.minecraft.world.level.ItemLike;
+
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.DefaultStyles;
 import guideme.document.LytSize;
 import guideme.document.block.AlignItems;
@@ -14,17 +28,6 @@ import guideme.render.RenderContext;
 import guideme.scene.LytItemImage;
 import guideme.siteexport.ExportableResourceProvider;
 import guideme.siteexport.ResourceExporter;
-import java.util.ArrayList;
-import java.util.List;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.display.RecipeDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
-import net.minecraft.world.level.ItemLike;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Provides an easy way to define recipes that are rendered as follows:
@@ -38,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
  * Use the {@link #builder()} method to get started.
  */
 public class LytStandardRecipeBox<T extends Recipe<?>> extends LytVBox implements ExportableResourceProvider {
+
     private final RecipeHolder<? extends T> holder;
 
     @ApiStatus.Internal
@@ -65,6 +69,7 @@ public class LytStandardRecipeBox<T extends Recipe<?>> extends LytVBox implement
     }
 
     public static class Builder {
+
         private LytBlock icon;
         private final LytParagraph title = new LytParagraph();
         private final List<LytBlock> topDecoration = new ArrayList<>();
@@ -94,7 +99,9 @@ public class LytStandardRecipeBox<T extends Recipe<?>> extends LytVBox implement
         }
 
         public Builder icon(ItemLike workbench) {
-            return icon(workbench.asItem().getDefaultInstance());
+            return icon(
+                workbench.asItem()
+                    .getDefaultInstance());
         }
 
         public Builder icon(ItemStack workbench) {
@@ -151,7 +158,8 @@ public class LytStandardRecipeBox<T extends Recipe<?>> extends LytVBox implement
         }
 
         public Builder outputFromResultOf(RecipeHolder<?> recipe) {
-            for (var recipeDisplay : recipe.value().display()) {
+            for (var recipeDisplay : recipe.value()
+                .display()) {
                 var resultDisplay = recipeDisplay.result();
                 if (resultDisplay.type() != SlotDisplay.Empty.TYPE) {
                     output(resultDisplay);

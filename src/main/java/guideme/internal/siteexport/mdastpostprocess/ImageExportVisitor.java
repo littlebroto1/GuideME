@@ -1,5 +1,7 @@
 package guideme.internal.siteexport.mdastpostprocess;
 
+import java.nio.file.Path;
+
 import guideme.compiler.IdUtils;
 import guideme.compiler.tags.FloatingImageCompiler;
 import guideme.libs.mdast.MdAstVisitor;
@@ -7,12 +9,12 @@ import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
 import guideme.libs.mdast.model.MdAstImage;
 import guideme.libs.mdast.model.MdAstNode;
 import guideme.siteexport.ResourceExporter;
-import java.nio.file.Path;
 
 /**
  * Searches for static images and exports them, while rewriting the referenced path with relation to the base URL.
  */
 public class ImageExportVisitor implements MdAstVisitor {
+
     private final ResourceExporter exporter;
 
     public ImageExportVisitor(ResourceExporter exporter) {

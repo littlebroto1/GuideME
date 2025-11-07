@@ -1,9 +1,11 @@
 package guideme.document.flow;
 
-import guideme.document.block.LytVisitor;
 import java.util.Objects;
 
+import guideme.document.block.LytVisitor;
+
 public class LytFlowText extends LytFlowContent {
+
     private String text = "";
 
     public String getText() {

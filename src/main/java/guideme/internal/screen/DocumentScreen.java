@@ -1,6 +1,23 @@
 package guideme.internal.screen;
 
+import java.util.Optional;
+import java.util.function.Function;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.mojang.blaze3d.platform.Window;
+
 import guideme.color.ColorValue;
 import guideme.color.ConstantColor;
 import guideme.document.DefaultStyles;
@@ -22,21 +39,9 @@ import guideme.style.ResolvedTextStyle;
 import guideme.style.TextStyle;
 import guideme.ui.GuideUiHost;
 import guideme.ui.UiPoint;
-import java.util.Optional;
-import java.util.function.Function;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.input.MouseButtonInfo;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class DocumentScreen extends IndepentScaleScreen implements GuideUiHost {
+
     private static final Logger LOG = LoggerFactory.getLogger(DocumentScreen.class);
 
     private static final DashPattern DEBUG_NODE_OUTLINE = new DashPattern(1f, 4, 3, 0xFFFFFFFF, 500);
@@ -67,7 +72,8 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
     protected void init() {
         super.init();
 
-        if (GuideMEClient.instance().isFullWidthLayout() || width < getMaxWidth()) {
+        if (GuideMEClient.instance()
+            .isFullWidthLayout() || width < getMaxWidth()) {
             screenRect = new LytRect(0, 0, width, height);
         } else {
             var maxWidth = getMaxWidth();
@@ -86,14 +92,16 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
 
     @Override
     protected float calculateEffectiveScale() {
-        if (!GuideMEClient.instance().isAdaptiveScalingEnabled()) {
+        if (!GuideMEClient.instance()
+            .isAdaptiveScalingEnabled()) {
             return 1f;
         }
 
         // The unifont is already scaled down by half at gui scale 1
         // and at scale 3 it is scaled to 150%, both look bad
         // For GUI scales 1 and 3 scale up the entire screen by 1
-        var window = Minecraft.getInstance().getWindow();
+        var window = Minecraft.getInstance()
+            .getWindow();
         var currentScale = window.getGuiScale();
         var effectiveScale = currentScale;
         if (currentScale == 1) {
@@ -107,8 +115,13 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
         var virtualHeight = window.getHeight() / effectiveScale;
         if (virtualWidth < Window.BASE_WIDTH || virtualHeight < Window.BASE_HEIGHT) {
             var reducedEffectiveScale = Math.max(2, currentScale - 1);
-            LOG.debug("Not enough screen space ({}x{}) to increase GUI scale from {} to {}. Decreasing to {} instead.",
-                    virtualWidth, virtualHeight, currentScale, effectiveScale, reducedEffectiveScale);
+            LOG.debug(
+                "Not enough screen space ({}x{}) to increase GUI scale from {} to {}. Decreasing to {} instead.",
+                virtualWidth,
+                virtualHeight,
+                currentScale,
+                effectiveScale,
+                reducedEffectiveScale);
             effectiveScale = reducedEffectiveScale;
         }
 
@@ -196,13 +209,15 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
         poseStack.pushMatrix();
         poseStack.translate(documentRect.x() - documentViewport.x(), documentRect.y() - documentViewport.y());
 
-        context.guiGraphics().nextStratum();
+        context.guiGraphics()
+            .nextStratum();
 
         document.render(context);
 
         context.popScissor();
 
-        if (GuideMEClient.instance().isShowDebugGuiOverlays()) {
+        if (GuideMEClient.instance()
+            .isShowDebugGuiOverlays()) {
             renderHoverOutline(document, context);
         }
 
@@ -217,68 +232,84 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
             return;
         }
 
-        context.poseStack().pushMatrix();
+        context.poseStack()
+            .pushMatrix();
 
         // Fill a rectangle highlighting margins
         if (hoveredElement.node() instanceof LytBlock block) {
             var bounds = block.getBounds();
             if (block.getMarginTop() > 0) {
                 context.fillRect(
-                        RenderPipelines.GUI_INVERT,
-                        bounds.withHeight(block.getMarginTop()).move(0, -block.getMarginTop()),
-                        DEBUG_HOVER_OUTLINE_COLOR);
+                    RenderPipelines.GUI_INVERT,
+                    bounds.withHeight(block.getMarginTop())
+                        .move(0, -block.getMarginTop()),
+                    DEBUG_HOVER_OUTLINE_COLOR);
             }
             if (block.getMarginBottom() > 0) {
                 context.fillRect(
-                        RenderPipelines.GUI_INVERT,
-                        bounds.withHeight(block.getMarginBottom()).move(0, bounds.height()),
-                        DEBUG_HOVER_OUTLINE_COLOR);
+                    RenderPipelines.GUI_INVERT,
+                    bounds.withHeight(block.getMarginBottom())
+                        .move(0, bounds.height()),
+                    DEBUG_HOVER_OUTLINE_COLOR);
             }
             if (block.getMarginLeft() > 0) {
                 context.fillRect(
-                        RenderPipelines.GUI_INVERT,
-                        bounds.withWidth(block.getMarginLeft()).move(-block.getMarginLeft(), 0),
-                        DEBUG_HOVER_OUTLINE_COLOR);
+                    RenderPipelines.GUI_INVERT,
+                    bounds.withWidth(block.getMarginLeft())
+                        .move(-block.getMarginLeft(), 0),
+                    DEBUG_HOVER_OUTLINE_COLOR);
             }
             if (block.getMarginRight() > 0) {
                 context.fillRect(
-                        RenderPipelines.GUI_INVERT,
-                        bounds.withWidth(block.getMarginRight()).move(bounds.width(), 0),
-                        DEBUG_HOVER_OUTLINE_COLOR);
+                    RenderPipelines.GUI_INVERT,
+                    bounds.withWidth(block.getMarginRight())
+                        .move(bounds.width(), 0),
+                    DEBUG_HOVER_OUTLINE_COLOR);
             }
         }
 
         // Fill the content rectangle
-        DashedRectangle.render(context, hoveredElement.node().getBounds(), DEBUG_NODE_OUTLINE);
+        DashedRectangle.render(
+            context,
+            hoveredElement.node()
+                .getBounds(),
+            DEBUG_NODE_OUTLINE);
 
         // Also outline any inline-elements in the block
         if (hoveredElement.content() != null) {
             if (hoveredElement.node() instanceof LytFlowContainer flowContainer) {
                 flowContainer.enumerateContentBounds(hoveredElement.content())
-                        .forEach(bound -> {
-                            DashedRectangle.render(context, bound, DEBUG_CONTENT_OUTLINE);
-                        });
+                    .forEach(bound -> { DashedRectangle.render(context, bound, DEBUG_CONTENT_OUTLINE); });
             }
         }
 
         // Render the class-name of the hovered node to make it easier to identify
-        var bounds = hoveredElement.node().getBounds();
+        var bounds = hoveredElement.node()
+            .getBounds();
         ResolvedTextStyle debugFontStyle = TextStyle.builder()
-                .color(ConstantColor.WHITE)
-                .build().mergeWith(DefaultStyles.BASE_STYLE);
+            .color(ConstantColor.WHITE)
+            .build()
+            .mergeWith(DefaultStyles.BASE_STYLE);
         context.fillRect(
-                bounds.x(),
-                bounds.bottom(),
-                (int) context.getWidth(hoveredElement.node().getClass().getName(), debugFontStyle),
-                10,
-                ConstantColor.BLACK);
+            bounds.x(),
+            bounds.bottom(),
+            (int) context.getWidth(
+                hoveredElement.node()
+                    .getClass()
+                    .getName(),
+                debugFontStyle),
+            10,
+            ConstantColor.BLACK);
         context.renderText(
-                hoveredElement.node().getClass().getName(),
-                debugFontStyle,
-                bounds.x(),
-                bounds.bottom());
+            hoveredElement.node()
+                .getClass()
+                .getName(),
+            debugFontStyle,
+            bounds.x(),
+            bounds.bottom());
 
-        context.poseStack().popMatrix();
+        context.poseStack()
+            .popMatrix();
     }
 
     @Override
@@ -292,9 +323,10 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
 
         var docPoint = getDocumentPoint(mouseX, mouseY);
         if (docPoint != null) {
-            dispatchEvent(docPoint.x(), docPoint.y(), el -> {
-                return el.mouseMoved(this, docPoint.x(), docPoint.y());
-            });
+            dispatchEvent(
+                docPoint.x(),
+                docPoint.y(),
+                el -> { return el.mouseMoved(this, docPoint.x(), docPoint.y()); });
         }
     }
 
@@ -310,9 +342,10 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
                 return true;
             }
 
-            return dispatchEvent(docPoint.x(), docPoint.y(), el -> {
-                return el.mouseClicked(this, docPoint.x(), docPoint.y(), event.buttonInfo(), doubleClick);
-            });
+            return dispatchEvent(
+                docPoint.x(),
+                docPoint.y(),
+                el -> { return el.mouseClicked(this, docPoint.x(), docPoint.y(), event.buttonInfo(), doubleClick); });
         } else {
             return false;
         }
@@ -328,8 +361,8 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
             var currentTarget = mouseCaptureTarget;
 
             var docPointUnclamped = getDocumentPointUnclamped(event.x(), event.y());
-            boolean handled = currentTarget.mouseReleased(this, docPointUnclamped.x(), docPointUnclamped.y(),
-                    event.buttonInfo());
+            boolean handled = currentTarget
+                .mouseReleased(this, docPointUnclamped.x(), docPointUnclamped.y(), event.buttonInfo());
 
             releaseMouseCapture(currentTarget);
             if (handled) {
@@ -343,9 +376,10 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
 
         var docPoint = getDocumentPoint(event.x(), event.y());
         if (docPoint != null) {
-            return dispatchEvent(docPoint.x(), docPoint.y(), el -> {
-                return el.mouseReleased(this, docPoint.x(), docPoint.y(), event.buttonInfo());
-            });
+            return dispatchEvent(
+                docPoint.x(),
+                docPoint.y(),
+                el -> { return el.mouseReleased(this, docPoint.x(), docPoint.y(), event.buttonInfo()); });
         } else {
             return false;
         }
@@ -353,6 +387,7 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
 
     @FunctionalInterface
     interface EventInvoker {
+
         boolean invoke(InteractiveElement el);
     }
 
@@ -392,7 +427,7 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
     }
 
     private static <T> Optional<T> dispatchInteraction(LytDocument.HitTestResult receiver,
-            Function<InteractiveElement, Optional<T>> invoker) {
+        Function<InteractiveElement, Optional<T>> invoker) {
         // Iterate through content ancestors
         for (var el = receiver.content(); el != null; el = el.getFlowParent()) {
             if (el instanceof InteractiveElement interactiveEl) {
@@ -424,8 +459,10 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
         if (document != null) {
             var mouseHandler = minecraft.mouseHandler;
             // We use screen here so it accounts for our gui-scale independent scaling screen.
-            var xScale = (double) minecraft.screen.width / (double) minecraft.getWindow().getScreenWidth();
-            var yScale = (double) minecraft.screen.height / (double) minecraft.getWindow().getScreenHeight();
+            var xScale = (double) minecraft.screen.width / (double) minecraft.getWindow()
+                .getScreenWidth();
+            var yScale = (double) minecraft.screen.height / (double) minecraft.getWindow()
+                .getScreenHeight();
             var x = mouseHandler.xpos() * xScale;
             var y = mouseHandler.ypos() * yScale;
 
@@ -450,7 +487,8 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
         var documentRect = getDocumentRect();
 
         if (screenX >= documentRect.x() && screenX < documentRect.right()
-                && screenY >= documentRect.y() && screenY < documentRect.bottom()) {
+            && screenY >= documentRect.y()
+            && screenY < documentRect.bottom()) {
             return getDocumentPointUnclamped(screenX, screenY);
         }
 
@@ -474,9 +512,7 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
         var documentViewport = getDocumentViewport();
         var x = documentPoint.x() - documentViewport.x();
         var y = documentPoint.y() - documentViewport.y();
-        return new LytPoint(
-                documentRect.x() + x,
-                documentRect.y() + y);
+        return new LytPoint(documentRect.x() + x, documentRect.y() + y);
     }
 
     @Override
@@ -507,15 +543,13 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
         }
         var hoveredElement = document.getHoveredElement();
         if (hoveredElement != null) {
-            dispatchInteraction(
-                    hoveredElement,
-                    el -> el.getTooltip(docPos.x(), docPos.y()))
-                    .ifPresent(tooltip -> renderTooltip(guiGraphics, tooltip, x, y, null));
+            dispatchInteraction(hoveredElement, el -> el.getTooltip(docPos.x(), docPos.y()))
+                .ifPresent(tooltip -> renderTooltip(guiGraphics, tooltip, x, y, null));
         }
     }
 
     private void renderTooltip(GuiGraphics guiGraphics, GuideTooltip tooltip, int mouseX, int mouseY,
-            @Nullable ResourceLocation sprite) {
+        @Nullable ResourceLocation sprite) {
         var minecraft = Minecraft.getInstance();
         var clientLines = tooltip.getLines();
 
@@ -554,7 +588,9 @@ public abstract class DocumentScreen extends IndepentScaleScreen implements Guid
             x += 18;
         }
 
-        var bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+        var bufferSource = Minecraft.getInstance()
+            .renderBuffers()
+            .bufferSource();
         int currentY = y;
 
         // Batch-render tooltip text first

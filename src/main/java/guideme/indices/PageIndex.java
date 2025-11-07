@@ -1,16 +1,19 @@
 package guideme.indices;
 
-import com.google.gson.stream.JsonWriter;
-import guideme.GuidePageChange;
-import guideme.compiler.ParsedGuidePage;
 import java.io.IOException;
 import java.util.List;
+
+import com.google.gson.stream.JsonWriter;
+
+import guideme.GuidePageChange;
+import guideme.compiler.ParsedGuidePage;
 
 /**
  * A page index is an index over all guidebook pages that will be automatically built when the guidebook is reloaded,
  * and when individual pages change.
  */
 public interface PageIndex {
+
     String getName();
 
     /**
@@ -26,8 +29,7 @@ public interface PageIndex {
     /**
      * Applies an incremental update to this index.
      */
-    void update(List<ParsedGuidePage> allPages,
-            List<GuidePageChange> changes);
+    void update(List<ParsedGuidePage> allPages, List<GuidePageChange> changes);
 
     /**
      * Serialize the index to JSON for export to the website.
@@ -36,6 +38,7 @@ public interface PageIndex {
 
     @FunctionalInterface
     interface JsonSerializer<T> {
+
         void write(JsonWriter writer, T value) throws IOException;
     }
 }

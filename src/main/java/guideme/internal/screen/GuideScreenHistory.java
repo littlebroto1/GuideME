@@ -1,9 +1,11 @@
 package guideme.internal.screen;
 
-import guideme.PageAnchor;
 import java.util.Optional;
 
+import guideme.PageAnchor;
+
 public interface GuideScreenHistory {
+
     /**
      * Append to history if it's not already appended
      */

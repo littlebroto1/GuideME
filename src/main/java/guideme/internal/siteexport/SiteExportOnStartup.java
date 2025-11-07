@@ -1,26 +1,29 @@
 package guideme.internal.siteexport;
 
-import guideme.internal.GuideOnStartup;
-import guideme.internal.GuideRegistry;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.ClientResourceLoadFinishedEvent;
 import net.neoforged.neoforge.common.NeoForge;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import guideme.internal.GuideOnStartup;
+import guideme.internal.GuideRegistry;
 
 /**
  * Utility class for exporting a Guide on startup and then exiting the game.
  */
 public final class SiteExportOnStartup {
+
     private static final Logger LOG = LoggerFactory.getLogger(SiteExportOnStartup.class);
 
-    private SiteExportOnStartup() {
-    }
+    private SiteExportOnStartup() {}
 
     public static void init() {
         var guidesToExport = getGuidesToExport();
@@ -48,7 +51,8 @@ public final class SiteExportOnStartup {
                         System.exit(1);
                     }
                 }
-                Minecraft.getInstance().stop();
+                Minecraft.getInstance()
+                    .stop();
             });
         }
     }
@@ -63,12 +67,15 @@ public final class SiteExportOnStartup {
         var guidesToExport = new HashMap<ResourceLocation, Path>();
         for (String unparsedResourceId : guideIdsString.split(",")) {
             var guideId = ResourceLocation.parse(unparsedResourceId);
-            String destinationPropertyName = "guideme.exportDestination." + guideId.getNamespace() + "."
-                    + guideId.getPath();
+            String destinationPropertyName = "guideme.exportDestination." + guideId.getNamespace()
+                + "."
+                + guideId.getPath();
             var destinationDirectory = System.getProperty(destinationPropertyName);
             if (destinationDirectory == null) {
-                throw new RuntimeException("When exporting GuideME guide " + guideId
-                        + " also set a destination directory using system property " + destinationPropertyName);
+                throw new RuntimeException(
+                    "When exporting GuideME guide " + guideId
+                        + " also set a destination directory using system property "
+                        + destinationPropertyName);
             }
             guidesToExport.put(guideId, Paths.get(destinationDirectory));
         }

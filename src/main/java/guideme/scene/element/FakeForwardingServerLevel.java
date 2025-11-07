@@ -8,6 +8,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -62,6 +63,7 @@ import net.minecraft.world.ticks.LevelTickAccess;
 import net.minecraft.world.ticks.TickPriority;
 import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
 import net.neoforged.neoforge.model.data.ModelData;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,6 +78,7 @@ import org.jetbrains.annotations.Nullable;
  * the server level in specific circumstances we don't use, this should continue to work.
  */
 class FakeForwardingServerLevel implements ServerLevelAccessor {
+
     private final LevelAccessor delegate;
 
     public FakeForwardingServerLevel(LevelAccessor delegate) {
@@ -170,13 +173,13 @@ class FakeForwardingServerLevel implements ServerLevelAccessor {
 
     @Override
     public void playSound(@Nullable Entity p_393763_, BlockPos p_46776_, SoundEvent p_46777_, SoundSource p_46778_,
-            float p_46779_, float p_46780_) {
+        float p_46779_, float p_46780_) {
         delegate.playSound(p_393763_, p_46776_, p_46777_, p_46778_, p_46779_, p_46780_);
     }
 
     @Override
     public void addParticle(ParticleOptions particleData, double x, double y, double z, double xSpeed, double ySpeed,
-            double zSpeed) {
+        double zSpeed) {
         delegate.addParticle(particleData, x, y, z, xSpeed, ySpeed, zSpeed);
     }
 
@@ -237,7 +240,7 @@ class FakeForwardingServerLevel implements ServerLevelAccessor {
 
     @Override
     public <T extends Entity> List<T> getEntities(EntityTypeTest<Entity, T> entityTypeTest, AABB bounds,
-            Predicate<? super T> predicate) {
+        Predicate<? super T> predicate) {
         return delegate.getEntities(entityTypeTest, bounds, predicate);
     }
 
@@ -264,7 +267,7 @@ class FakeForwardingServerLevel implements ServerLevelAccessor {
     @Override
     @Nullable
     public Player getNearestPlayer(double x, double y, double z, double distance,
-            @Nullable Predicate<Entity> predicate) {
+        @Nullable Predicate<Entity> predicate) {
         return delegate.getNearestPlayer(x, y, z, distance, predicate);
     }
 
@@ -534,7 +537,7 @@ class FakeForwardingServerLevel implements ServerLevelAccessor {
     @Override
     @Nullable
     public BlockHitResult clipWithInteractionOverride(Vec3 startVec, Vec3 endVec, BlockPos pos, VoxelShape shape,
-            BlockState state) {
+        BlockState state) {
         return delegate.clipWithInteractionOverride(startVec, endVec, pos, shape, state);
     }
 
@@ -549,7 +552,7 @@ class FakeForwardingServerLevel implements ServerLevelAccessor {
     }
 
     public static <T, C> T traverseBlocks(Vec3 from, Vec3 to, C context, BiFunction<C, BlockPos, T> tester,
-            Function<C, T> onFail) {
+        Function<C, T> onFail) {
         return BlockGetter.traverseBlocks(from, to, context, tester, onFail);
     }
 
@@ -634,7 +637,7 @@ class FakeForwardingServerLevel implements ServerLevelAccessor {
 
     @Override
     public Optional<Vec3> findFreePosition(@Nullable Entity entity, VoxelShape shape, Vec3 pos, double x, double y,
-            double z) {
+        double z) {
         return delegate.findFreePosition(entity, shape, pos, x, y, z);
     }
 

@@ -1,5 +1,12 @@
 package guideme.compiler.tags;
 
+import java.util.Set;
+
+import net.minecraft.ResourceLocationException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import guideme.compiler.IdUtils;
 import guideme.compiler.IndexingContext;
 import guideme.compiler.IndexingSink;
@@ -9,12 +16,9 @@ import guideme.document.flow.InlineBlockAlignment;
 import guideme.document.flow.LytFlowInlineBlock;
 import guideme.document.flow.LytFlowParent;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
-import java.util.Set;
-import net.minecraft.ResourceLocationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FloatingImageCompiler extends FlowTagCompiler {
+
     public static final String TAG_NAME = "FloatingImage";
     private static final Logger LOG = LoggerFactory.getLogger(FloatingImageCompiler.class);
 

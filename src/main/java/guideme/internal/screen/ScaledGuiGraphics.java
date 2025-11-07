@@ -3,6 +3,7 @@ package guideme.internal.screen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.render.state.GuiRenderState;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Matrix3x2fStack;
 
@@ -12,12 +13,10 @@ import org.joml.Matrix3x2fStack;
  */
 @ApiStatus.Internal
 public final class ScaledGuiGraphics extends GuiGraphics {
+
     private final float scale;
 
-    public ScaledGuiGraphics(Minecraft minecraft,
-            Matrix3x2fStack pose,
-            GuiRenderState renderState,
-            float scale) {
+    public ScaledGuiGraphics(Minecraft minecraft, Matrix3x2fStack pose, GuiRenderState renderState, float scale) {
         super(minecraft, pose, renderState);
         this.scale = scale;
     }

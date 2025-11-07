@@ -1,11 +1,13 @@
 package guideme.scene;
 
-import guideme.document.LytSize;
 import net.minecraft.util.Mth;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
+
+import guideme.document.LytSize;
 
 public class CameraSettings {
 
@@ -27,8 +29,7 @@ public class CameraSettings {
         this.viewportSize = size;
         var halfWidth = size.width() / 2f;
         var halfHeight = size.height() / 2f;
-        var renderViewport = new Vector4f(
-                -halfWidth, -halfHeight, halfWidth, halfHeight);
+        var renderViewport = new Vector4f(-halfWidth, -halfHeight, halfWidth, halfHeight);
         this.viewport.set(renderViewport);
     }
 
@@ -90,13 +91,7 @@ public class CameraSettings {
 
     public Matrix4f getProjectionMatrix() {
         var projectionMatrix = new Matrix4f();
-        projectionMatrix.setOrtho(
-                viewport.x(),
-                viewport.z(),
-                viewport.y(),
-                viewport.w(),
-                -1000,
-                3000);
+        projectionMatrix.setOrtho(viewport.x(), viewport.z(), viewport.y(), viewport.w(), -1000, 3000);
         return projectionMatrix;
     }
 

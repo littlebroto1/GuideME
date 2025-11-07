@@ -3,6 +3,7 @@ package guideme.internal;
 import guideme.internal.data.LocalizationEnum;
 
 public enum GuidebookText implements LocalizationEnum {
+
     HistoryGoBack("Go back one page"),
     HistoryGoForward("Go forward one page"),
     Close("Close"),

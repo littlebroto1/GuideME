@@ -1,14 +1,16 @@
 package guideme.document.block.table;
 
-import guideme.document.LytRect;
-import guideme.document.block.LytNode;
 import java.util.ArrayList;
 import java.util.List;
+
+import guideme.document.LytRect;
+import guideme.document.block.LytNode;
 
 /**
  * A row in {@link LytTable}. Contains {@link LytTableCell}.
  */
 public class LytTableRow extends LytNode {
+
     private final LytTable table;
     private final List<LytTableCell> cells = new ArrayList<>();
     LytRect bounds = LytRect.empty();

@@ -1,14 +1,16 @@
 package guideme.compiler;
 
+import java.util.Locale;
+import java.util.Stack;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.block.LytDocument;
 import guideme.document.block.LytHeading;
 import guideme.document.block.LytNode;
 import guideme.document.block.LytVisitor;
 import guideme.document.flow.LytFlowAnchor;
 import guideme.document.flow.LytFlowContent;
-import java.util.Locale;
-import java.util.Stack;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Indexes all anchors within a page to allow faster navigation to them.
@@ -23,6 +25,7 @@ public final class AnchorIndexer {
 
     public AnchorTarget get(String anchor) {
         var visitor = new LytVisitor() {
+
             final Stack<LytNode> nodeStack = new Stack<>();
             AnchorTarget target;
 
@@ -62,9 +65,10 @@ public final class AnchorIndexer {
     }
 
     private String normalizeAnchor(String anchor) {
-        return anchor.toLowerCase(Locale.ROOT).trim().replaceAll("\\s+", "-");
+        return anchor.toLowerCase(Locale.ROOT)
+            .trim()
+            .replaceAll("\\s+", "-");
     }
 
-    public record AnchorTarget(LytNode blockNode, @Nullable LytFlowContent flowContent) {
-    }
+    public record AnchorTarget(LytNode blockNode, @Nullable LytFlowContent flowContent) {}
 }

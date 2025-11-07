@@ -1,11 +1,13 @@
 package guideme.layout.flow;
 
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.LytRect;
 import guideme.document.flow.LytFlowContent;
 import guideme.render.RenderContext;
-import org.jetbrains.annotations.Nullable;
 
 public abstract class LineElement {
+
     /**
      * Next Element in flow direction.
      */
@@ -32,6 +34,5 @@ public abstract class LineElement {
     /**
      * Render any other content individually.
      */
-    public void render(RenderContext context) {
-    }
+    public void render(RenderContext context) {}
 }

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -11,15 +12,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 class QueryStringSplitterTest {
 
     @ParameterizedTest
-    @CsvSource({
-            "'apple \"orange juice\" banana \"grape fruit\"', 'apple|orange juice|banana|grape fruit'",
-            "'apple orange banana', 'apple|orange|banana'",
-            "'\"quoted term\"', 'quoted term'",
-            "'''quoted term''', 'quoted term'",
-            "'term with spaces', 'term|with|spaces'",
-            "'  apple  banana  ', 'apple|banana'",
-            "'\"apple banana\" orange', 'apple banana|orange'"
-    })
+    @CsvSource({ "'apple \"orange juice\" banana \"grape fruit\"', 'apple|orange juice|banana|grape fruit'",
+        "'apple orange banana', 'apple|orange|banana'", "'\"quoted term\"', 'quoted term'",
+        "'''quoted term''', 'quoted term'", "'term with spaces', 'term|with|spaces'",
+        "'  apple  banana  ', 'apple|banana'", "'\"apple banana\" orange', 'apple banana|orange'" })
     public void testParseQuery(String query, String expected) {
         List<String> parsedTerms = QueryStringSplitter.split(query);
 
@@ -50,8 +46,10 @@ class QueryStringSplitterTest {
     @Test
     public void testMultipleSpacesAroundQuotedTerm() {
         List<String> parsedTerms = QueryStringSplitter.split("   \"apple pie\"   banana   ");
-        assertEquals(List.of("apple pie", "banana"), parsedTerms,
-                "Spaces around quoted terms should not affect the output.");
+        assertEquals(
+            List.of("apple pie", "banana"),
+            parsedTerms,
+            "Spaces around quoted terms should not affect the output.");
     }
 
 }

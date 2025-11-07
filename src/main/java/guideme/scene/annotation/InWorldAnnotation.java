@@ -1,6 +1,7 @@
 package guideme.scene.annotation;
 
 import java.util.OptionalDouble;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;

@@ -1,18 +1,21 @@
 package guideme.scene.annotation;
 
+import net.minecraft.network.chat.Component;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.block.LytBlock;
 import guideme.document.interaction.ContentTooltip;
 import guideme.document.interaction.GuideTooltip;
 import guideme.document.interaction.TextTooltip;
 import guideme.siteexport.ExportableResourceProvider;
 import guideme.siteexport.ResourceExporter;
-import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * An annotation to show additional information to the user about content in a {@link guideme.scene.GuidebookScene}.
  */
 public abstract class SceneAnnotation implements ExportableResourceProvider {
+
     @Nullable
     private GuideTooltip tooltip;
 

@@ -1,13 +1,16 @@
 package guideme.internal.siteexport.model;
 
-import com.google.gson.JsonElement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import net.minecraft.resources.ResourceLocation;
 
+import com.google.gson.JsonElement;
+
 public class SiteExportJson {
+
     public int version = 2;
 
     public String defaultNamespace;

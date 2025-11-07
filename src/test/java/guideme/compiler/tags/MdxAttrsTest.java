@@ -1,18 +1,21 @@
 package guideme.compiler.tags;
 
+import java.util.HashMap;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
+
 import guideme.compiler.PageCompiler;
 import guideme.document.LytErrorSink;
 import guideme.libs.mdast.mdx.model.MdxJsxAttribute;
 import guideme.libs.mdast.mdx.model.MdxJsxAttributeNode;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
 import guideme.libs.mdast.mdx.model.MdxJsxTextElement;
-import java.util.HashMap;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoSettings;
 
 @MockitoSettings
 class MdxAttrsTest {
+
     @Mock
     PageCompiler compiler;
 
@@ -28,7 +31,10 @@ class MdxAttrsTest {
             var value = keyValuePairs[i + 1];
             attrMap.put(key, value);
         }
-        return new MdxJsxTextElement("irrelevant", attrMap.entrySet().stream()
+        return new MdxJsxTextElement(
+            "irrelevant",
+            attrMap.entrySet()
+                .stream()
                 .<MdxJsxAttributeNode>map(entry -> {
                     var attr = new MdxJsxAttribute();
                     attr.name = entry.getKey();
@@ -40,9 +46,7 @@ class MdxAttrsTest {
 
     @Test
     void testVector3() {
-        var el = makeEl(
-                "from",
-                "");
+        var el = makeEl("from", "");
         MdxAttrs.getVector3(compiler, errorSink, el, "from", null);
     }
 }

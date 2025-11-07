@@ -1,16 +1,5 @@
 package guideme.internal;
 
-import guideme.Guide;
-import guideme.GuideItemSettings;
-import guideme.GuidePage;
-import guideme.GuidePageChange;
-import guideme.compiler.PageCompiler;
-import guideme.compiler.ParsedGuidePage;
-import guideme.extensions.ExtensionCollection;
-import guideme.indices.PageIndex;
-import guideme.internal.screen.GuideScreen;
-import guideme.internal.util.LangUtil;
-import guideme.navigation.NavigationTree;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -22,18 +11,33 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import guideme.Guide;
+import guideme.GuideItemSettings;
+import guideme.GuidePage;
+import guideme.GuidePageChange;
+import guideme.compiler.PageCompiler;
+import guideme.compiler.ParsedGuidePage;
+import guideme.extensions.ExtensionCollection;
+import guideme.indices.PageIndex;
+import guideme.internal.screen.GuideScreen;
+import guideme.internal.util.LangUtil;
+import guideme.navigation.NavigationTree;
 
 /**
  * Encapsulates a Guide, which consists of a collection of Markdown pages and associated content, loaded from a
  * guide-specific subdirectory of resource packs.
  */
 public final class MutableGuide implements Guide {
+
     private static final Logger LOG = LoggerFactory.getLogger(MutableGuide.class);
 
     private final ResourceLocation id;
@@ -60,17 +64,10 @@ public final class MutableGuide implements Guide {
     @Nullable
     private GuideSourceWatcher watcher;
 
-    public MutableGuide(ResourceLocation id,
-            String defaultNamespace,
-            String folder,
-            String defaultLanguage,
-            ResourceLocation startPage,
-            @Nullable Path developmentSourceFolder,
-            @Nullable String developmentSourceNamespace,
-            Map<Class<?>, PageIndex> indices,
-            ExtensionCollection extensions,
-            boolean availableToOpenHotkey,
-            GuideItemSettings itemSettings) {
+    public MutableGuide(ResourceLocation id, String defaultNamespace, String folder, String defaultLanguage,
+        ResourceLocation startPage, @Nullable Path developmentSourceFolder, @Nullable String developmentSourceNamespace,
+        Map<Class<?>, PageIndex> indices, ExtensionCollection extensions, boolean availableToOpenHotkey,
+        GuideItemSettings itemSettings) {
         this.id = id;
         this.defaultNamespace = defaultNamespace;
         this.folder = folder;
@@ -154,7 +151,8 @@ public final class MutableGuide implements Guide {
     public byte[] loadAsset(ResourceLocation id) {
         // Try loading the language specific version first
         var language = LangUtil.getCurrentLanguage();
-        if (!GuideMEClient.instance().isIgnoreTranslatedGuides() && !Objects.equals(language, defaultLanguage)) {
+        if (!GuideMEClient.instance()
+            .isIgnoreTranslatedGuides() && !Objects.equals(language, defaultLanguage)) {
             var result = loadAssetInternal(id.withPrefix("_" + language + "/"));
             if (result != null) {
                 return result;
@@ -165,12 +163,12 @@ public final class MutableGuide implements Guide {
 
     private byte @Nullable [] loadAssetInternal(ResourceLocation id) {
         // Also load images from the development sources folder, if it exists and contains the asset namespace
-        if (developmentSourceFolder != null && id.getNamespace().equals(developmentSourceNamespace)) {
+        if (developmentSourceFolder != null && id.getNamespace()
+            .equals(developmentSourceNamespace)) {
             var path = developmentSourceFolder.resolve(id.getPath());
             try (var in = Files.newInputStream(path)) {
                 return in.readAllBytes();
-            } catch (NoSuchFileException ignored) {
-            } catch (IOException e) {
+            } catch (NoSuchFileException ignored) {} catch (IOException e) {
                 LOG.error("Failed to open guidebook asset {}", path);
                 return null;
             }
@@ -179,7 +177,10 @@ public final class MutableGuide implements Guide {
         // Transform id such that the path is prefixed with "ae2assets", the source folder for the guidebook assets
         id = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), folder + "/" + id.getPath());
 
-        var resource = Minecraft.getInstance().getResourceManager().getResource(id).orElse(null);
+        var resource = Minecraft.getInstance()
+            .getResourceManager()
+            .getResource(id)
+            .orElse(null);
         if (resource == null) {
             return null;
         }
@@ -209,7 +210,8 @@ public final class MutableGuide implements Guide {
      */
     @Nullable
     public Path getDevelopmentSourcePath(ResourceLocation id) {
-        if (developmentSourceFolder != null && id.getNamespace().equals(developmentSourceNamespace)) {
+        if (developmentSourceFolder != null && id.getNamespace()
+            .equals(developmentSourceNamespace)) {
             var path = developmentSourceFolder.resolve(id.getPath());
             if (Files.exists(path)) {
                 return path;
@@ -241,7 +243,8 @@ public final class MutableGuide implements Guide {
         }
 
         watcher = new GuideSourceWatcher(developmentSourceNamespace, defaultLanguage, developmentSourceFolder);
-        Runtime.getRuntime().addShutdownHook(new Thread(watcher::close));
+        Runtime.getRuntime()
+            .addShutdownHook(new Thread(watcher::close));
     }
 
     public void tick() {
@@ -276,7 +279,8 @@ public final class MutableGuide implements Guide {
             } else {
                 for (int j = 0; j < i; j++) {
                     var prevChange = changes.get(j);
-                    if (prevChange != null && prevChange.pageId().equals(change.pageId())) {
+                    if (prevChange != null && prevChange.pageId()
+                        .equals(change.pageId())) {
                         changes.set(j, null);
                     }
                 }
@@ -292,7 +296,7 @@ public final class MutableGuide implements Guide {
             // Handle language changes
             var currentPage = developmentPages.get(pageId);
             if (currentPage != null && !defaultLanguage.equals(currentPage.getLanguage())
-                    && isForDefaultLanguage(change)) {
+                && isForDefaultLanguage(change)) {
                 changes.set(i, null);
                 continue;
             }
@@ -326,7 +330,10 @@ public final class MutableGuide implements Guide {
         // Reload the current page if it has been changed
         if (Minecraft.getInstance().screen instanceof GuideScreen guideScreen) {
             var currentPageId = guideScreen.getCurrentPageId();
-            if (changes.stream().anyMatch(c -> c.pageId().equals(currentPageId))) {
+            if (changes.stream()
+                .anyMatch(
+                    c -> c.pageId()
+                        .equals(currentPageId))) {
                 guideScreen.reloadPage();
             }
         }

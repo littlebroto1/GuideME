@@ -1,6 +1,7 @@
 package guideme.compiler;
 
 import java.net.URI;
+
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 
@@ -9,8 +10,7 @@ import net.minecraft.resources.ResourceLocation;
  */
 public final class IdUtils {
 
-    private IdUtils() {
-    }
+    private IdUtils() {}
 
     public static ResourceLocation resolveId(String idText, String defaultNamespace) {
         if (!idText.contains(":")) {
@@ -25,7 +25,7 @@ public final class IdUtils {
      * locations potentially having a different namespace than the anchor.
      */
     public static ResourceLocation resolveLink(String idText, ResourceLocation anchor)
-            throws ResourceLocationException {
+        throws ResourceLocationException {
         if (idText.startsWith("/")) {
             // Absolute path, but relative to namespace
             return ResourceLocation.fromNamespaceAndPath(anchor.getNamespace(), idText.substring(1));

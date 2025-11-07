@@ -1,18 +1,9 @@
 package guideme.internal.hotkey;
 
-import com.google.common.base.Strings;
-import com.mojang.blaze3d.platform.InputConstants;
-import guideme.Guide;
-import guideme.PageAnchor;
-import guideme.indices.ItemIndex;
-import guideme.internal.GuideMEClient;
-import guideme.internal.GuideRegistry;
-import guideme.internal.GuidebookText;
-import guideme.internal.screen.GuideScreen;
-import guideme.ui.GuideUiHost;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -27,13 +18,29 @@ import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
+import com.google.common.base.Strings;
+import com.mojang.blaze3d.platform.InputConstants;
+
+import guideme.Guide;
+import guideme.PageAnchor;
+import guideme.indices.ItemIndex;
+import guideme.internal.GuideMEClient;
+import guideme.internal.GuideRegistry;
+import guideme.internal.GuidebookText;
+import guideme.internal.screen.GuideScreen;
+import guideme.ui.GuideUiHost;
+
 /**
  * Adds a "Hold X to show guide" tooltip
  */
 public final class OpenGuideHotkey {
+
     private static final KeyMapping OPEN_GUIDE_MAPPING = new KeyMapping(
-            "key.guideme.guide", KeyConflictContext.GUI, InputConstants.Type.KEYSYM, InputConstants.KEY_G,
-            GuideMEClient.KEYBIND_CATEGORY);
+        "key.guideme.guide",
+        KeyConflictContext.GUI,
+        InputConstants.Type.KEYSYM,
+        InputConstants.KEY_G,
+        GuideMEClient.KEYBIND_CATEGORY);
 
     private static final int TICKS_TO_OPEN = 10;
 
@@ -47,22 +54,19 @@ public final class OpenGuideHotkey {
     // Is the key to open currently held
     private static boolean holding;
 
-    private OpenGuideHotkey() {
-    }
+    private OpenGuideHotkey() {}
 
-    private record FoundPage(Guide guide, PageAnchor page) {
-    }
+    private record FoundPage(Guide guide, PageAnchor page) {}
 
     public static void init() {
-        NeoForge.EVENT_BUS.addListener(
-                (ItemTooltipEvent evt) -> {
-                    // Ignore events fired for anything but the current local player,
-                    // for example while building the search tree for the creative menu
-                    if (evt.getEntity() != Minecraft.getInstance().player) {
-                        return;
-                    }
-                    handleTooltip(evt.getItemStack(), evt.getFlags(), evt.getToolTip());
-                });
+        NeoForge.EVENT_BUS.addListener((ItemTooltipEvent evt) -> {
+            // Ignore events fired for anything but the current local player,
+            // for example while building the search tree for the creative menu
+            if (evt.getEntity() != Minecraft.getInstance().player) {
+                return;
+            }
+            handleTooltip(evt.getItemStack(), evt.getFlags(), evt.getToolTip());
+        });
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post evt) -> newTick = true);
     }
 
@@ -84,23 +88,27 @@ public final class OpenGuideHotkey {
             return;
         }
 
-        var guide = guidebookPages.getFirst().guide();
-        var pageAnchor = guidebookPages.getFirst().page();
+        var guide = guidebookPages.getFirst()
+            .guide();
+        var pageAnchor = guidebookPages.getFirst()
+            .page();
 
         // Don't do anything if we're already on the target page
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.screen instanceof GuideScreen guideScreen
-                && guideScreen.getGuide() == guide
-                && guideScreen.getCurrentPageId().equals(pageAnchor.pageId())) {
+        if (minecraft.screen instanceof GuideScreen guideScreen && guideScreen.getGuide() == guide
+            && guideScreen.getCurrentPageId()
+                .equals(pageAnchor.pageId())) {
             return;
         }
 
         // Compute the progress value between [0,1]
         float progress = ticksKeyHeld;
         if (holding) {
-            progress += minecraft.getDeltaTracker().getRealtimeDeltaTicks();
+            progress += minecraft.getDeltaTracker()
+                .getRealtimeDeltaTicks();
         } else {
-            progress -= minecraft.getDeltaTracker().getRealtimeDeltaTicks();
+            progress -= minecraft.getDeltaTracker()
+                .getRealtimeDeltaTicks();
         }
         progress /= (float) TICKS_TO_OPEN;
         var component = makeProgressBar(Mth.clamp(progress, 0, 1));
@@ -115,9 +123,11 @@ public final class OpenGuideHotkey {
     private static Component makeProgressBar(float progress) {
         var minecraft = Minecraft.getInstance();
 
-        var holdW = GuidebookText.HoldToShow
-                .text(getHotkey().getTranslatedKeyMessage().copy().withStyle(ChatFormatting.GRAY))
-                .withStyle(ChatFormatting.DARK_GRAY);
+        var holdW = GuidebookText.HoldToShow.text(
+            getHotkey().getTranslatedKeyMessage()
+                .copy()
+                .withStyle(ChatFormatting.GRAY))
+            .withStyle(ChatFormatting.DARK_GRAY);
 
         var fontRenderer = minecraft.font;
         var charWidth = fontRenderer.width("|");
@@ -127,10 +137,11 @@ public final class OpenGuideHotkey {
         var current = (int) (progress * total);
 
         if (progress > 0) {
-            var result = Component.literal(Strings.repeat("|", current)).withStyle(ChatFormatting.GRAY);
-            if (progress < 1)
-                result = result.append(
-                        Component.literal(Strings.repeat("|", total - current)).withStyle(ChatFormatting.DARK_GRAY));
+            var result = Component.literal(Strings.repeat("|", current))
+                .withStyle(ChatFormatting.GRAY);
+            if (progress < 1) result = result.append(
+                Component.literal(Strings.repeat("|", total - current))
+                    .withStyle(ChatFormatting.DARK_GRAY));
             return result;
         }
 
@@ -139,9 +150,9 @@ public final class OpenGuideHotkey {
 
     private static void update(ItemStack itemStack) {
         var itemId = itemStack.getItemHolder()
-                .unwrapKey()
-                .map(ResourceKey::location)
-                .orElse(null);
+            .unwrapKey()
+            .map(ResourceKey::location)
+            .orElse(null);
 
         if (!Objects.equals(itemId, previousItemId)) {
             previousItemId = itemId;
@@ -195,8 +206,10 @@ public final class OpenGuideHotkey {
      * This circumvents any current UI key handling.
      */
     private static boolean isKeyHeld() {
-        int keyCode = getHotkey().getKey().getValue();
-        var window = Minecraft.getInstance().getWindow();
+        int keyCode = getHotkey().getKey()
+            .getValue();
+        var window = Minecraft.getInstance()
+            .getWindow();
 
         return InputConstants.isKeyDown(window, keyCode);
     }

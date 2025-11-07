@@ -1,25 +1,8 @@
 package guideme.internal;
 
-import guideme.Guide;
-import guideme.PageAnchor;
-import guideme.color.LightDarkMode;
-import guideme.internal.command.GuideClientCommand;
-import guideme.internal.command.StructureCommands;
-import guideme.internal.data.GuideMELanguageProvider;
-import guideme.internal.data.GuideMEModelProvider;
-import guideme.internal.hotkey.OpenGuideHotkey;
-import guideme.internal.item.GuideItemDispatchUnbaked;
-import guideme.internal.scene.ScenePictureInPictureRenderer;
-import guideme.internal.screen.GlobalInMemoryHistory;
-import guideme.internal.screen.GuideNavigation;
-import guideme.internal.search.GuideSearch;
-import guideme.internal.siteexport.SiteExportOnStartup;
-import guideme.internal.siteexport.TextureDownloader;
-import guideme.internal.util.Blitter;
-import guideme.render.GuiAssets;
-import guideme.scene.annotation.InWorldAnnotationRenderer;
 import java.util.Objects;
 import java.util.Set;
+
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
@@ -55,11 +38,32 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import guideme.Guide;
+import guideme.PageAnchor;
+import guideme.color.LightDarkMode;
+import guideme.internal.command.GuideClientCommand;
+import guideme.internal.command.StructureCommands;
+import guideme.internal.data.GuideMELanguageProvider;
+import guideme.internal.data.GuideMEModelProvider;
+import guideme.internal.hotkey.OpenGuideHotkey;
+import guideme.internal.item.GuideItemDispatchUnbaked;
+import guideme.internal.scene.ScenePictureInPictureRenderer;
+import guideme.internal.screen.GlobalInMemoryHistory;
+import guideme.internal.screen.GuideNavigation;
+import guideme.internal.search.GuideSearch;
+import guideme.internal.siteexport.SiteExportOnStartup;
+import guideme.internal.siteexport.TextureDownloader;
+import guideme.internal.util.Blitter;
+import guideme.render.GuiAssets;
+import guideme.scene.annotation.InWorldAnnotationRenderer;
+
 @Mod(value = GuideME.MOD_ID, dist = Dist.CLIENT)
 public class GuideMEClient {
+
     private static final Logger LOG = LoggerFactory.getLogger(GuideMEClient.class);
 
     public static final KeyMapping.Category KEYBIND_CATEGORY = new KeyMapping.Category(GuideME.makeId("category"));
@@ -98,9 +102,10 @@ public class GuideMEClient {
 
         OpenGuideHotkey.init();
 
-        modBus.addListener((AddClientReloadListenersEvent evt) -> {
-            evt.addListener(GuideReloadListener.ID, new GuideReloadListener());
-        });
+        modBus.addListener(
+            (AddClientReloadListenersEvent evt) -> {
+                evt.addListener(GuideReloadListener.ID, new GuideReloadListener());
+            });
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Pre evt) -> {
             search.processWork();
             processDevWatchers();
@@ -126,7 +131,8 @@ public class GuideMEClient {
     }
 
     private void configureGpuDevice(ConfigureGpuDeviceEvent event) {
-        if (event.getAvailableFeatures().logicOp()) {
+        if (event.getAvailableFeatures()
+            .logicOp()) {
             event.enableLogicOp();
         }
     }
@@ -156,7 +162,9 @@ public class GuideMEClient {
     }
 
     private void resetSprites(TextureAtlasStitchedEvent event) {
-        if (event.getAtlas().location().equals(AtlasIds.GUI)) {
+        if (event.getAtlas()
+            .location()
+            .equals(AtlasIds.GUI)) {
             GuiAssets.resetSprites();
         }
     }
@@ -261,6 +269,7 @@ public class GuideMEClient {
     }
 
     private static class ClientConfig {
+
         final ModConfigSpec spec;
         final ModConfigSpec.BooleanValue adaptiveScaling;
         final ModConfigSpec.BooleanValue showDebugGuiOverlays;
@@ -272,30 +281,24 @@ public class GuideMEClient {
             var builder = new ModConfigSpec.Builder();
 
             builder.push("guides");
-            ignoreTranslatedGuides = builder
-                    .comment("Never load translated guide pages for your current language.")
-                    .define("ignoreTranslatedGuides", false);
-            hideMissingRecipeErrors = builder
-                    .comment(
-                            "Never show errors in guides when recipes can't be found (i.e. because they were hidden by a datapack).")
-                    .define("hideMissingRecipeErrors", false);
+            ignoreTranslatedGuides = builder.comment("Never load translated guide pages for your current language.")
+                .define("ignoreTranslatedGuides", false);
+            hideMissingRecipeErrors = builder.comment(
+                "Never show errors in guides when recipes can't be found (i.e. because they were hidden by a datapack).")
+                .define("hideMissingRecipeErrors", false);
             builder.pop();
 
             builder.push("gui");
             adaptiveScaling = builder
-                    .comment(
-                            "Adapt GUI scaling for the Guide screen to fix Minecraft font issues at GUI scale 1 and 3.")
-                    .define("adaptiveScaling", true);
-            fullWidthLayout = builder
-                    .comment(
-                            "Use the full width of the screen for the guide when it is opened.")
-                    .define("fullWidthLayout", true);
+                .comment("Adapt GUI scaling for the Guide screen to fix Minecraft font issues at GUI scale 1 and 3.")
+                .define("adaptiveScaling", true);
+            fullWidthLayout = builder.comment("Use the full width of the screen for the guide when it is opened.")
+                .define("fullWidthLayout", true);
             builder.pop();
 
             builder.push("debug");
-            showDebugGuiOverlays = builder
-                    .comment("Show debugging overlays in GUI on mouse-over.")
-                    .define("showDebugGuiOverlays", false);
+            showDebugGuiOverlays = builder.comment("Show debugging overlays in GUI on mouse-over.")
+                .define("showDebugGuiOverlays", false);
             builder.pop();
 
             spec = builder.build();

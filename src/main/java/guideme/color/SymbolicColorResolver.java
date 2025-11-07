@@ -1,16 +1,20 @@
 package guideme.color;
 
+import java.util.Locale;
+
+import net.minecraft.resources.ResourceLocation;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.compiler.PageCompiler;
 import guideme.extensions.Extension;
 import guideme.extensions.ExtensionPoint;
-import java.util.Locale;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * This extension point can be used to register custom symbolic colors in your guide.
  */
 public interface SymbolicColorResolver extends Extension {
+
     ExtensionPoint<SymbolicColorResolver> EXTENSION_POINT = new ExtensionPoint<>(SymbolicColorResolver.class);
 
     /**
@@ -32,8 +36,7 @@ public interface SymbolicColorResolver extends Extension {
     static ColorValue resolve(PageCompiler compiler, String id) {
         try {
             return SymbolicColor.valueOf(id.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException ignored) {
-        }
+        } catch (IllegalArgumentException ignored) {}
 
         // See if it's a resource location
         ResourceLocation resourceLocation;

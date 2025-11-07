@@ -1,14 +1,17 @@
 package guideme.scene.annotation;
 
-import guideme.color.ColorValue;
 import java.util.OptionalDouble;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Intersectionf;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import guideme.color.ColorValue;
+
 public final class InWorldLineAnnotation extends InWorldAnnotation {
+
     public static final float DEFAULT_THICKNESS = 0.5f / 16f;
     private final Vector3f from;
     private final Vector3f to;
@@ -36,18 +39,28 @@ public final class InWorldLineAnnotation extends InWorldAnnotation {
         var resultA = new Vector3f();
         var resultB = new Vector3f();
         var distance = Intersectionf.findClosestPointsLineSegments(
-                from.x, from.y, from.z,
-                to.x, to.y, to.z,
+            from.x,
+            from.y,
+            from.z,
+            to.x,
+            to.y,
+            to.z,
 
-                rayOrigin.x, rayOrigin.y, rayOrigin.z,
-                rayTo.x, rayTo.y, rayTo.z,
-                resultA, resultB);
+            rayOrigin.x,
+            rayOrigin.y,
+            rayOrigin.z,
+            rayTo.x,
+            rayTo.y,
+            rayTo.z,
+            resultA,
+            resultB);
 
         if (distance > thickness * thickness / 4) {
             return OptionalDouble.empty();
         }
 
-        var distanceFromOrigin = resultB.sub(rayOrigin).lengthSquared() / rayDir.lengthSquared();
+        var distanceFromOrigin = resultB.sub(rayOrigin)
+            .lengthSquared() / rayDir.lengthSquared();
         return OptionalDouble.of(distanceFromOrigin);
     }
 

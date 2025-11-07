@@ -4,6 +4,7 @@ package guideme.document.flow;
  * Line-Break that also clears floats.
  */
 public class LytFlowBreak extends LytFlowContent {
+
     private boolean clearLeft;
     private boolean clearRight;
 

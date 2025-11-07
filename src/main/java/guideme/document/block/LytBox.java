@@ -1,14 +1,17 @@
 package guideme.document.block;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.color.SymbolicColor;
 import guideme.document.LytRect;
 import guideme.layout.LayoutContext;
 import guideme.render.RenderContext;
-import java.util.ArrayList;
-import java.util.List;
-import org.jetbrains.annotations.Nullable;
 
 public abstract class LytBox extends LytBlock implements LytBlockContainer {
+
     protected final List<LytBlock> children = new ArrayList<>();
 
     protected int paddingLeft;
@@ -56,22 +59,24 @@ public abstract class LytBox extends LytBlock implements LytBlockContainer {
 
         // Apply padding and border
         var innerLayout = computeBoxLayout(
-                context,
-                x + paddingLeft + borderLeft,
-                y + paddingTop + borderTop,
-                availableWidth - paddingLeft - paddingRight - borderLeft - borderRight);
+            context,
+            x + paddingLeft + borderLeft,
+            y + paddingTop + borderTop,
+            availableWidth - paddingLeft - paddingRight - borderLeft - borderRight);
 
         return innerLayout.expand(
-                paddingLeft + borderLeft,
-                paddingTop + borderTop,
-                paddingRight + borderRight,
-                paddingBottom + borderBottom);
+            paddingLeft + borderLeft,
+            paddingTop + borderTop,
+            paddingRight + borderRight,
+            paddingBottom + borderBottom);
     }
 
     @Override
     protected void onLayoutMoved(int deltaX, int deltaY) {
         for (var child : children) {
-            child.setLayoutPos(child.bounds.point().add(deltaX, deltaY));
+            child.setLayoutPos(
+                child.bounds.point()
+                    .add(deltaX, deltaY));
         }
     }
 
@@ -117,19 +122,15 @@ public abstract class LytBox extends LytBlock implements LytBlockContainer {
             context.fillRect(bounds, backgroundColor);
         }
 
-        context.guiGraphics().nextStratum();
+        context.guiGraphics()
+            .nextStratum();
         for (var child : children) {
             child.render(context);
         }
 
-        context.guiGraphics().nextStratum();
+        context.guiGraphics()
+            .nextStratum();
         // Render border on top of children
-        borderRenderer.render(
-                context,
-                bounds,
-                getBorderTop(),
-                getBorderLeft(),
-                getBorderRight(),
-                getBorderBottom());
+        borderRenderer.render(context, bounds, getBorderTop(), getBorderLeft(), getBorderRight(), getBorderBottom());
     }
 }

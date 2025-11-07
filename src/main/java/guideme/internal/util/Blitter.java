@@ -1,26 +1,22 @@
 /*
  * This file is part of Applied Energistics 2.
  * Copyright (c) 2021, TeamAppliedEnergistics, All rights reserved.
- *
  * Applied Energistics 2 is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  * Applied Energistics 2 is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Applied Energistics 2.  If not, see <http://www.gnu.org/licenses/lgpl>.
+ * along with Applied Energistics 2. If not, see <http://www.gnu.org/licenses/lgpl>.
  */
 
 package guideme.internal.util;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import guideme.internal.GuideME;
 import java.util.Objects;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.render.TextureSetup;
@@ -32,16 +28,22 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+
 import org.joml.Matrix3x2f;
+
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+
+import guideme.internal.GuideME;
 
 /**
  * Utility class for drawing rectangular textures in the UI.
  */
 public final class Blitter {
+
     public static final RenderPipeline GUI_TEXTURED_OPAQUE = RenderPipelines.GUI_TEXTURED.toBuilder()
-            .withLocation(GuideME.makeId("pipeline/gui_textured_opaque"))
-            .withoutBlend()
-            .build();
+        .withLocation(GuideME.makeId("pipeline/gui_textured_opaque"))
+        .withoutBlend()
+        .build();
 
     // This assumption is obviously bogus, but currently all textures are this size,
     // and it's impossible to get the texture size from an already loaded texture.
@@ -102,14 +104,17 @@ public final class Blitter {
      * Creates a blitter from a texture atlas sprite.
      */
     public static Blitter sprite(TextureAtlasSprite sprite) {
-        var atlas = (TextureAtlas) Minecraft.getInstance().getTextureManager().getTexture(sprite.atlasLocation());
+        var atlas = (TextureAtlas) Minecraft.getInstance()
+            .getTextureManager()
+            .getTexture(sprite.atlasLocation());
 
-        return new Blitter(sprite.atlasLocation(), atlas.getWidth(), atlas.getHeight())
-                .src(
-                        sprite.getX(),
-                        sprite.getY(),
-                        sprite.contents().width(),
-                        sprite.contents().height());
+        return new Blitter(sprite.atlasLocation(), atlas.getWidth(), atlas.getHeight()).src(
+            sprite.getX(),
+            sprite.getY(),
+            sprite.contents()
+                .width(),
+            sprite.contents()
+                .height());
     }
 
     public Blitter copy() {
@@ -280,15 +285,23 @@ public final class Blitter {
             pipeline = GUI_TEXTURED_OPAQUE;
         }
 
-        var textureView = Minecraft.getInstance().getTextureManager().getTexture(this.texture).getTextureView();
-        guiGraphics.submitGuiElementRenderState(new BlitRenderState(
+        var textureView = Minecraft.getInstance()
+            .getTextureManager()
+            .getTexture(this.texture)
+            .getTextureView();
+        guiGraphics.submitGuiElementRenderState(
+            new BlitRenderState(
                 pipeline,
                 TextureSetup.singleTexture(textureView),
                 new Matrix3x2f(guiGraphics.pose()),
-                (int) x1, (int) y1,
-                (int) x2, (int) y2,
-                minU, maxU,
-                minV, maxV,
+                (int) x1,
+                (int) y1,
+                (int) x2,
+                (int) y2,
+                minU,
+                maxU,
+                minV,
+                maxV,
                 ARGB.color(a, r, g, b),
                 guiGraphics.peekScissorStack()));
     }

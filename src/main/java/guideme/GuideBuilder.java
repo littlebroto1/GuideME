@@ -1,5 +1,18 @@
 package guideme;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import net.minecraft.resources.ResourceLocation;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.extensions.Extension;
 import guideme.extensions.ExtensionCollection;
 import guideme.extensions.ExtensionPoint;
@@ -9,16 +22,6 @@ import guideme.indices.PageIndex;
 import guideme.internal.GuideRegistry;
 import guideme.internal.MutableGuide;
 import guideme.internal.extensions.DefaultExtensions;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Constructs new guides.
@@ -26,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
  * Use {@link Guide#builder(ResourceLocation)} to obtain a new builder.
  */
 public class GuideBuilder {
+
     private final ResourceLocation id;
     private final Map<Class<?>, PageIndex> indices = new IdentityHashMap<>();
     private final ExtensionCollection.Builder extensionsBuilder = ExtensionCollection.builder();
@@ -39,7 +43,7 @@ public class GuideBuilder {
     private boolean disableDefaultExtensions = false;
     private boolean availableToOpenHotkey = true;
     private final Set<ExtensionPoint<?>> disableDefaultsForExtensionPoints = Collections
-            .newSetFromMap(new IdentityHashMap<>());
+        .newSetFromMap(new IdentityHashMap<>());
     private boolean register = true;
     private GuideItemSettings itemSettings = GuideItemSettings.DEFAULT;
 
@@ -236,17 +240,17 @@ public class GuideBuilder {
         var extensionCollection = buildExtensions();
 
         var guide = new MutableGuide(
-                id,
-                defaultNamespace,
-                folder,
-                defaultLanguage,
-                startPage,
-                developmentSourceFolder,
-                developmentSourceNamespace,
-                indices,
-                extensionCollection,
-                availableToOpenHotkey,
-                itemSettings);
+            id,
+            defaultNamespace,
+            folder,
+            defaultLanguage,
+            startPage,
+            developmentSourceFolder,
+            developmentSourceNamespace,
+            indices,
+            extensionCollection,
+            availableToOpenHotkey,
+            itemSettings);
 
         if (developmentSourceFolder != null && watchDevelopmentSources) {
             guide.watchDevelopmentSources();

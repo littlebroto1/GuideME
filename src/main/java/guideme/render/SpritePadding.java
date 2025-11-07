@@ -1,6 +1,7 @@
 package guideme.render;
 
 record SpritePadding(int left, int top, int right, int bottom) {
+
     public int height() {
         return top + bottom;
     }

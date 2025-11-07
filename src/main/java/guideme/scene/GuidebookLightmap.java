@@ -1,19 +1,23 @@
 package guideme.scene;
 
-import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.textures.GpuTextureView;
 import java.util.Objects;
+
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
+
 import org.joml.Vector3f;
+
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.textures.GpuTextureView;
 
 /**
  * A version of {@link LightTexture} which is independent of the current client level.
  */
 public class GuidebookLightmap implements AutoCloseable {
+
     private final DynamicTexture lightmapTexture;
     private final NativeImage lightmapPixels;
 
@@ -82,8 +86,10 @@ public class GuidebookLightmap implements AutoCloseable {
     }
 
     private static void clampColor(Vector3f vector3f) {
-        vector3f.set(Mth.clamp(vector3f.x, 0.0F, 1.0F), Mth.clamp(vector3f.y, 0.0F, 1.0F),
-                Mth.clamp(vector3f.z, 0.0F, 1.0F));
+        vector3f.set(
+            Mth.clamp(vector3f.x, 0.0F, 1.0F),
+            Mth.clamp(vector3f.y, 0.0F, 1.0F),
+            Mth.clamp(vector3f.z, 0.0F, 1.0F));
     }
 
     private float notGamma(float value) {

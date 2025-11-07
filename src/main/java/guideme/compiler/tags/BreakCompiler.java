@@ -1,13 +1,15 @@
 package guideme.compiler.tags;
 
+import java.util.Set;
+
 import guideme.compiler.PageCompiler;
 import guideme.document.flow.LytFlowBreak;
 import guideme.document.flow.LytFlowParent;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
 import guideme.libs.mdast.model.MdAstNode;
-import java.util.Set;
 
 public class BreakCompiler extends FlowTagCompiler {
+
     @Override
     public Set<String> getTagNames() {
         return Set.of("br");
@@ -24,8 +26,7 @@ public class BreakCompiler extends FlowTagCompiler {
                 br.setClearLeft(true);
                 br.setClearRight(true);
             }
-            case "none" -> {
-            }
+            case "none" -> {}
             default -> parent.append(compiler.createErrorFlowContent("Invalid 'clear' attribute", (MdAstNode) el));
         }
 

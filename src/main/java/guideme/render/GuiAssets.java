@@ -1,19 +1,23 @@
 package guideme.render;
 
-import guideme.color.LightDarkMode;
-import guideme.internal.GuideME;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
 import net.minecraft.resources.ResourceLocation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import guideme.color.LightDarkMode;
+import guideme.internal.GuideME;
 
 /**
  * Asset management
  */
 public final class GuiAssets {
+
     private static final Logger LOG = LoggerFactory.getLogger(GuiAssets.class);
 
     private static final Map<ResourceLocation, GuiSprite> sprites = new ConcurrentHashMap<>();
@@ -29,8 +33,7 @@ public final class GuiAssets {
     public static final GuiSprite LARGE_SLOT = sprite("large_slot");
     public static final GuiSprite ARROW = sprite("recipe_arrow");
 
-    private GuiAssets() {
-    }
+    private GuiAssets() {}
 
     public static GuiSprite sprite(String id) {
         return sprite(GuideME.makeId(id));
@@ -74,17 +77,14 @@ public final class GuiAssets {
         var v3 = sprite.getV1();
 
         return new NineSliceSprite(
-                sprite.atlasLocation(),
-                new SpritePadding(border.left(), border.top(), border.right(), border.bottom()),
-                new float[] { u0, u1, u2, u3, v0, v1, v2, v3 });
+            sprite.atlasLocation(),
+            new SpritePadding(border.left(), border.top(), border.right(), border.bottom()),
+            new float[] { u0, u1, u2, u3, v0, v1, v2, v3 });
     }
 
     /**
      * @param uv First 4 U values delimiting the horizontal slices, then 4 V values delimiting the vertical slices.
      *           These values refer to the atlas.
      */
-    public record NineSliceSprite(ResourceLocation atlasLocation,
-            SpritePadding padding,
-            float[] uv) {
-    }
+    public record NineSliceSprite(ResourceLocation atlasLocation, SpritePadding padding, float[] uv) {}
 }

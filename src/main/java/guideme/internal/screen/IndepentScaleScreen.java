@@ -1,14 +1,16 @@
 package guideme.internal.screen;
 
-import guideme.render.RenderContext;
-import guideme.render.SimpleRenderContext;
 import java.util.Optional;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+
+import guideme.render.RenderContext;
+import guideme.render.SimpleRenderContext;
 
 public abstract class IndepentScaleScreen extends Screen {
 
@@ -28,8 +30,14 @@ public abstract class IndepentScaleScreen extends Screen {
     protected void init() {
         super.init();
 
-        this.width = toVirtual(Minecraft.getInstance().getWindow().getGuiScaledWidth());
-        this.height = toVirtual(Minecraft.getInstance().getWindow().getGuiScaledHeight());
+        this.width = toVirtual(
+            Minecraft.getInstance()
+                .getWindow()
+                .getGuiScaledWidth());
+        this.height = toVirtual(
+            Minecraft.getInstance()
+                .getWindow()
+                .getGuiScaledHeight());
     }
 
     @Override
@@ -41,26 +49,29 @@ public abstract class IndepentScaleScreen extends Screen {
     @Override
     public final void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         var scaledGraphics = new ScaledGuiGraphics(
-                Minecraft.getInstance(),
-                guiGraphics.pose(),
-                guiGraphics.guiRenderState,
-                (float) this.effectiveScale);
+            Minecraft.getInstance(),
+            guiGraphics.pose(),
+            guiGraphics.guiRenderState,
+            (float) this.effectiveScale);
 
         var renderContext = new SimpleRenderContext(guiGraphics);
 
-        scaledGraphics.pose().pushMatrix();
+        scaledGraphics.pose()
+            .pushMatrix();
         // This scale has to be uniform, otherwise items rendered with it will have messed up normals (and broken
         // lighting)
-        scaledGraphics.pose().scale((float) effectiveScale, (float) effectiveScale);
+        scaledGraphics.pose()
+            .scale((float) effectiveScale, (float) effectiveScale);
         scaledRender(scaledGraphics, renderContext, toVirtual(mouseX), toVirtual(mouseY), partialTick);
 
         scaledGraphics.renderDeferredElements();
 
-        scaledGraphics.pose().popMatrix();
+        scaledGraphics.pose()
+            .popMatrix();
     }
 
     protected void scaledRender(GuiGraphics guiGraphics, RenderContext context, int mouseX, int mouseY,
-            float partialTick) {
+        float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
@@ -124,10 +135,7 @@ public abstract class IndepentScaleScreen extends Screen {
     }
 
     protected final MouseButtonEvent toVirtual(MouseButtonEvent event) {
-        return new MouseButtonEvent(
-                toVirtual(event.x()),
-                toVirtual(event.y()),
-                event.buttonInfo());
+        return new MouseButtonEvent(toVirtual(event.x()), toVirtual(event.y()), event.buttonInfo());
     }
 
     protected final double toVirtual(double value) {

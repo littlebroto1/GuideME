@@ -1,6 +1,10 @@
 
 package guideme.scene;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import guideme.color.SymbolicColor;
 import guideme.compiler.IndexingContext;
 import guideme.compiler.IndexingSink;
@@ -14,11 +18,9 @@ import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
 import guideme.libs.mdast.model.MdAstNode;
 import guideme.scene.element.SceneElementTagCompiler;
 import guideme.scene.level.GuidebookLevel;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class SceneTagCompiler extends BlockTagCompiler implements Extension {
+
     public static final String TAG_NAME = "GameScene";
 
     private final Map<String, SceneElementTagCompiler> elementTagCompilers = new HashMap<>();
@@ -52,7 +54,8 @@ public class SceneTagCompiler extends BlockTagCompiler implements Extension {
             }
         }
 
-        scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
+        scene.getCameraSettings()
+            .setRotationCenter(scene.getWorldCenter());
         scene.centerScene();
 
         var lytScene = new LytGuidebookScene(compiler.getExtensions());
@@ -81,6 +84,5 @@ public class SceneTagCompiler extends BlockTagCompiler implements Extension {
     }
 
     @Override
-    public void index(IndexingContext indexer, MdxJsxElementFields el, IndexingSink sink) {
-    }
+    public void index(IndexingContext indexer, MdxJsxElementFields el, IndexingSink sink) {}
 }

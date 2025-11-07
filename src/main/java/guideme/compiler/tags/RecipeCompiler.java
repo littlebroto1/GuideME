@@ -1,13 +1,5 @@
 package guideme.compiler.tags;
 
-import guideme.compiler.PageCompiler;
-import guideme.document.block.LytBlock;
-import guideme.document.block.LytBlockContainer;
-import guideme.document.block.LytParagraph;
-import guideme.internal.GuideMEClient;
-import guideme.internal.util.Platform;
-import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
-import guideme.libs.mdast.model.MdAstNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -17,6 +9,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -27,14 +20,25 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.item.crafting.RecipeType;
+
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import guideme.compiler.PageCompiler;
+import guideme.document.block.LytBlock;
+import guideme.document.block.LytBlockContainer;
+import guideme.document.block.LytParagraph;
+import guideme.internal.GuideMEClient;
+import guideme.internal.util.Platform;
+import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
+import guideme.libs.mdast.model.MdAstNode;
 
 /**
  * Shows a Recipe-Book-Like representation of the recipe needed to craft a given item.
  */
 public class RecipeCompiler extends BlockTagCompiler {
+
     private static final Logger LOG = LoggerFactory.getLogger(RecipeCompiler.class);
 
     @Nullable
@@ -104,7 +108,8 @@ public class RecipeCompiler extends BlockTagCompiler {
             }
 
             if (fallbackText == null) {
-                if (!GuideMEClient.instance().isHideMissingRecipeErrors()) {
+                if (!GuideMEClient.instance()
+                    .isHideMissingRecipeErrors()) {
                     parent.appendError(compiler, "Couldn't find recipe for " + id, el);
                 }
             } else if (!fallbackText.isEmpty()) {
@@ -139,7 +144,8 @@ public class RecipeCompiler extends BlockTagCompiler {
             }
 
             if (fallbackText == null) {
-                if (!GuideMEClient.instance().isHideMissingRecipeErrors()) {
+                if (!GuideMEClient.instance()
+                    .isHideMissingRecipeErrors()) {
                     parent.appendError(compiler, "Couldn't find a handler for recipe " + recipeId, el);
                 }
             } else if (!fallbackText.isEmpty()) {
@@ -151,9 +157,9 @@ public class RecipeCompiler extends BlockTagCompiler {
     /**
      * Maps a recipe type to a factory that can create a layout block to display it.
      */
-    private record RecipeTypeMapping<T extends Recipe<C>, C extends RecipeInput>(
-            RecipeType<T> recipeType,
-            Function<RecipeHolder<T>, Stream<? extends LytBlock>> factory) {
+    private record RecipeTypeMapping<T extends Recipe<C>, C extends RecipeInput> (RecipeType<T> recipeType,
+        Function<RecipeHolder<T>, Stream<? extends LytBlock>> factory) {
+
         @Nullable
         LytBlock createFirst(RecipeMap recipeMap, Item resultItem) {
             var result = createAll(recipeMap, resultItem).iterator();
@@ -169,7 +175,8 @@ public class RecipeCompiler extends BlockTagCompiler {
             // We try to find non-special recipes first then fall back to special
             List<RecipeHolder<T>> fallbackCandidates = new ArrayList<>();
             for (var holder : recipeMap.byType(recipeType)) {
-                if (holder.value().isSpecial()) {
+                if (holder.value()
+                    .isSpecial()) {
                     fallbackCandidates.add(holder);
                     continue;
                 }
@@ -191,7 +198,8 @@ public class RecipeCompiler extends BlockTagCompiler {
         @SuppressWarnings("unchecked")
         @Nullable
         Stream<? extends LytBlock> tryCreate(RecipeHolder<?> recipe) {
-            if (recipeType == recipe.value().getType()) {
+            if (recipeType == recipe.value()
+                .getType()) {
                 return factory.apply((RecipeHolder<T>) recipe);
             }
             return null;
@@ -201,9 +209,10 @@ public class RecipeCompiler extends BlockTagCompiler {
     private Iterable<RecipeTypeMapping<?, ?>> getMappings(PageCompiler compiler) {
         List<RecipeTypeMapping<?, ?>> result = new ArrayList<>();
         var mappings = new RecipeTypeMappingSupplier.RecipeTypeMappings() {
+
             @Override
             public <T extends Recipe<C>, C extends RecipeInput> void addStreamFactory(RecipeType<T> recipeType,
-                    Function<RecipeHolder<T>, Stream<? extends LytBlock>> factory) {
+                Function<RecipeHolder<T>, Stream<? extends LytBlock>> factory) {
                 result.add(new RecipeTypeMapping<>(recipeType, factory));
             }
         };
@@ -224,9 +233,10 @@ public class RecipeCompiler extends BlockTagCompiler {
         Set<ResourceLocation> recipeTypes = new HashSet<>();
         List<RecipeTypeMapping<?, ?>> result = new ArrayList<>();
         var mappings = new RecipeTypeMappingSupplier.RecipeTypeMappings() {
+
             @Override
             public <T extends Recipe<C>, C extends RecipeInput> void addStreamFactory(RecipeType<T> recipeType,
-                    Function<RecipeHolder<T>, Stream<? extends LytBlock>> factory) {
+                Function<RecipeHolder<T>, Stream<? extends LytBlock>> factory) {
                 Objects.requireNonNull(recipeType, "recipeType");
                 Objects.requireNonNull(factory, "factory");
 
@@ -235,11 +245,14 @@ public class RecipeCompiler extends BlockTagCompiler {
             }
         };
 
-        var it = ServiceLoader.load(RecipeTypeMappingSupplier.class).stream().iterator();
+        var it = ServiceLoader.load(RecipeTypeMappingSupplier.class)
+            .stream()
+            .iterator();
         while (it.hasNext()) {
             var provider = it.next();
             try {
-                provider.get().collect(mappings);
+                provider.get()
+                    .collect(mappings);
             } catch (Exception e) {
                 LOG.error("Failed to collect shared recipe type mappings from {}", provider.type(), e);
             }

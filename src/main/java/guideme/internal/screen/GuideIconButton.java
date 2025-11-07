@@ -1,21 +1,24 @@
 package guideme.internal.screen;
 
-import guideme.color.SymbolicColor;
-import guideme.internal.GuideME;
-import guideme.internal.GuideMEClient;
-import guideme.internal.GuidebookText;
-import guideme.internal.util.Blitter;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
+import guideme.color.SymbolicColor;
+import guideme.internal.GuideME;
+import guideme.internal.GuideMEClient;
+import guideme.internal.GuidebookText;
+import guideme.internal.util.Blitter;
+
 /**
  * Button found in the toolbar at the top of {@link GuideScreen}.
  */
 public class GuideIconButton extends Button {
+
     public static final int WIDTH = 16;
     public static final int HEIGHT = 16;
 
@@ -26,14 +29,7 @@ public class GuideIconButton extends Button {
     }
 
     public GuideIconButton(int x, int y, Role role, Consumer<GuideIconButton> callback) {
-        super(
-                x,
-                y,
-                WIDTH,
-                HEIGHT,
-                role.actionText,
-                btn -> callback.accept((GuideIconButton) btn),
-                Supplier::get);
+        super(x, y, WIDTH, HEIGHT, role.actionText, btn -> callback.accept((GuideIconButton) btn), Supplier::get);
         this.role = role;
         setTooltip(Tooltip.create(getMessage()));
     }
@@ -61,13 +57,14 @@ public class GuideIconButton extends Button {
         var resolved = color.resolve(GuideMEClient.currentLightDarkMode());
 
         Blitter.texture(GuideME.makeId("textures/guide/buttons.png"), 64, 64)
-                .src(role.iconSrcX, role.iconSrcY, 16, 16)
-                .dest(getX(), getY(), 16, 16)
-                .colorArgb(resolved)
-                .blit(guiGraphics);
+            .src(role.iconSrcX, role.iconSrcY, 16, 16)
+            .dest(getX(), getY(), 16, 16)
+            .colorArgb(resolved)
+            .blit(guiGraphics);
     }
 
     public enum Role {
+
         BACK(GuidebookText.HistoryGoBack.text(), 0, 0),
         FORWARD(GuidebookText.HistoryGoForward.text(), 16, 0),
         CLOSE(GuidebookText.Close.text(), 32, 0),

@@ -1,6 +1,5 @@
 package guideme.internal.screen;
 
-import guideme.color.Colors;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -9,7 +8,10 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
+import guideme.color.Colors;
+
 public class GuideScrollbar extends AbstractWidget {
+
     private static final int WIDTH = 8;
     private int contentHeight;
     private int scrollAmount;
@@ -20,8 +22,7 @@ public class GuideScrollbar extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     protected int getMaxScrollAmount() {
         return Math.max(0, contentHeight - (this.height - 4));
@@ -44,14 +45,8 @@ public class GuideScrollbar extends AbstractWidget {
         int top = getY() + getThumbTop();
         int bottom = top + thumbHeight;
 
-        guiGraphics.fill(
-                RenderPipelines.GUI,
-                left, top, right, bottom,
-                Colors.rgb(128, 128, 128));
-        guiGraphics.fill(
-                RenderPipelines.GUI,
-                left, top, right - 1, bottom - 1,
-                Colors.rgb(192, 192, 192));
+        guiGraphics.fill(RenderPipelines.GUI, left, top, right, bottom, Colors.rgb(128, 128, 128));
+        guiGraphics.fill(RenderPipelines.GUI, left, top, right - 1, bottom - 1, Colors.rgb(192, 192, 192));
     }
 
     /**
@@ -80,10 +75,9 @@ public class GuideScrollbar extends AbstractWidget {
         var thumbTop = getY() + getThumbTop();
         var thumbBottom = thumbTop + getThumbHeight();
 
-        boolean thumbHit = event.x() >= getX()
-                && event.x() <= getX() + WIDTH
-                && event.y() >= thumbTop
-                && event.y() < thumbBottom;
+        boolean thumbHit = event.x() >= getX() && event.x() <= getX() + WIDTH
+            && event.y() >= thumbTop
+            && event.y() < thumbBottom;
         if (thumbHit) {
             this.thumbHeldAt = event.y() - thumbTop;
             return true;

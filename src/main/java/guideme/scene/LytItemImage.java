@@ -1,15 +1,17 @@
 package guideme.scene;
 
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+
 import guideme.document.LytRect;
 import guideme.document.block.LytBlock;
 import guideme.layout.LayoutContext;
 import guideme.render.RenderContext;
 import guideme.siteexport.ExportableResourceProvider;
 import guideme.siteexport.ResourceExporter;
-import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemStack;
 
 public class LytItemImage extends LytBlock implements ExportableResourceProvider {
+
     private ItemStack item = ItemStack.EMPTY;
 
     private float scale = 1;
@@ -36,8 +38,7 @@ public class LytItemImage extends LytBlock implements ExportableResourceProvider
     }
 
     @Override
-    protected void onLayoutMoved(int deltaX, int deltaY) {
-    }
+    protected void onLayoutMoved(int deltaX, int deltaY) {}
 
     @Override
     public void render(RenderContext context) {

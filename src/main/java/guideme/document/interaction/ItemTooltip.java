@@ -1,14 +1,17 @@
 package guideme.document.interaction;
 
-import guideme.siteexport.ResourceExporter;
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
+import guideme.siteexport.ResourceExporter;
+
 public class ItemTooltip implements GuideTooltip {
+
     private final ItemStack stack;
     private final ItemStack icon;
 
@@ -34,9 +37,9 @@ public class ItemTooltip implements GuideTooltip {
     public List<ClientTooltipComponent> getLines() {
         var lines = Screen.getTooltipFromItem(Minecraft.getInstance(), stack);
         return lines.stream()
-                .map(Component::getVisualOrderText)
-                .map(ClientTooltipComponent::create)
-                .toList();
+            .map(Component::getVisualOrderText)
+            .map(ClientTooltipComponent::create)
+            .toList();
     }
 
     @Override

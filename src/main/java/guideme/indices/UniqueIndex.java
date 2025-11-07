@@ -1,23 +1,28 @@
 package guideme.indices;
 
-import com.google.gson.stream.JsonWriter;
-import guideme.GuidePageChange;
-import guideme.compiler.ParsedGuidePage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import net.minecraft.resources.ResourceLocation;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.stream.JsonWriter;
+
+import guideme.GuidePageChange;
+import guideme.compiler.ParsedGuidePage;
+
 /**
  * Maintains an index for any given page using a mapping function for keys and values of the index.
  */
 public class UniqueIndex<K, V> implements PageIndex {
+
     private static final Logger LOG = LoggerFactory.getLogger(UniqueIndex.class);
 
     private final Map<K, Record<V>> index = new HashMap<>();
@@ -31,7 +36,7 @@ public class UniqueIndex<K, V> implements PageIndex {
     private boolean hadDuplicates;
 
     public UniqueIndex(String name, EntryFunction<K, V> entryFunction, JsonSerializer<K> keySerializer,
-            JsonSerializer<V> valueSerializer) {
+        JsonSerializer<V> valueSerializer) {
         this.name = name;
         this.entryFunction = entryFunction;
         this.keySerializer = keySerializer;
@@ -76,9 +81,10 @@ public class UniqueIndex<K, V> implements PageIndex {
 
         // Clean up all index entries associated with changed pages
         var idsToRemove = changes.stream()
-                .map(GuidePageChange::pageId)
-                .collect(Collectors.toSet());
-        index.values().removeIf(p -> idsToRemove.contains(p.pageId));
+            .map(GuidePageChange::pageId)
+            .collect(Collectors.toSet());
+        index.values()
+            .removeIf(p -> idsToRemove.contains(p.pageId));
 
         // Then re-add new or changed pages
         for (var change : changes) {
@@ -95,8 +101,12 @@ public class UniqueIndex<K, V> implements PageIndex {
             var value = entry.getValue();
             var previousPage = index.put(key, new Record<>(page.getId(), value));
             if (previousPage != null) {
-                LOG.warn("Key conflict in index {}: {} is used by pages {} and {}",
-                        name, key, page, previousPage.pageId);
+                LOG.warn(
+                    "Key conflict in index {}: {} is used by pages {} and {}",
+                    name,
+                    key,
+                    page,
+                    previousPage.pageId);
                 hadDuplicates = true;
             }
         }
@@ -107,16 +117,19 @@ public class UniqueIndex<K, V> implements PageIndex {
         writer.beginArray();
         for (var entry : index.entrySet()) {
             keySerializer.write(writer, entry.getKey());
-            valueSerializer.write(writer, entry.getValue().value());
+            valueSerializer.write(
+                writer,
+                entry.getValue()
+                    .value());
         }
         writer.endArray();
     }
 
     @FunctionalInterface
     public interface EntryFunction<K, V> {
+
         Iterable<Pair<K, V>> getEntry(ParsedGuidePage page);
     }
 
-    private record Record<V>(ResourceLocation pageId, V value) {
-    }
+    private record Record<V> (ResourceLocation pageId, V value) {}
 }

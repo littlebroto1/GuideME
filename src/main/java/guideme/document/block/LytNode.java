@@ -1,15 +1,18 @@
 package guideme.document.block;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.LytRect;
 import guideme.document.flow.LytFlowContent;
 import guideme.libs.mdast.model.MdAstNode;
 import guideme.style.Styleable;
 import guideme.style.TextStyle;
-import java.util.Collections;
-import java.util.List;
-import org.jetbrains.annotations.Nullable;
 
 public abstract class LytNode implements Styleable {
+
     @Nullable
     protected LytNode parent;
 
@@ -22,8 +25,7 @@ public abstract class LytNode implements Styleable {
     @Nullable
     private MdAstNode sourceNode;
 
-    public void removeChild(LytNode node) {
-    }
+    public void removeChild(LytNode node) {}
 
     public List<? extends LytNode> getChildren() {
         return Collections.emptyList();
@@ -51,14 +53,11 @@ public abstract class LytNode implements Styleable {
 
     public abstract LytRect getBounds();
 
-    public void onMouseEnter(@Nullable LytFlowContent hoveredContent) {
-    }
+    public void onMouseEnter(@Nullable LytFlowContent hoveredContent) {}
 
-    public void onMouseLeave() {
-    }
+    public void onMouseLeave() {}
 
-    public void tick() {
-    }
+    public void tick() {}
 
     @Nullable
     public LytNode pickNode(int x, int y) {
@@ -78,6 +77,7 @@ public abstract class LytNode implements Styleable {
 
     public final String getTextContent() {
         var visitor = new LytVisitor() {
+
             final StringBuilder builder = new StringBuilder();
 
             @Override

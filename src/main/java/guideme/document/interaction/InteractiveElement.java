@@ -1,10 +1,13 @@
 package guideme.document.interaction;
 
-import guideme.ui.GuideUiHost;
 import java.util.Optional;
+
 import net.minecraft.client.input.MouseButtonInfo;
 
+import guideme.ui.GuideUiHost;
+
 public interface InteractiveElement {
+
     default boolean mouseMoved(GuideUiHost screen, int x, int y) {
         return false;
     }
@@ -17,8 +20,7 @@ public interface InteractiveElement {
         return false;
     }
 
-    default void mouseCaptureLost() {
-    }
+    default void mouseCaptureLost() {}
 
     /**
      * @param x X position of the mouse in document coordinates.

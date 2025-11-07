@@ -1,5 +1,7 @@
 package guideme.compiler.tags;
 
+import java.util.Set;
+
 import guideme.compiler.PageCompiler;
 import guideme.document.block.AlignItems;
 import guideme.document.block.LytAxisBox;
@@ -7,9 +9,9 @@ import guideme.document.block.LytBlockContainer;
 import guideme.document.block.LytHBox;
 import guideme.document.block.LytVBox;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
-import java.util.Set;
 
 public class BoxTagCompiler extends BlockTagCompiler {
+
     private final BoxFlowDirection direction;
 
     public BoxTagCompiler(BoxFlowDirection direction) {

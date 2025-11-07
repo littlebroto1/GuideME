@@ -1,14 +1,16 @@
 package guideme.document.block.table;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import guideme.color.SymbolicColor;
 import guideme.document.LytRect;
 import guideme.document.block.LytBlock;
 import guideme.layout.LayoutContext;
 import guideme.render.RenderContext;
-import java.util.ArrayList;
-import java.util.List;
 
 public class LytTable extends LytBlock {
+
     /**
      * Width of border around cells.
      */
@@ -50,10 +52,7 @@ public class LytTable extends LytBlock {
             currentY = rowBottom + CELL_BORDER;
         }
 
-        return new LytRect(
-                x, y,
-                availableWidth,
-                currentY - y);
+        return new LytRect(x, y, availableWidth, currentY - y);
     }
 
     @Override
@@ -64,7 +63,10 @@ public class LytTable extends LytBlock {
         for (var row : rows) {
             row.bounds = row.bounds.move(deltaX, deltaY);
             for (var cell : row.getChildren()) {
-                cell.setLayoutPos(cell.getBounds().point().add(deltaX, deltaY));
+                cell.setLayoutPos(
+                    cell.getBounds()
+                        .point()
+                        .add(deltaX, deltaY));
             }
         }
     }

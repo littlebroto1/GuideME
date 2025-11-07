@@ -1,21 +1,25 @@
 package guideme.document.block;
 
-import guideme.document.DefaultStyles;
-import guideme.document.LytRect;
-import guideme.layout.LayoutContext;
-import guideme.render.RenderContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
 import net.minecraft.client.Minecraft;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import guideme.document.DefaultStyles;
+import guideme.document.LytRect;
+import guideme.layout.LayoutContext;
+import guideme.render.RenderContext;
 
 /**
  * This layout block shows a loading indicator and will ultimately replace itself with the final content.
  */
 public class LytPlaceholderBlock extends LytBlock {
+
     private static final Logger LOG = LoggerFactory.getLogger(LytPlaceholderBlock.class);
 
     private final CompletableFuture<LytBlock> future;

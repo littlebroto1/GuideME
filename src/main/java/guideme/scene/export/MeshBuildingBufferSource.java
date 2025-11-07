@@ -1,18 +1,22 @@
 package guideme.scene.export;
 
-import com.mojang.blaze3d.vertex.ByteBufferBuilder;
-import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMaps;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMaps;
 
 /**
  * A buffer source we pass into the standard renderer to capture all rendered 3D data in buffers suitable for export.
  */
 class MeshBuildingBufferSource extends MultiBufferSource.BufferSource implements AutoCloseable {
+
     private final List<Mesh> meshes = new ArrayList<>();
 
     public MeshBuildingBufferSource() {
@@ -36,7 +40,7 @@ class MeshBuildingBufferSource extends MultiBufferSource.BufferSource implements
 
                 var vbSource = buffer.vertexBuffer();
                 var vertexBuffer = ByteBuffer.allocate(vbSource.remaining())
-                        .order(ByteOrder.nativeOrder());
+                    .order(ByteOrder.nativeOrder());
                 vertexBuffer.put(vbSource);
                 vertexBuffer.flip();
 
@@ -49,18 +53,15 @@ class MeshBuildingBufferSource extends MultiBufferSource.BufferSource implements
                     indexBuffer.flip();
                 }
 
-                this.meshes.add(new Mesh(
-                        drawState,
-                        vertexBuffer,
-                        indexBuffer,
-                        renderType));
+                this.meshes.add(new Mesh(drawState, vertexBuffer, indexBuffer, renderType));
             }
         }
     }
 
     @Override
     public void close() {
-        fixedBuffers.values().forEach(ByteBufferBuilder::close);
+        fixedBuffers.values()
+            .forEach(ByteBufferBuilder::close);
         sharedBuffer.close();
     }
 }

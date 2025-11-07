@@ -1,14 +1,16 @@
 package guideme.scene.annotation;
 
+import org.joml.Vector3f;
+
 import guideme.color.ColorValue;
 import guideme.color.ConstantColor;
 import guideme.document.LytRect;
 import guideme.internal.GuideME;
 import guideme.render.RenderContext;
 import guideme.scene.GuidebookScene;
-import org.joml.Vector3f;
 
 public class DiamondAnnotation extends OverlayAnnotation {
+
     private final Vector3f pos;
     private final ColorValue outerColor;
     private final ColorValue color;
@@ -43,8 +45,10 @@ public class DiamondAnnotation extends OverlayAnnotation {
         var outer = outerColor;
         var inner = color;
         if (isHovered()) {
-            outer = context.mutableColor(outer).lighter(20);
-            inner = context.mutableColor(inner).lighter(20);
+            outer = context.mutableColor(outer)
+                .lighter(20);
+            inner = context.mutableColor(inner)
+                .lighter(20);
         }
 
         var texture = GuideME.makeId("textures/guide/diamond.png");

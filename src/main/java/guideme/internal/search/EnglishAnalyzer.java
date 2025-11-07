@@ -13,6 +13,7 @@ import org.apache.lucene.analysis.standard.StandardTokenizer;
  * Custom version of the default english analyzer to enable the better {@link KStemFilter}.
  */
 public final class EnglishAnalyzer extends Analyzer {
+
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
         final Tokenizer source = new StandardTokenizer();

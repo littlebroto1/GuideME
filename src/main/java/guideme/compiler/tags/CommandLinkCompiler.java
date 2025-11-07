@@ -1,5 +1,16 @@
 package guideme.compiler.tags;
 
+import java.util.ArrayList;
+import java.util.Set;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import guideme.compiler.IndexingContext;
 import guideme.compiler.IndexingSink;
 import guideme.compiler.PageCompiler;
@@ -9,19 +20,12 @@ import guideme.document.interaction.GuideTooltip;
 import guideme.document.interaction.TextTooltip;
 import guideme.internal.GuidebookText;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
-import java.util.ArrayList;
-import java.util.Set;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Runs a command when clicked.
  */
 public class CommandLinkCompiler extends FlowTagCompiler {
+
     private static final Logger LOG = LoggerFactory.getLogger(CommandLinkCompiler.class);
 
     @Override
@@ -82,7 +86,9 @@ public class CommandLinkCompiler extends FlowTagCompiler {
         } else {
             commandTooltipLine = Component.literal(command);
         }
-        tooltipLines.add(GuidebookText.RunsCommand.text().withStyle(ChatFormatting.DARK_GRAY));
+        tooltipLines.add(
+            GuidebookText.RunsCommand.text()
+                .withStyle(ChatFormatting.DARK_GRAY));
         tooltipLines.add(commandTooltipLine.withStyle(ChatFormatting.DARK_GRAY));
 
         return new TextTooltip(tooltipLines);

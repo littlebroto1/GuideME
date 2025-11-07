@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFW;
  * Models transitions for numeric values.
  */
 public final class Transition {
+
     private static final double EPSILON = 0.0001; // Values differing less than this are considered equal
     private static final double MIN_UPDATE_DURATION = 0.005; // 5 millisecond
 
@@ -85,6 +86,7 @@ public final class Transition {
 
     @FunctionalInterface
     public interface Ticker {
+
         Ticker SYSTEM = GLFW::glfwGetTime;
 
         double currentSeconds();
@@ -92,11 +94,13 @@ public final class Transition {
 
     @FunctionalInterface
     public interface ValueGetter {
+
         double get();
     }
 
     @FunctionalInterface
     public interface ValueSetter {
+
         void set(double value);
     }
 

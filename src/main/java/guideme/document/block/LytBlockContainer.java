@@ -5,6 +5,7 @@ import guideme.document.LytErrorSink;
 import guideme.libs.unist.UnistNode;
 
 public interface LytBlockContainer extends LytErrorSink {
+
     void append(LytBlock node);
 
     @Override

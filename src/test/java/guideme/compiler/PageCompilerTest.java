@@ -1,18 +1,22 @@
 package guideme.compiler;
 
-import guideme.Guide;
-import guideme.GuidePage;
-import guideme.extensions.ExtensionCollection;
-import guideme.internal.GuideME;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import net.minecraft.resources.ResourceLocation;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import guideme.Guide;
+import guideme.GuidePage;
+import guideme.extensions.ExtensionCollection;
+import guideme.internal.GuideME;
+
 class PageCompilerTest {
+
     private Path guidebookFolder;
 
     @BeforeEach
@@ -30,11 +34,11 @@ class PageCompilerTest {
         try (var in = Files.newInputStream(path)) {
             var parsed = PageCompiler.parse("ae2", "en_us", GuideME.makeId(id), in);
             var testPages = Guide.builder(ResourceLocation.fromNamespaceAndPath("ae2", "ae2guide"))
-                    .developmentSources(guidebookFolder)
-                    .watchDevelopmentSources(false)
-                    .register(false)
-                    .disableOpenHotkey()
-                    .build();
+                .developmentSources(guidebookFolder)
+                .watchDevelopmentSources(false)
+                .register(false)
+                .disableOpenHotkey()
+                .build();
             return PageCompiler.compile(testPages, ExtensionCollection.empty(), parsed);
         }
     }
@@ -47,7 +51,9 @@ class PageCompilerTest {
 
         // Search up for the guidebook folder
         var url = ClassLoader.getSystemClassLoader()
-                .getResource(PageCompilerTest.class.getName().replace('.', '/') + ".class");
+            .getResource(
+                PageCompilerTest.class.getName()
+                    .replace('.', '/') + ".class");
         var jarPath = Paths.get(url.toURI());
         var current = jarPath.getParent();
         while (current != null) {

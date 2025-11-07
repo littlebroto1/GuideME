@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(targets = "guideme.internal.shaded.lucene.internal.vectorization.VectorizationProvider", remap = false)
 public class LuceneVectorizationMixin {
+
     @Inject(method = "getUpperJavaFeatureVersion", cancellable = true, at = @At("TAIL"))
     private static void getUpperJavaFeatureVersion(CallbackInfoReturnable<Integer> ci) {
         ci.setReturnValue(17);

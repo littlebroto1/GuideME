@@ -1,5 +1,12 @@
 package guideme.compiler.tags;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+
+import net.minecraft.resources.ResourceLocation;
+
 import guideme.PageAnchor;
 import guideme.compiler.PageCompiler;
 import guideme.document.block.AlignItems;
@@ -13,15 +20,11 @@ import guideme.document.flow.LytFlowLink;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
 import guideme.navigation.NavigationNode;
 import guideme.scene.LytItemImage;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import net.minecraft.resources.ResourceLocation;
 
 public class SubPagesCompiler extends BlockTagCompiler {
+
     private static final Comparator<NavigationNode> ALPHABETICAL_COMPARATOR = Comparator
-            .comparing(NavigationNode::title);
+        .comparing(NavigationNode::title);
 
     @Override
     public Set<String> getTagNames() {
@@ -34,7 +37,8 @@ public class SubPagesCompiler extends BlockTagCompiler {
         var showIcons = MdxAttrs.getBoolean(compiler, parent, el, "icons", false);
         var alphabetical = MdxAttrs.getBoolean(compiler, parent, el, "alphabetical", false);
 
-        var navigationTree = compiler.getPageCollection().getNavigationTree();
+        var navigationTree = compiler.getPageCollection()
+            .getNavigationTree();
 
         // Find the page in the tree, if it's explicitly set to empty, show the root nav
         List<NavigationNode> subNodes;
@@ -79,7 +83,8 @@ public class SubPagesCompiler extends BlockTagCompiler {
 
             LytBlock listItemBlock = listItemPar;
 
-            if (showIcons && !childNode.icon().isEmpty()) {
+            if (showIcons && !childNode.icon()
+                .isEmpty()) {
                 var lytHBox = new LytHBox();
 
                 var icon = new LytItemImage();

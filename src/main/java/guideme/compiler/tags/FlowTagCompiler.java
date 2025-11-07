@@ -14,6 +14,7 @@ import guideme.libs.mdast.mdx.model.MdxJsxTextElement;
  * context by wrapping it in a paragraph.
  */
 public abstract class FlowTagCompiler implements TagCompiler {
+
     protected abstract void compile(PageCompiler compiler, LytFlowParent parent, MdxJsxElementFields el);
 
     @Override

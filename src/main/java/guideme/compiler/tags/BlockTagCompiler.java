@@ -15,6 +15,7 @@ import guideme.libs.mdast.mdx.model.MdxJsxTextElement;
  * context by wrapping it in an inline block.
  */
 public abstract class BlockTagCompiler implements TagCompiler {
+
     protected abstract void compile(PageCompiler compiler, LytBlockContainer parent, MdxJsxElementFields el);
 
     @Override

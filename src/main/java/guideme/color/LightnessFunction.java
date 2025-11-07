@@ -4,6 +4,7 @@ package guideme.color;
  * Applies a function to an existing color that makes it lighter or darker by a given percentage.
  */
 public class LightnessFunction implements ColorValue {
+
     private final ColorValue color;
     private final float percentage;
 

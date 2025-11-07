@@ -9,6 +9,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.DynamicTest;
@@ -38,15 +39,21 @@ public class ApiConsistencyTest {
 
         var result = new ArrayList<DynamicNode>();
         Files.walkFileTree(classRoot, new SimpleFileVisitor<>() {
+
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                if (file.toString().endsWith(".class")) {
-                    String classFilePath = classRoot.relativize(file).toString().replace('\\', '/');
+                if (file.toString()
+                    .endsWith(".class")) {
+                    String classFilePath = classRoot.relativize(file)
+                        .toString()
+                        .replace('\\', '/');
                     if (!isApiClassFile(classFilePath)) {
                         return FileVisitResult.CONTINUE;
                     }
-                    result.add(DynamicTest.dynamicTest(
-                            classFilePath.replace('/', '.').replaceAll(".class$", ""),
+                    result.add(
+                        DynamicTest.dynamicTest(
+                            classFilePath.replace('/', '.')
+                                .replaceAll(".class$", ""),
                             () -> testApiConsistency(classRoot, file)));
                 }
                 return FileVisitResult.CONTINUE;
@@ -62,9 +69,10 @@ public class ApiConsistencyTest {
         String[] className = new String[1];
 
         var visitor = new ClassVisitor(Opcodes.ASM9) {
+
             @Override
             public void visit(int version, int access, String name, String signature, String superName,
-                    String[] interfaces) {
+                String[] interfaces) {
                 className[0] = name;
 
                 if (isForbiddenTypeReference(superName)) {
@@ -84,7 +92,7 @@ public class ApiConsistencyTest {
                     var fieldType = Type.getType(descriptor);
                     if (isForbiddenTypeReference(fieldType.getClassName())) {
                         violations.add(
-                                "Has visible field with non-API type: " + name + " (" + fieldType.getClassName() + ")");
+                            "Has visible field with non-API type: " + name + " (" + fieldType.getClassName() + ")");
                     }
                 }
 
@@ -95,8 +103,8 @@ public class ApiConsistencyTest {
             public RecordComponentVisitor visitRecordComponent(String name, String descriptor, String signature) {
                 var fieldType = Type.getType(descriptor);
                 if (isForbiddenTypeReference(fieldType.getClassName())) {
-                    violations.add(
-                            "Has record component with non-API type: " + name + " (" + fieldType.getClassName() + ")");
+                    violations
+                        .add("Has record component with non-API type: " + name + " (" + fieldType.getClassName() + ")");
                 }
 
                 return null;
@@ -104,7 +112,7 @@ public class ApiConsistencyTest {
 
             @Override
             public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-                    String[] exceptions) {
+                String[] exceptions) {
 
                 // Ignore non-public methods
                 if ((access & (Opcodes.ACC_PUBLIC | Opcodes.ACC_PROTECTED)) == 0) {
@@ -113,15 +121,15 @@ public class ApiConsistencyTest {
 
                 for (var argType : Type.getArgumentTypes(descriptor)) {
                     if (isForbiddenTypeReference(argType.getClassName())) {
-                        violations.add(
-                                "Has method with non-API parameter: " + name + " (" + argType.getClassName() + ")");
+                        violations
+                            .add("Has method with non-API parameter: " + name + " (" + argType.getClassName() + ")");
                     }
                 }
 
                 var returnType = Type.getReturnType(descriptor);
                 if (isForbiddenTypeReference(returnType.getClassName())) {
-                    violations.add(
-                            "Has method with non-API return type: " + name + " (" + returnType.getClassName() + ")");
+                    violations
+                        .add("Has method with non-API return type: " + name + " (" + returnType.getClassName() + ")");
                 }
 
                 if (exceptions != null) {
@@ -134,11 +142,15 @@ public class ApiConsistencyTest {
 
                 if (signature != null) {
                     var signatureVisitor = new SignatureVisitor(Opcodes.ASM9) {
+
                         @Override
                         public void visitClassType(String genericName) {
                             if (isForbiddenTypeReference(genericName)) {
-                                violations.add("Has method with non-API generic type parameter: " + name + " ("
-                                        + genericName + ")");
+                                violations.add(
+                                    "Has method with non-API generic type parameter: " + name
+                                        + " ("
+                                        + genericName
+                                        + ")");
                             }
                         }
                     };
@@ -163,23 +175,28 @@ public class ApiConsistencyTest {
 
         if (!violations.isEmpty()) {
             var report = new StringBuilder();
-            report.append("Class ").append(className[0].replace('/', '.')).append(" has API violations:\n");
+            report.append("Class ")
+                .append(className[0].replace('/', '.'))
+                .append(" has API violations:\n");
             for (var violation : violations) {
-                report.append("  - ").append(violation).append("\n");
+                report.append("  - ")
+                    .append(violation)
+                    .append("\n");
             }
             Assertions.fail(report.toString());
         }
     }
 
     private static boolean isApiClassFile(String classFile) {
-        return !classFile.matches(".*/[^/]*Internal\\.[^/]*")
-                && !classFile.matches(".*/[^/]Internal\\$[^/]*\\.[^/]*")
-                && !classFile.matches(".*/internal/.*");
+        return !classFile.matches(".*/[^/]*Internal\\.[^/]*") && !classFile.matches(".*/[^/]Internal\\$[^/]*\\.[^/]*")
+            && !classFile.matches(".*/internal/.*");
     }
 
     private static Path getClassRoot() throws URISyntaxException {
-        String canaryClassFilename = CANARY_CLASS.getName().replace('.', '/') + ".class";
-        var canaryClassUrl = ClassLoader.getSystemClassLoader().getResource(canaryClassFilename);
+        String canaryClassFilename = CANARY_CLASS.getName()
+            .replace('.', '/') + ".class";
+        var canaryClassUrl = ClassLoader.getSystemClassLoader()
+            .getResource(canaryClassFilename);
         var canaryClassPath = Paths.get(canaryClassUrl.toURI());
 
         var relativePath = Paths.get(canaryClassFilename);
@@ -188,7 +205,7 @@ public class ApiConsistencyTest {
         }
 
         canaryClassPath = canaryClassPath.getRoot()
-                .resolve(canaryClassPath.subpath(0, canaryClassPath.getNameCount() - relativePath.getNameCount()));
+            .resolve(canaryClassPath.subpath(0, canaryClassPath.getNameCount() - relativePath.getNameCount()));
 
         return canaryClassPath;
     }

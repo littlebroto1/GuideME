@@ -1,11 +1,13 @@
 package guideme.document.flow;
 
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.block.LytVisitor;
 import guideme.style.Styleable;
 import guideme.style.TextStyle;
-import org.jetbrains.annotations.Nullable;
 
 public class LytFlowContent implements Styleable {
+
     private TextStyle style = TextStyle.EMPTY;
     private TextStyle hoverStyle = TextStyle.EMPTY;
 
@@ -67,6 +69,5 @@ public class LytFlowContent implements Styleable {
         visitor.afterFlowContent(this);
     }
 
-    protected void visitChildren(LytVisitor visitor) {
-    }
+    protected void visitChildren(LytVisitor visitor) {}
 }

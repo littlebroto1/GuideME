@@ -7,6 +7,7 @@ import net.minecraft.util.Mth;
  * A helper for mutating color values. The color values are stored as {@code float} components between 0 and 1.
  */
 public final class MutableColor implements ColorValue {
+
     private float r = 1f;
     private float g = 1f;
     private float b = 1f;
@@ -15,8 +16,7 @@ public final class MutableColor implements ColorValue {
     /**
      * Initializes a mutable color that has 1 for all components.
      */
-    public MutableColor() {
-    }
+    public MutableColor() {}
 
     /**
      * Initializes a color value with alpha=1.
@@ -51,11 +51,7 @@ public final class MutableColor implements ColorValue {
     }
 
     public static MutableColor ofBytes(int r, int g, int b, int a) {
-        return new MutableColor(
-                fromByte(r),
-                fromByte(g),
-                fromByte(b),
-                fromByte(a));
+        return new MutableColor(fromByte(r), fromByte(g), fromByte(b), fromByte(a));
     }
 
     /**
@@ -66,19 +62,11 @@ public final class MutableColor implements ColorValue {
     }
 
     public int toArgb32() {
-        return ARGB.color(
-                alphaByte(),
-                redByte(),
-                greenByte(),
-                blueByte());
+        return ARGB.color(alphaByte(), redByte(), greenByte(), blueByte());
     }
 
     public int toAbgr32() {
-        return ARGB.color(
-                alphaByte(),
-                redByte(),
-                greenByte(),
-                blueByte());
+        return ARGB.color(alphaByte(), redByte(), greenByte(), blueByte());
     }
 
     public float red() {
@@ -189,11 +177,9 @@ public final class MutableColor implements ColorValue {
         float m_ = (float) Math.cbrt(m);
         float s_ = (float) Math.cbrt(s);
 
-        return new float[] {
-                0.2104542553f * l_ + 0.7936177850f * m_ - 0.0040720468f * s_,
-                1.9779984951f * l_ - 2.4285922050f * m_ + 0.4505937099f * s_,
-                0.0259040371f * l_ + 0.7827717662f * m_ - 0.8086757660f * s_,
-        };
+        return new float[] { 0.2104542553f * l_ + 0.7936177850f * m_ - 0.0040720468f * s_,
+            1.9779984951f * l_ - 2.4285922050f * m_ + 0.4505937099f * s_,
+            0.0259040371f * l_ + 0.7827717662f * m_ - 0.8086757660f * s_, };
     }
 
     /**

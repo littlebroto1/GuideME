@@ -6,6 +6,7 @@ import java.util.OptionalInt;
  * Zero-Width Flow-Content that can be referred to by links.
  */
 public class LytFlowAnchor extends LytFlowContent {
+
     private final String name;
 
     private int layoutY;

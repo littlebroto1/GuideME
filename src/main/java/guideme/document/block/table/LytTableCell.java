@@ -6,6 +6,7 @@ import guideme.document.block.LytVBox;
  * A cell in a {@link LytTable}s {@link LytTableRow}.
  */
 public class LytTableCell extends LytVBox {
+
     final LytTable table;
     final LytTableRow row;
     final LytTableColumn column;

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class QueryStringSplitter {
-    private QueryStringSplitter() {
-    }
+
+    private QueryStringSplitter() {}
 
     public static List<String> split(String query) {
         List<String> terms = new ArrayList<>();

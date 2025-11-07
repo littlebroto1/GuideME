@@ -1,5 +1,8 @@
 package guideme.compiler.tags;
 
+import java.net.URI;
+import java.util.Set;
+
 import guideme.PageAnchor;
 import guideme.compiler.IndexingContext;
 import guideme.compiler.IndexingSink;
@@ -10,10 +13,9 @@ import guideme.document.flow.LytFlowLink;
 import guideme.document.flow.LytFlowParent;
 import guideme.document.interaction.TextTooltip;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
-import java.net.URI;
-import java.util.Set;
 
 public class ATagCompiler extends FlowTagCompiler {
+
     @Override
     public Set<String> getTagNames() {
         return Set.of("a");
@@ -36,6 +38,7 @@ public class ATagCompiler extends FlowTagCompiler {
             }
             if (!href.isEmpty()) {
                 LinkParser.parseLink(compiler, href, new LinkParser.Visitor() {
+
                     @Override
                     public void handlePage(PageAnchor page) {
                         link.setPageLink(page);

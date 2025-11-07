@@ -1,5 +1,14 @@
 package guideme.internal.command;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -7,23 +16,18 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+
 import guideme.PageAnchor;
 import guideme.internal.GuideMEProxy;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 
 /**
  * An argument for commands that identifies a registered GuideME guide.
  */
 public class PageAnchorArgument implements ArgumentType<PageAnchor> {
+
     private static final List<String> EXAMPLES = List.of("index.md", "index.md#anchor");
     private static final SimpleCommandExceptionType ERROR_INVALID = new SimpleCommandExceptionType(
-            Component.translatable("argument.resource_or_id.invalid"));
+        Component.translatable("argument.resource_or_id.invalid"));
 
     public static PageAnchorArgument argument() {
         return new PageAnchorArgument();
@@ -60,7 +64,10 @@ public class PageAnchorArgument implements ArgumentType<PageAnchor> {
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         var guideId = GuideIdArgument.getGuide(context, "guide");
-        SharedSuggestionProvider.suggestResource(GuideMEProxy.instance().getAvailablePages(guideId), builder);
+        SharedSuggestionProvider.suggestResource(
+            GuideMEProxy.instance()
+                .getAvailablePages(guideId),
+            builder);
         return builder.buildFuture();
     }
 

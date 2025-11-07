@@ -1,17 +1,20 @@
 package guideme.document.block;
 
-import guideme.document.LytRect;
-import guideme.layout.LayoutContext;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
+
+import guideme.document.LytRect;
+import guideme.layout.LayoutContext;
 
 /**
  * Shows items in a grid-like fashion, i.e. to show-case variants.
  */
 public class LytItemGrid extends LytBox {
+
     private final List<LytSlot> slots = new ArrayList<>();
 
     public LytItemGrid() {
@@ -26,18 +29,11 @@ public class LytItemGrid extends LytBox {
         for (int i = 0; i < slots.size(); i++) {
             var slotX = i % cols;
             var slotY = i / cols;
-            slots.get(i).layout(
-                    context,
-                    x + slotX * LytSlot.OUTER_SIZE,
-                    y + slotY * LytSlot.OUTER_SIZE,
-                    availableWidth);
+            slots.get(i)
+                .layout(context, x + slotX * LytSlot.OUTER_SIZE, y + slotY * LytSlot.OUTER_SIZE, availableWidth);
         }
 
-        return new LytRect(
-                x,
-                y,
-                cols * LytSlot.OUTER_SIZE,
-                rows * LytSlot.OUTER_SIZE);
+        return new LytRect(x, y, cols * LytSlot.OUTER_SIZE, rows * LytSlot.OUTER_SIZE);
     }
 
     public void addItem(SlotDisplay display) {

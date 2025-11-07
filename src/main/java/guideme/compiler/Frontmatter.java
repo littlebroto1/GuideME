@@ -1,15 +1,16 @@
 package guideme.compiler;
 
 import java.util.Map;
+
 import net.minecraft.resources.ResourceLocation;
+
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
-public record Frontmatter(
-        @Nullable FrontmatterNavigation navigationEntry,
-        Map<String, Object> additionalProperties) {
+public record Frontmatter(@Nullable FrontmatterNavigation navigationEntry, Map<String, Object> additionalProperties) {
+
     public static Frontmatter parse(ResourceLocation pageId, String yamlText) {
         var yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
 
@@ -17,7 +18,7 @@ public record Frontmatter(
         Map<String, Object> data = yaml.load(yamlText);
         var navigationObj = data.remove("navigation");
         if (navigationObj != null) {
-            if (!(navigationObj instanceof Map<?, ?> navigationMap)) {
+            if (!(navigationObj instanceof Map<?, ?>navigationMap)) {
                 throw new IllegalArgumentException("The navigation key in the frontmatter has to be a map");
             }
 
@@ -46,9 +47,7 @@ public record Frontmatter(
             navigation = new FrontmatterNavigation(title, parentId, position, iconId, iconComponents);
         }
 
-        return new Frontmatter(
-                navigation,
-                Map.copyOf(data));
+        return new Frontmatter(navigation, Map.copyOf(data));
     }
 
     @Nullable
@@ -77,7 +76,7 @@ public record Frontmatter(
         if (value == null) {
             return null;
         }
-        if (!(value instanceof Map<?, ?> mapValue)) {
+        if (!(value instanceof Map<?, ?>mapValue)) {
             throw new IllegalArgumentException("Key " + key + " has to be a map!");
         }
         return mapValue;

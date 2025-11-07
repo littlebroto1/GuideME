@@ -1,5 +1,32 @@
 package guideme.scene.export;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.IntConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.zip.GZIPOutputStream;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+
+import org.joml.Matrix4f;
+import org.lwjgl.system.MemoryStack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.flatbuffers.FlatBufferBuilder;
 import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.buffers.GpuBuffer;
@@ -11,6 +38,7 @@ import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
+
 import guideme.flatbuffers.scene.ExpAnimatedTexturePart;
 import guideme.flatbuffers.scene.ExpAnimatedTexturePartFrame;
 import guideme.flatbuffers.scene.ExpCameraSettings;
@@ -34,36 +62,13 @@ import guideme.scene.GuidebookScene;
 import guideme.scene.level.GuidebookLevel;
 import guideme.siteexport.ResourceExporter;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.IntConsumer;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPOutputStream;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import org.joml.Matrix4f;
-import org.lwjgl.system.MemoryStack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Exports a game scene 3d rendering to a custom 3d format for rendering it using WebGL in the browser. See scene.fbs
  * (we use FlatBuffers to encode the actual data).
  */
 public class SceneExporter {
+
     private static final Logger LOG = LoggerFactory.getLogger(SceneExporter.class);
 
     private final ResourceExporter resourceExporter;
@@ -73,9 +78,8 @@ public class SceneExporter {
     }
 
     public static boolean isAnimated(GuidebookScene scene) {
-        return getSprites(scene)
-                .stream()
-                .anyMatch(sprite -> sprite.contents().animatedTexture != null);
+        return getSprites(scene).stream()
+            .anyMatch(sprite -> sprite.contents().animatedTexture != null);
     }
 
     private static Set<TextureAtlasSprite> getSprites(GuidebookScene scene) {
@@ -83,23 +87,29 @@ public class SceneExporter {
         var meshes = renderToMeshes(level);
 
         return meshes.stream()
-                .flatMap(Mesh::getSprites)
-                .collect(Collectors.toSet());
+            .flatMap(Mesh::getSprites)
+            .collect(Collectors.toSet());
     }
 
     private static List<Mesh> renderToMeshes(GuidebookLevel level) {
         try (var bufferSource = new MeshBuildingBufferSource()) {
             var submitStorage = new SubmitNodeStorage();
             var featureRenderDispatcher = new FeatureRenderDispatcher(
-                    submitStorage,
-                    Minecraft.getInstance().getBlockRenderer(),
-                    bufferSource,
-                    Minecraft.getInstance().getAtlasManager(),
-                    Minecraft.getInstance().renderBuffers().outlineBufferSource(),
-                    Minecraft.getInstance().renderBuffers().crumblingBufferSource(),
-                    Minecraft.getInstance().font);
-            GuidebookLevelRenderer.getInstance().renderContent(level, bufferSource, featureRenderDispatcher,
-                    new PoseStack());
+                submitStorage,
+                Minecraft.getInstance()
+                    .getBlockRenderer(),
+                bufferSource,
+                Minecraft.getInstance()
+                    .getAtlasManager(),
+                Minecraft.getInstance()
+                    .renderBuffers()
+                    .outlineBufferSource(),
+                Minecraft.getInstance()
+                    .renderBuffers()
+                    .crumblingBufferSource(),
+                Minecraft.getInstance().font);
+            GuidebookLevelRenderer.getInstance()
+                .renderContent(level, bufferSource, featureRenderDispatcher, new PoseStack());
             featureRenderDispatcher.renderAllFeatures();
             return bufferSource.getMeshes();
         }
@@ -111,15 +121,20 @@ public class SceneExporter {
         var device = RenderSystem.getDevice();
 
         List<Mesh> meshes;
-        try (var projectionMatrixBuffer = device.createBuffer(() -> "Projection matrix UBO",
-                GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_COPY_DST, RenderSystem.PROJECTION_MATRIX_UBO_SIZE)) {
+        try (var projectionMatrixBuffer = device.createBuffer(
+            () -> "Projection matrix UBO",
+            GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_COPY_DST,
+            RenderSystem.PROJECTION_MATRIX_UBO_SIZE)) {
 
             // To avoid baking in the projection and camera, we need to reset these here
             // Write an identity matrix to the projection matrix buffer
             try (var stack = MemoryStack.stackPush()) {
                 var buffer = Std140Builder.onStack(stack, RenderSystem.PROJECTION_MATRIX_UBO_SIZE)
-                        .putMat4f(new Matrix4f()).get();
-                RenderSystem.getDevice().createCommandEncoder().writeToBuffer(projectionMatrixBuffer.slice(), buffer);
+                    .putMat4f(new Matrix4f())
+                    .get();
+                RenderSystem.getDevice()
+                    .createCommandEncoder()
+                    .writeToBuffer(projectionMatrixBuffer.slice(), buffer);
             }
             var bufferSlice = projectionMatrixBuffer.slice(0, RenderSystem.PROJECTION_MATRIX_UBO_SIZE);
 
@@ -164,11 +179,12 @@ public class SceneExporter {
 
     private int writeAnimations(FlatBufferBuilder builder, List<Mesh> meshes) {
         // Find all animations we also need to export
-        var animSprites = meshes.stream().flatMap(Mesh::getSprites)
-                .filter(s -> s.contents().animatedTexture != null)
-                .distinct()
-                .mapToInt(sprite -> writeAnimatedTextureSprite(builder, sprite))
-                .toArray();
+        var animSprites = meshes.stream()
+            .flatMap(Mesh::getSprites)
+            .filter(s -> s.contents().animatedTexture != null)
+            .distinct()
+            .mapToInt(sprite -> writeAnimatedTextureSprite(builder, sprite))
+            .toArray();
 
         return ExpScene.createAnimatedTexturesVector(builder, animSprites);
     }
@@ -187,11 +203,11 @@ public class SceneExporter {
             // For textures that have interpolation enabled, we pre-interpolate all frames
             // since this is hard to do on the browser-side
             var interpResult = InterpolatedSpriteBuilder.interpolate(
-                    contents.originalImage,
-                    contents.width(),
-                    contents.height(),
-                    animatedTexture.frameRowSize,
-                    animatedTexture.frames);
+                contents.originalImage,
+                contents.width(),
+                contents.height(),
+                animatedTexture.frameRowSize,
+                animatedTexture.frames);
             try (var interpFrames = interpResult.frames()) {
                 image = Platform.exportAsPng(interpFrames);
             } catch (IOException e) {
@@ -204,10 +220,7 @@ public class SceneExporter {
             // We've simplified frames here. They all have frame time 1
             ExpAnimatedTexturePart.startFramesVector(builder, interpResult.indices().length);
             for (var frameIndex : interpResult.indices()) {
-                ExpAnimatedTexturePartFrame.createExpAnimatedTexturePartFrame(
-                        builder,
-                        frameIndex,
-                        1);
+                ExpAnimatedTexturePartFrame.createExpAnimatedTexturePartFrame(builder, frameIndex, 1);
             }
             framesOffset = builder.endVector();
         } else {
@@ -217,23 +230,21 @@ public class SceneExporter {
                 throw new RuntimeException(e);
             }
 
-            frameCount = animatedTexture.getUniqueFrames().count();
+            frameCount = animatedTexture.getUniqueFrames()
+                .count();
             frameRowSize = animatedTexture.frameRowSize;
 
             ExpAnimatedTexturePart.startFramesVector(builder, animatedTexture.frames.size());
             for (var frame : animatedTexture.frames) {
-                ExpAnimatedTexturePartFrame.createExpAnimatedTexturePartFrame(
-                        builder,
-                        frame.index(),
-                        frame.time());
+                ExpAnimatedTexturePartFrame.createExpAnimatedTexturePartFrame(builder, frame.index(), frame.time());
             }
             framesOffset = builder.endVector();
         }
 
         var path = resourceExporter.getOutputFolder()
-                .resolve("!anims")
-                .resolve(name.getNamespace())
-                .resolve(name.getPath() + ".png");
+            .resolve("!anims")
+            .resolve(name.getNamespace())
+            .resolve(name.getPath() + ".png");
         try {
             path = CacheBusting.writeAsset(path, image);
         } catch (IOException e) {
@@ -241,27 +252,32 @@ public class SceneExporter {
         }
         var relativePath = resourceExporter.getPathRelativeFromOutputFolder(path);
 
-        var textureIdOffset = builder.createSharedString(sprite.atlasLocation().toString());
+        var textureIdOffset = builder.createSharedString(
+            sprite.atlasLocation()
+                .toString());
         var spritePath = builder.createString(relativePath);
 
         return ExpAnimatedTexturePart.createExpAnimatedTexturePart(
-                builder,
-                textureIdOffset,
-                sprite.getX(),
-                sprite.getY(),
-                contents.width(),
-                contents.height(),
-                spritePath,
-                frameCount,
-                frameRowSize,
-                framesOffset);
+            builder,
+            textureIdOffset,
+            sprite.getX(),
+            sprite.getY(),
+            contents.width(),
+            contents.height(),
+            spritePath,
+            frameCount,
+            frameRowSize,
+            framesOffset);
     }
 
     private Map<VertexFormat, Integer> writeVertexFormats(List<Mesh> meshes, FlatBufferBuilder builder) {
         var result = new IdentityHashMap<VertexFormat, Integer>();
 
         for (var mesh : meshes) {
-            result.computeIfAbsent(mesh.drawState().format(), format -> writeVertexFormat(format, builder));
+            result.computeIfAbsent(
+                mesh.drawState()
+                    .format(),
+                format -> writeVertexFormat(format, builder));
         }
 
         return result;
@@ -270,9 +286,10 @@ public class SceneExporter {
     private int writeVertexFormat(VertexFormat format, FlatBufferBuilder builder) {
 
         // Count relevant vertex formats
-        var count = (int) format.getElements().stream()
-                .filter(SceneExporter::isRelevant)
-                .count();
+        var count = (int) format.getElements()
+            .stream()
+            .filter(SceneExporter::isRelevant)
+            .count();
 
         ExpVertexFormat.startElementsVector(builder, count);
 
@@ -281,23 +298,24 @@ public class SceneExporter {
         for (int i = elements.size() - 1; i >= 0; i--) {
             var offset = 0;
             for (int j = 0; j < i; j++) {
-                offset += elements.get(j).byteSize();
+                offset += elements.get(j)
+                    .byteSize();
             }
 
             var element = elements.get(i);
             if (isRelevant(element)) {
                 var normalized = element.usage() == VertexFormatElement.Usage.NORMAL
-                        || element.usage() == VertexFormatElement.Usage.COLOR;
+                    || element.usage() == VertexFormatElement.Usage.COLOR;
 
                 ExpVertexFormatElement.createExpVertexFormatElement(
-                        builder,
-                        element.index(),
-                        mapType(element.type()),
-                        mapUsage(element.usage()),
-                        element.count(),
-                        offset,
-                        element.byteSize(),
-                        normalized);
+                    builder,
+                    element.index(),
+                    mapType(element.type()),
+                    mapUsage(element.usage()),
+                    element.count(),
+                    offset,
+                    element.byteSize(),
+                    normalized);
             }
         }
         var elementsOffset = builder.endVector();
@@ -330,14 +348,17 @@ public class SceneExporter {
 
         var pipeline = compositeType.renderPipeline;
 
-        var shaderNameOffset = builder.createSharedString(pipeline.getLocation().toString());
+        var shaderNameOffset = builder.createSharedString(
+            pipeline.getLocation()
+                .toString());
 
         var nameOffset = builder.createSharedString(type.name);
 
         var disableCulling = !pipeline.isCull();
 
         // Handle transparency
-        var transparencyState = pipeline.getBlendFunction().orElse(null);
+        var transparencyState = pipeline.getBlendFunction()
+            .orElse(null);
         int transparency;
         if (transparencyState == null) {
             transparency = ExpTransparency.DISABLED;
@@ -347,14 +368,17 @@ public class SceneExporter {
             transparency = ExpTransparency.LIGHTNING;
         } else if (transparencyState.equals(BlendFunction.GLINT)) {
             transparency = ExpTransparency.GLINT;
-        } else if (transparencyState.equals(RenderPipelines.CRUMBLING.getBlendFunction().orElse(null))) {
-            transparency = ExpTransparency.CRUMBLING;
-        } else if (transparencyState.equals(BlendFunction.TRANSLUCENT)) {
-            transparency = ExpTransparency.TRANSLUCENT;
-        } else {
-            LOG.warn("Cannot handle transparency state {} of render type {}", transparencyState, type);
-            transparency = ExpTransparency.DISABLED;
-        }
+        } else if (transparencyState.equals(
+            RenderPipelines.CRUMBLING.getBlendFunction()
+                .orElse(null))) {
+                    transparency = ExpTransparency.CRUMBLING;
+                } else
+            if (transparencyState.equals(BlendFunction.TRANSLUCENT)) {
+                transparency = ExpTransparency.TRANSLUCENT;
+            } else {
+                LOG.warn("Cannot handle transparency state {} of render type {}", transparencyState, type);
+                transparency = ExpTransparency.DISABLED;
+            }
 
         // Handle depth-testing
         int depthTest;
@@ -379,21 +403,23 @@ public class SceneExporter {
 
             var texturePath = resourceExporter.exportTexture(sampler.texture());
             var textureOffset = builder.createSharedString(texturePath);
-            var textureIdOffset = builder.createSharedString(sampler.texture().toString());
+            var textureIdOffset = builder.createSharedString(
+                sampler.texture()
+                    .toString());
 
-            var samplerOffset = ExpSampler.createExpSampler(builder, textureIdOffset, textureOffset, sampler.blur(),
-                    sampler.blur());
+            var samplerOffset = ExpSampler
+                .createExpSampler(builder, textureIdOffset, textureOffset, sampler.blur(), sampler.blur());
             samplersOffset = ExpMaterial.createSamplersVector(builder, new int[] { samplerOffset });
         }
 
         return ExpMaterial.createExpMaterial(
-                builder,
-                nameOffset,
-                shaderNameOffset,
-                disableCulling,
-                transparency,
-                depthTest,
-                samplersOffset);
+            builder,
+            nameOffset,
+            shaderNameOffset,
+            disableCulling,
+            transparency,
+            depthTest,
+            samplersOffset);
 
     }
 
@@ -431,10 +457,8 @@ public class SceneExporter {
         };
     }
 
-    private int writeMeshes(List<Mesh> meshes,
-            FlatBufferBuilder builder,
-            Map<VertexFormat, Integer> vertexFormats,
-            Map<RenderType, Integer> materials) {
+    private int writeMeshes(List<Mesh> meshes, FlatBufferBuilder builder, Map<VertexFormat, Integer> vertexFormats,
+        Map<RenderType, Integer> materials) {
         var writtenMeshes = new IntArrayList(meshes.size());
 
         for (var mesh : meshes) {
@@ -448,8 +472,16 @@ public class SceneExporter {
             ExpMesh.addIndexType(builder, mapIndexType(ibData.indexType));
             ExpMesh.addIndexCount(builder, ibData.indexCount);
             ExpMesh.addMaterial(builder, materials.get(mesh.renderType()));
-            ExpMesh.addVertexFormat(builder, vertexFormats.get(mesh.drawState().format()));
-            ExpMesh.addPrimitiveType(builder, mapMode(mesh.drawState().mode()));
+            ExpMesh.addVertexFormat(
+                builder,
+                vertexFormats.get(
+                    mesh.drawState()
+                        .format()));
+            ExpMesh.addPrimitiveType(
+                builder,
+                mapMode(
+                    mesh.drawState()
+                        .mode()));
             writtenMeshes.add(ExpMesh.endExpMesh(builder));
         }
 
@@ -463,11 +495,7 @@ public class SceneExporter {
         };
     }
 
-    record IndexBufferAttributes(
-            ByteBuffer data,
-            VertexFormat.IndexType indexType,
-            int indexCount) {
-    }
+    record IndexBufferAttributes(ByteBuffer data, VertexFormat.IndexType indexType, int indexCount) {}
 
     private IndexBufferAttributes createIndexBuffer(MeshData.DrawState drawState, ByteBuffer idxBuffer) {
         // Handle index buffer
@@ -478,10 +506,7 @@ public class SceneExporter {
 
         // Auto-generated indices
         if (idxBuffer == null) {
-            var generated = generateSequentialIndices(
-                    mode,
-                    drawState.vertexCount(),
-                    drawState.indexCount());
+            var generated = generateSequentialIndices(mode, drawState.vertexCount(), drawState.indexCount());
             effectiveIndices = generated.data;
             indexType = generated.type;
             indexCount = generated.indexCount();
@@ -507,7 +532,7 @@ public class SceneExporter {
                 triIndices.flip();
 
                 effectiveIndices = ByteBuffer.allocate(triIndices.remaining() * 2)
-                        .order(ByteOrder.nativeOrder());
+                    .order(ByteOrder.nativeOrder());
                 while (triIndices.hasRemaining()) {
                     effectiveIndices.putShort(triIndices.get());
                 }
@@ -536,7 +561,7 @@ public class SceneExporter {
                 triIndices.flip();
 
                 effectiveIndices = ByteBuffer.allocate(triIndices.remaining() * 4)
-                        .order(ByteOrder.nativeOrder());
+                    .order(ByteOrder.nativeOrder());
                 while (triIndices.hasRemaining()) {
                     effectiveIndices.putInt(triIndices.get());
                 }
@@ -552,7 +577,7 @@ public class SceneExporter {
     }
 
     private GeneratedIndexBuffer generateSequentialIndices(VertexFormat.Mode mode, int vertexCount,
-            int expectedIndexCount) {
+        int expectedIndexCount) {
         var indicesPerPrimitive = switch (mode) {
             case LINES -> 2;
             case DEBUG_LINES -> 2;
@@ -574,7 +599,8 @@ public class SceneExporter {
         }
 
         var indexType = VertexFormat.IndexType.least(indexCount);
-        var buffer = ByteBuffer.allocate(indexType.bytes * indexCount).order(ByteOrder.nativeOrder());
+        var buffer = ByteBuffer.allocate(indexType.bytes * indexCount)
+            .order(ByteOrder.nativeOrder());
 
         IntConsumer indexConsumer;
         if (indexType == VertexFormat.IndexType.SHORT) {
@@ -593,7 +619,8 @@ public class SceneExporter {
                     indexConsumer.accept(i + 3);
                     indexConsumer.accept(i + 0);
                 }
-                default -> IntStream.range(0, indexCount).forEach(indexConsumer);
+                default -> IntStream.range(0, indexCount)
+                    .forEach(indexConsumer);
             }
         }
 
@@ -602,16 +629,15 @@ public class SceneExporter {
         return new GeneratedIndexBuffer(indexType, buffer, indexCount);
     }
 
-    record GeneratedIndexBuffer(VertexFormat.IndexType type, ByteBuffer data, int indexCount) {
-    }
+    record GeneratedIndexBuffer(VertexFormat.IndexType type, ByteBuffer data, int indexCount) {}
 
     private int createCameraModel(CameraSettings cameraSettings, FlatBufferBuilder builder) {
         return ExpCameraSettings.createExpCameraSettings(
-                builder,
-                cameraSettings.getRotationY(),
-                cameraSettings.getRotationX(),
-                cameraSettings.getRotationZ(),
-                cameraSettings.getZoom());
+            builder,
+            cameraSettings.getRotationY(),
+            cameraSettings.getRotationX(),
+            cameraSettings.getRotationZ(),
+            cameraSettings.getZoom());
     }
 
 }

@@ -3,6 +3,7 @@ package guideme.document.block;
 import guideme.document.flow.LytFlowContent;
 
 public interface LytVisitor {
+
     default Result beforeNode(LytNode node) {
         return Result.CONTINUE;
     }
@@ -19,8 +20,7 @@ public interface LytVisitor {
         return Result.CONTINUE;
     }
 
-    default void text(String text) {
-    }
+    default void text(String text) {}
 
     enum Result {
         CONTINUE,

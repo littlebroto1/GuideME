@@ -1,5 +1,7 @@
 package guideme.compiler;
 
+import java.util.Set;
+
 import guideme.document.block.LytBlockContainer;
 import guideme.document.flow.LytFlowParent;
 import guideme.extensions.Extension;
@@ -7,12 +9,12 @@ import guideme.extensions.ExtensionPoint;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
 import guideme.libs.mdast.mdx.model.MdxJsxFlowElement;
 import guideme.libs.mdast.mdx.model.MdxJsxTextElement;
-import java.util.Set;
 
 /**
  * Tag compilers handle HTML-like tags found in Markdown content, such as <code>&lt;Image /&gt;</code> and similar.
  */
 public interface TagCompiler extends Extension {
+
     ExtensionPoint<TagCompiler> EXTENSION_POINT = new ExtensionPoint<>(TagCompiler.class);
 
     /**

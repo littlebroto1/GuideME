@@ -4,6 +4,7 @@ package guideme.style;
  * See https://developer.mozilla.org/en-US/docs/Web/CSS/white-space
  */
 public enum WhiteSpaceMode {
+
     NORMAL(true, true),
     NOWRAP(true, true),
     PRE(false, false),

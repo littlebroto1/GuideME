@@ -2,6 +2,7 @@ package guideme.internal.search;
 
 import java.util.Collection;
 import java.util.List;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
@@ -13,8 +14,8 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.QueryBuilder;
 
 public class GuideQueryParser {
-    private GuideQueryParser() {
-    }
+
+    private GuideQueryParser() {}
 
     /**
      * This method will create a query of the following form:
@@ -36,32 +37,33 @@ public class GuideQueryParser {
 
             // Exact occurrences in the title are scored with 20% boost
             builder.add(
-                    new BoostQuery(buildFieldQuery(queryBuilder, titleField, tokens, false, BooleanClause.Occur.SHOULD),
-                            1.2f),
-                    BooleanClause.Occur.SHOULD);
+                new BoostQuery(
+                    buildFieldQuery(queryBuilder, titleField, tokens, false, BooleanClause.Occur.SHOULD),
+                    1.2f),
+                BooleanClause.Occur.SHOULD);
             // Exact occurrences in the body are scored normally
-            builder.add(buildFieldQuery(queryBuilder, textField, tokens, false, BooleanClause.Occur.SHOULD),
-                    BooleanClause.Occur.SHOULD);
+            builder.add(
+                buildFieldQuery(queryBuilder, textField, tokens, false, BooleanClause.Occur.SHOULD),
+                BooleanClause.Occur.SHOULD);
             // Occurrences in the title, where the last token is expanded to a wildcard are scored at 40%
             builder.add(
-                    new BoostQuery(buildFieldQuery(queryBuilder, titleField, tokens, true, BooleanClause.Occur.SHOULD),
-                            0.4f),
-                    BooleanClause.Occur.SHOULD);
+                new BoostQuery(
+                    buildFieldQuery(queryBuilder, titleField, tokens, true, BooleanClause.Occur.SHOULD),
+                    0.4f),
+                BooleanClause.Occur.SHOULD);
             // Occurrences in the body, where the last token is expanded to a wildcard are scored at 20%
             builder.add(
-                    new BoostQuery(buildFieldQuery(queryBuilder, textField, tokens, true, BooleanClause.Occur.SHOULD),
-                            0.2f),
-                    BooleanClause.Occur.SHOULD);
+                new BoostQuery(
+                    buildFieldQuery(queryBuilder, textField, tokens, true, BooleanClause.Occur.SHOULD),
+                    0.2f),
+                BooleanClause.Occur.SHOULD);
         }
 
         return builder.build();
     }
 
-    private static BooleanQuery buildFieldQuery(QueryBuilder queryBuilder,
-            String fieldName,
-            List<String> tokens,
-            boolean makeLastTokenWildcard,
-            BooleanClause.Occur clause) {
+    private static BooleanQuery buildFieldQuery(QueryBuilder queryBuilder, String fieldName, List<String> tokens,
+        boolean makeLastTokenWildcard, BooleanClause.Occur clause) {
 
         // Prepare a BooleanQuery to combine terms with OR
         var booleanQueryBuilder = new BooleanQuery.Builder();
@@ -82,7 +84,8 @@ public class GuideQueryParser {
 
             Query q;
             if (token.contains("*")) {
-                BytesRef normalizedTerm = queryBuilder.getAnalyzer().normalize(fieldName, token);
+                BytesRef normalizedTerm = queryBuilder.getAnalyzer()
+                    .normalize(fieldName, token);
                 q = new WildcardQuery(new Term(fieldName, normalizedTerm));
             } else {
                 q = queryBuilder.createBooleanQuery(fieldName, token);

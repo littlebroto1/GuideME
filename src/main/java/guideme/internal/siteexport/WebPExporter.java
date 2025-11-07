@@ -7,7 +7,6 @@ import static org.bytedeco.ffmpeg.global.avutil.av_dict_set;
 import static org.bytedeco.ffmpeg.global.avutil.av_dict_set_int;
 import static org.bytedeco.ffmpeg.global.avutil.av_free;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import org.bytedeco.ffmpeg.avcodec.AVCodec;
 import org.bytedeco.ffmpeg.avcodec.AVCodecContext;
 import org.bytedeco.ffmpeg.avcodec.AVPacket;
@@ -25,10 +24,13 @@ import org.bytedeco.ffmpeg.swscale.SwsContext;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.DoublePointer;
 
+import com.mojang.blaze3d.platform.NativeImage;
+
 /**
  * Uses ffmpeg to write WebP animations.
  */
 public class WebPExporter implements AutoCloseable {
+
     private final AVCodec codec;
     private final AVFormatContext formatContext;
     private final AVStream stream;
@@ -75,14 +77,19 @@ public class WebPExporter implements AutoCloseable {
             codecContext.pix_fmt(targetFormat);
 
             codecContext.time_base(new AVRational());
-            codecContext.time_base().num(1);
-            codecContext.time_base().den(20); // 20 fps to match tickrate
+            codecContext.time_base()
+                .num(1);
+            codecContext.time_base()
+                .den(20); // 20 fps to match tickrate
             codecContext.framerate(new AVRational());
-            codecContext.framerate().num(20); // 20 fps to match tickrate
-            codecContext.framerate().den(1);
+            codecContext.framerate()
+                .num(20); // 20 fps to match tickrate
+            codecContext.framerate()
+                .den(1);
 
             /* Some formats want stream headers to be separate. */
-            if ((formatContext.oformat().flags() & avformat.AVFMT_GLOBALHEADER) != 0) {
+            if ((formatContext.oformat()
+                .flags() & avformat.AVFMT_GLOBALHEADER) != 0) {
                 codecContext.flags(codecContext.flags() | avcodec.AV_CODEC_FLAG_GLOBAL_HEADER);
             }
 
@@ -97,14 +104,14 @@ public class WebPExporter implements AutoCloseable {
             check(avcodec.avcodec_open2(codecContext, codec, codecOptions));
 
             var codecpar = stream.codecpar();
-            check(avcodec.avcodec_parameters_from_context(
-                    codecpar,
-                    codecContext));
+            check(avcodec.avcodec_parameters_from_context(codecpar, codecContext));
             stream.codecpar(codecpar);
 
             stream.time_base(new AVRational());
-            stream.time_base().num(1);
-            stream.time_base().den(20); // 20 fps to match tickrate
+            stream.time_base()
+                .num(1);
+            stream.time_base()
+                .den(20); // 20 fps to match tickrate
 
             // Frame used to push data into the codec
             frame = avutil.av_frame_alloc();
@@ -134,9 +141,16 @@ public class WebPExporter implements AutoCloseable {
 
             // Conversion context for RGBA->YUV
             swsCtx = swscale.sws_getContext(
-                    rgbFrame.width(), rgbFrame.height(), rgbFrame.format(),
-                    frame.width(), frame.height(), frame.format(),
-                    swscale.SWS_FAST_BILINEAR, null, null, (DoublePointer) null);
+                rgbFrame.width(),
+                rgbFrame.height(),
+                rgbFrame.format(),
+                frame.width(),
+                frame.height(),
+                frame.format(),
+                swscale.SWS_FAST_BILINEAR,
+                null,
+                null,
+                (DoublePointer) null);
             if (swsCtx.isNull()) {
                 throw new RuntimeException("Failed to allocate sws context");
             }
@@ -163,9 +177,14 @@ public class WebPExporter implements AutoCloseable {
         }
 
         // Convert from in-memory pixel format to format required by codec
-        swscale.sws_scale(swsCtx, rgbFrame.data(),
-                rgbFrame.linesize(), 0, codecContext.height(), frame.data(),
-                frame.linesize());
+        swscale.sws_scale(
+            swsCtx,
+            rgbFrame.data(),
+            rgbFrame.linesize(),
+            0,
+            codecContext.height(),
+            frame.data(),
+            frame.linesize());
 
         frame.pts(index);
 
@@ -188,7 +207,7 @@ public class WebPExporter implements AutoCloseable {
     }
 
     private static void encode(AVFormatContext formatContext, AVCodecContext codecContext, AVPacket packet,
-            AVStream stream, AVFrame frame) {
+        AVStream stream, AVFrame frame) {
         // Send frame to codec
         check(avcodec.avcodec_send_frame(codecContext, frame));
 
@@ -222,7 +241,8 @@ public class WebPExporter implements AutoCloseable {
         if (avutil.av_strerror(err, e, 512) < 0) {
             return "Unknown Error";
         }
-        return e.getString().substring(0, (int) BytePointer.strlen(e));
+        return e.getString()
+            .substring(0, (int) BytePointer.strlen(e));
     }
 
     @Override
@@ -239,7 +259,8 @@ public class WebPExporter implements AutoCloseable {
         if (codec != null) {
             codec.close();
         }
-        if (formatContext != null && !formatContext.pb().isNull()) {
+        if (formatContext != null && !formatContext.pb()
+            .isNull()) {
             var pb = new BytePointer();
             avio_close_dyn_buf(formatContext.pb(), pb);
             av_free(pb);
@@ -250,6 +271,7 @@ public class WebPExporter implements AutoCloseable {
     }
 
     public enum Format {
+
         LOSSLESS_ALPHA(true, true),
         LOSSLESS(true, false),
         NORMAL_ALPHA(false, true),

@@ -1,14 +1,17 @@
 package guideme.document.interaction;
 
-import guideme.siteexport.ResourceExporter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 
+import guideme.siteexport.ResourceExporter;
+
 public class TextTooltip implements GuideTooltip {
+
     private final List<ClientTooltipComponent> lines;
 
     public TextTooltip(String text) {
@@ -17,8 +20,8 @@ public class TextTooltip implements GuideTooltip {
 
     public TextTooltip(List<Component> lines) {
         this.lines = lines.stream()
-                .<ClientTooltipComponent>map(line -> new ClientTextTooltip(line.getVisualOrderText()))
-                .toList();
+            .<ClientTooltipComponent>map(line -> new ClientTextTooltip(line.getVisualOrderText()))
+            .toList();
     }
 
     public TextTooltip(Component firstLine, Component... additionalLines) {
@@ -38,6 +41,5 @@ public class TextTooltip implements GuideTooltip {
     }
 
     @Override
-    public void exportResources(ResourceExporter exporter) {
-    }
+    public void exportResources(ResourceExporter exporter) {}
 }

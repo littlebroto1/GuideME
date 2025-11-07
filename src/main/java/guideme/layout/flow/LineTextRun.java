@@ -4,6 +4,7 @@ import guideme.render.RenderContext;
 import guideme.style.ResolvedTextStyle;
 
 public class LineTextRun extends LineElement {
+
     final String text;
     final ResolvedTextStyle style;
     final ResolvedTextStyle hoverStyle;

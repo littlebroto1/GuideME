@@ -1,15 +1,5 @@
 package guideme.internal.search;
 
-import guideme.Guide;
-import guideme.Guides;
-import guideme.compiler.IndexingSink;
-import guideme.compiler.ParsedGuidePage;
-import guideme.document.DefaultStyles;
-import guideme.document.flow.LytFlowContent;
-import guideme.document.flow.LytFlowSpan;
-import guideme.internal.util.LangUtil;
-import guideme.libs.mdast.model.MdAstHeading;
-import guideme.libs.unist.UnistNode;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
@@ -21,7 +11,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
 import net.minecraft.resources.ResourceLocation;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -50,6 +42,17 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import guideme.Guide;
+import guideme.Guides;
+import guideme.compiler.IndexingSink;
+import guideme.compiler.ParsedGuidePage;
+import guideme.document.DefaultStyles;
+import guideme.document.flow.LytFlowContent;
+import guideme.document.flow.LytFlowSpan;
+import guideme.internal.util.LangUtil;
+import guideme.libs.mdast.model.MdAstHeading;
+import guideme.libs.unist.UnistNode;
+
 /**
  * Search index management across all guides.
  * <p/>
@@ -57,6 +60,7 @@ import org.slf4j.LoggerFactory;
  * tutorial on in-memory Lucene.
  */
 public class GuideSearch implements AutoCloseable {
+
     private static final Logger LOG = LoggerFactory.getLogger(GuideSearch.class);
 
     /**
@@ -92,7 +96,11 @@ public class GuideSearch implements AutoCloseable {
 
     public void index(Guide guide) {
         try {
-            indexWriter.deleteDocuments(new PhraseQuery(IndexSchema.FIELD_GUIDE_ID, guide.getId().toString()));
+            indexWriter.deleteDocuments(
+                new PhraseQuery(
+                    IndexSchema.FIELD_GUIDE_ID,
+                    guide.getId()
+                        .toString()));
         } catch (IOException e) {
             LOG.error("Failed to delete all documents before re-indexing.", e);
         }
@@ -101,7 +109,9 @@ public class GuideSearch implements AutoCloseable {
             indexingStarted = Instant.now();
             pagesIndexed = 0;
         }
-        pendingTasks.removeIf(t -> t.guide.getId().equals(guide.getId()));
+        pendingTasks.removeIf(
+            t -> t.guide.getId()
+                .equals(guide.getId()));
         pendingTasks.add(new GuideIndexingTask(guide, new ArrayList<>(guide.getPages())));
     }
 
@@ -192,11 +202,15 @@ public class GuideSearch implements AutoCloseable {
 
         // Filter by guide if given one
         if (onlyFromGuide != null) {
-            query = new BooleanQuery.Builder()
-                    .add(query, BooleanClause.Occur.MUST)
-                    .add(new TermQuery(new Term(IndexSchema.FIELD_GUIDE_ID, onlyFromGuide.getId().toString())),
-                            BooleanClause.Occur.FILTER)
-                    .build();
+            query = new BooleanQuery.Builder().add(query, BooleanClause.Occur.MUST)
+                .add(
+                    new TermQuery(
+                        new Term(
+                            IndexSchema.FIELD_GUIDE_ID,
+                            onlyFromGuide.getId()
+                                .toString())),
+                    BooleanClause.Occur.FILTER)
+                .build();
         }
 
         LOG.debug("Running GuideME search query: {}", query);
@@ -234,8 +248,10 @@ public class GuideSearch implements AutoCloseable {
 
                 String bestFragment = "";
                 try {
-                    bestFragment = highlighter.getBestFragment(analyzer, IndexSchema.getTextField(searchLanguage),
-                            document.get(IndexSchema.FIELD_TEXT));
+                    bestFragment = highlighter.getBestFragment(
+                        analyzer,
+                        IndexSchema.getTextField(searchLanguage),
+                        document.get(IndexSchema.FIELD_TEXT));
                     if (bestFragment == null) {
                         bestFragment = "";
                     }
@@ -265,8 +281,7 @@ public class GuideSearch implements AutoCloseable {
                 }
                 currentSpan.appendText(bestFragment.substring(startOfSegment));
 
-                result.add(
-                        new SearchResult(guideId, pageId, pageTitle, currentSpan));
+                result.add(new SearchResult(guideId, pageId, pageTitle, currentSpan));
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -276,13 +291,16 @@ public class GuideSearch implements AutoCloseable {
     }
 
     private boolean isStartOfHighlight(CharSequence text, int i) {
-        return (i + 3 <= text.length()) && text.charAt(i) == '<' && text.charAt(i + 1) == 'B'
-                && text.charAt(i + 2) == '>';
+        return (i + 3 <= text.length()) && text.charAt(i) == '<'
+            && text.charAt(i + 1) == 'B'
+            && text.charAt(i + 2) == '>';
     }
 
     private boolean isEndOfHighlight(CharSequence text, int i) {
-        return (i + 4 <= text.length()) && text.charAt(i) == '<' && text.charAt(i + 1) == '/'
-                && text.charAt(i + 2) == 'B' && text.charAt(i + 3) == '>';
+        return (i + 4 <= text.length()) && text.charAt(i) == '<'
+            && text.charAt(i + 1) == '/'
+            && text.charAt(i + 2) == 'B'
+            && text.charAt(i + 3) == '>';
     }
 
     @Nullable
@@ -293,8 +311,17 @@ public class GuideSearch implements AutoCloseable {
         var searchLang = getLuceneLanguageFromMinecraft(page.getLanguage());
 
         var doc = new Document();
-        doc.add(new StringField(IndexSchema.FIELD_GUIDE_ID, guide.getId().toString(), Field.Store.YES));
-        doc.add(new StoredField(IndexSchema.FIELD_PAGE_ID, page.getId().toString()));
+        doc.add(
+            new StringField(
+                IndexSchema.FIELD_GUIDE_ID,
+                guide.getId()
+                    .toString(),
+                Field.Store.YES));
+        doc.add(
+            new StoredField(
+                IndexSchema.FIELD_PAGE_ID,
+                page.getId()
+                    .toString()));
         doc.add(new StoredField(IndexSchema.FIELD_LANG, page.getLanguage()));
         doc.add(new StoredField(IndexSchema.FIELD_SEARCH_LANG, searchLang));
 
@@ -312,8 +339,8 @@ public class GuideSearch implements AutoCloseable {
         if (luceneLang == null) {
             if (warnedAboutLanguage.add(language)) {
                 LOG.warn(
-                        "Minecraft language '{}' has unknown and will be treated as english for the purposes of search.",
-                        language);
+                    "Minecraft language '{}' has unknown and will be treated as english for the purposes of search.",
+                    language);
             }
             return Analyzers.LANG_ENGLISH;
         }
@@ -323,16 +350,19 @@ public class GuideSearch implements AutoCloseable {
     private static String getPageTitle(Guide guide, ParsedGuidePage page) {
 
         // Navigation title in frontmatter wins
-        var navigationEntry = page.getFrontmatter().navigationEntry();
+        var navigationEntry = page.getFrontmatter()
+            .navigationEntry();
         if (navigationEntry != null) {
             return navigationEntry.title();
         }
 
         // Find the first heading (same logic as in GuideScreen)
-        for (var child : page.getAstRoot().children()) {
+        for (var child : page.getAstRoot()
+            .children()) {
             if (child instanceof MdAstHeading heading && heading.depth == 1) {
                 var pageTitle = new StringBuilder();
                 var sink = new IndexingSink() {
+
                     @Override
                     public void appendText(UnistNode parent, String text) {
                         pageTitle.append(text);
@@ -348,13 +378,15 @@ public class GuideSearch implements AutoCloseable {
             }
         }
 
-        return page.getId().toString();
+        return page.getId()
+            .toString();
     }
 
     private static String getSearchableText(Guide guide, ParsedGuidePage page) {
         var searchableText = new StringBuilder();
 
         var sink = new IndexingSink() {
+
             @Override
             public void appendText(UnistNode parent, String text) {
                 searchableText.append(text);
@@ -399,11 +431,11 @@ public class GuideSearch implements AutoCloseable {
         }
     }
 
-    record GuideIndexingTask(Guide guide, List<ParsedGuidePage> pendingPages) {
-    }
+    record GuideIndexingTask(Guide guide, List<ParsedGuidePage> pendingPages) {}
 
     public record SearchResult(ResourceLocation guideId, ResourceLocation pageId, String pageTitle,
-            LytFlowContent text) {
+        LytFlowContent text) {
+
         public SearchResult {
             Objects.requireNonNull(guideId, "guideId");
             Objects.requireNonNull(pageId, "pageId");

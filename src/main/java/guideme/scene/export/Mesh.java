@@ -1,37 +1,39 @@
 package guideme.scene.export;
 
-import com.mojang.blaze3d.vertex.MeshData;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 import org.joml.Vector4i;
+
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormatElement;
 
 /**
  * Captured rendering data.
  *
  * @param indexBuffer Can be null if sequential indices are to be used.
  */
-record Mesh(MeshData.DrawState drawState,
-        ByteBuffer vertexBuffer,
-        @Nullable ByteBuffer indexBuffer,
-        RenderType renderType) {
+record Mesh(MeshData.DrawState drawState, ByteBuffer vertexBuffer, @Nullable ByteBuffer indexBuffer,
+    RenderType renderType) {
 
     /**
      * Checks if the mesh contains any texture atlases that are animated.
      */
     public Stream<TextureAtlasSprite> getSprites() {
 
-        var textureManager = Minecraft.getInstance().getTextureManager();
+        var textureManager = Minecraft.getInstance()
+            .getTextureManager();
 
         // We only implement this for quads since standard block vertex-format
         // uses BakedQuads
@@ -44,16 +46,18 @@ record Mesh(MeshData.DrawState drawState,
         if (samplers.isEmpty()) {
             return Stream.of(); // No textures
         }
-        var texture = textureManager.getTexture(samplers.get(0).texture());
+        var texture = textureManager.getTexture(
+            samplers.get(0)
+                .texture());
         if (!(texture instanceof TextureAtlas textureAtlas)) {
             return Stream.of(); // Only atlases can have sprites
         }
 
         var offset = 0;
         VertexFormatElement uvElement = null;
-        for (var element : renderType.format().getElements()) {
-            if (element.usage() == VertexFormatElement.Usage.UV && element.index() == 0
-                    && element.count() == 2) {
+        for (var element : renderType.format()
+            .getElements()) {
+            if (element.usage() == VertexFormatElement.Usage.UV && element.index() == 0 && element.count() == 2) {
                 uvElement = element;
                 break;
             }
@@ -68,9 +72,8 @@ record Mesh(MeshData.DrawState drawState,
         // TODO: Should cache this...
         var spriteFinder = new SpriteFinder(textureAtlas.getTextures(), textureAtlas);
 
-        return streamQuadMidpoints(uvSupplier)
-                .map(uvPos -> spriteFinder.find(uvPos.x, uvPos.y))
-                .filter(Objects::nonNull);
+        return streamQuadMidpoints(uvSupplier).map(uvPos -> spriteFinder.find(uvPos.x, uvPos.y))
+            .filter(Objects::nonNull);
     }
 
     private Stream<Vector2f> streamQuadMidpoints(IntFunction<Vector2f> uvSupplier) {
@@ -81,23 +84,25 @@ record Mesh(MeshData.DrawState drawState,
         if (indexBuffer == null) {
             var quadCount = drawState.vertexCount() / 4;
             return IntStream.range(0, quadCount)
-                    .mapToObj(quadIdx -> new Vector4i(quadIdx * 4, quadIdx * 4 + 1, quadIdx * 4 + 2, quadIdx * 4 + 3));
+                .mapToObj(quadIdx -> new Vector4i(quadIdx * 4, quadIdx * 4 + 1, quadIdx * 4 + 2, quadIdx * 4 + 3));
         } else if (drawState.indexType() == VertexFormat.IndexType.INT) {
             var quadCount = drawState.indexCount() / 4;
             return IntStream.range(0, quadCount)
-                    .mapToObj(quadIdx -> new Vector4i(
-                            indexBuffer.getInt(quadIdx * 4 * 4),
-                            indexBuffer.getInt(quadIdx * 4 * 4 + 4),
-                            indexBuffer.getInt(quadIdx * 4 * 4 + 8),
-                            indexBuffer.getInt(quadIdx * 4 * 4 + 12)));
+                .mapToObj(
+                    quadIdx -> new Vector4i(
+                        indexBuffer.getInt(quadIdx * 4 * 4),
+                        indexBuffer.getInt(quadIdx * 4 * 4 + 4),
+                        indexBuffer.getInt(quadIdx * 4 * 4 + 8),
+                        indexBuffer.getInt(quadIdx * 4 * 4 + 12)));
         } else if (drawState.indexType() == VertexFormat.IndexType.SHORT) {
             var quadCount = drawState.indexCount() / 4;
             return IntStream.range(0, quadCount)
-                    .mapToObj(quadIdx -> new Vector4i(
-                            indexBuffer.getShort(quadIdx * 4 * 2),
-                            indexBuffer.getShort(quadIdx * 4 * 2 + 2),
-                            indexBuffer.getShort(quadIdx * 4 * 2 + 4),
-                            indexBuffer.getShort(quadIdx * 4 * 2 + 6)));
+                .mapToObj(
+                    quadIdx -> new Vector4i(
+                        indexBuffer.getShort(quadIdx * 4 * 2),
+                        indexBuffer.getShort(quadIdx * 4 * 2 + 2),
+                        indexBuffer.getShort(quadIdx * 4 * 2 + 4),
+                        indexBuffer.getShort(quadIdx * 4 * 2 + 6)));
         } else {
             throw new IllegalArgumentException("Unsupported index type: " + drawState.indexType());
         }
@@ -120,11 +125,15 @@ record Mesh(MeshData.DrawState drawState,
     }
 
     private Vector2f getUV(int index, int offset, VertexFormatElement uvElement) {
-        var stride = drawState.format().getVertexSize();
+        var stride = drawState.format()
+            .getVertexSize();
         var dataStart = index * stride + offset;
         return new Vector2f(
-                readFloat(uvElement.type(), dataStart),
-                readFloat(uvElement.type(), dataStart + uvElement.type().size()));
+            readFloat(uvElement.type(), dataStart),
+            readFloat(
+                uvElement.type(),
+                dataStart + uvElement.type()
+                    .size()));
     }
 
     private float readFloat(VertexFormatElement.Type type, int offset) {

@@ -1,12 +1,9 @@
 package guideme.internal;
 
-import guideme.Guides;
-import guideme.PageAnchor;
-import guideme.internal.screen.GuideScreen;
-import guideme.internal.util.Platform;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -27,19 +24,25 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.resource.ResourcePackLoader;
+
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import guideme.Guides;
+import guideme.PageAnchor;
+import guideme.internal.screen.GuideScreen;
+import guideme.internal.util.Platform;
+
 /**
  * Utility class for facilitating the use of the Guide without entering the game.
  */
 public final class GuideOnStartup {
+
     private static final Logger LOG = LoggerFactory.getLogger(GuideOnStartup.class);
 
-    private GuideOnStartup() {
-    }
+    private GuideOnStartup() {}
 
     public static void init() {
 
@@ -84,8 +87,7 @@ public final class GuideOnStartup {
         }
     }
 
-    private record ShowOnStartup(ResourceLocation guideId, @Nullable PageAnchor anchor) {
-    }
+    private record ShowOnStartup(ResourceLocation guideId, @Nullable PageAnchor anchor) {}
 
     private static ShowOnStartup getShowOnStartup() {
         var showOnStartup = System.getProperty("guideme.showOnStartup");
@@ -149,47 +151,46 @@ public final class GuideOnStartup {
             var layeredAccess = RegistryLayer.createRegistryAccess();
 
             PackRepository packRepository = new PackRepository(
-                    new ServerPacksSource(new DirectoryValidator(path -> false)));
+                new ServerPacksSource(new DirectoryValidator(path -> false)));
             // This fires AddPackFindersEvent but it's probably ok.
             ResourcePackLoader.populatePackRepository(packRepository, PackType.SERVER_DATA, true);
             packRepository.reload();
             packRepository.setSelected(packRepository.getAvailableIds());
 
-            var resourceManager = new MultiPackResourceManager(PackType.SERVER_DATA,
-                    packRepository.openAllSelected());
+            var resourceManager = new MultiPackResourceManager(PackType.SERVER_DATA, packRepository.openAllSelected());
 
-            var postponedTags = TagLoader.loadTagsForExistingRegistries(resourceManager,
-                    layeredAccess.getLayer(RegistryLayer.STATIC));
+            var postponedTags = TagLoader
+                .loadTagsForExistingRegistries(resourceManager, layeredAccess.getLayer(RegistryLayer.STATIC));
             var worldgenLayer = RegistryDataLoader.load(
-                    resourceManager,
-                    TagLoader.buildUpdatedLookups(layeredAccess.getAccessForLoading(RegistryLayer.WORLDGEN),
-                            postponedTags),
-                    RegistryDataLoader.WORLDGEN_REGISTRIES);
+                resourceManager,
+                TagLoader.buildUpdatedLookups(layeredAccess.getAccessForLoading(RegistryLayer.WORLDGEN), postponedTags),
+                RegistryDataLoader.WORLDGEN_REGISTRIES);
             layeredAccess = layeredAccess.replaceFrom(RegistryLayer.WORLDGEN, worldgenLayer);
 
             var stuff = ReloadableServerResources.loadResources(
-                    resourceManager,
-                    layeredAccess,
-                    postponedTags,
-                    FeatureFlagSet.of(),
-                    Commands.CommandSelection.ALL,
-                    0,
-                    command -> {
-                        try {
-                            command.run();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            throw e;
-                        }
-                    },
-                    command -> {
-                        try {
-                            command.run();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            throw e;
-                        }
-                    }).get();
+                resourceManager,
+                layeredAccess,
+                postponedTags,
+                FeatureFlagSet.of(),
+                Commands.CommandSelection.ALL,
+                0,
+                command -> {
+                    try {
+                        command.run();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                    }
+                },
+                command -> {
+                    try {
+                        command.run();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                    }
+                })
+                .get();
             stuff.updateStaticRegistryTags();
             Platform.fallbackClientRecipeManager = stuff.getRecipeManager();
             Platform.fallbackClientRegistryAccess = layeredAccess.compositeAccess();

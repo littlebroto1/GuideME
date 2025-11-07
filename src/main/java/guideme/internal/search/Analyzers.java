@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.ar.ArabicAnalyzer;
 import org.apache.lucene.analysis.bg.BulgarianAnalyzer;
@@ -31,8 +32,8 @@ import org.apache.lucene.analysis.sv.SwedishAnalyzer;
 import org.apache.lucene.analysis.tr.TurkishAnalyzer;
 
 final class Analyzers {
-    private Analyzers() {
-    }
+
+    private Analyzers() {}
 
     public static final String LANG_ARABIC = "ar";
     public static final String LANG_BRAZILIAN = "br";
@@ -63,33 +64,33 @@ final class Analyzers {
     public static final String LANG_TURKISH = "tr";
 
     public static final List<String> LANGUAGES = List.of(
-            LANG_ARABIC,
-            LANG_BRAZILIAN,
-            LANG_BULGARIAN,
-            LANG_CATALAN,
-            LANG_CHINESE,
-            LANG_CZECH,
-            LANG_DANISH,
-            LANG_DUTCH,
-            LANG_ENGLISH,
-            LANG_FARSI,
-            LANG_FINNISH,
-            LANG_FRENCH,
-            LANG_GERMAN,
-            LANG_GREEK,
-            LANG_HINDI,
-            LANG_HUNGARIAN,
-            LANG_IRISH,
-            LANG_ITALIAN,
-            LANG_JAPANESE,
-            LANG_KOREAN,
-            LANG_NORWEGIAN,
-            LANG_PORTUGUESE,
-            LANG_ROMANIAN,
-            LANG_RUSSIAN,
-            LANG_SPANISH,
-            LANG_SWEDISH,
-            LANG_TURKISH);
+        LANG_ARABIC,
+        LANG_BRAZILIAN,
+        LANG_BULGARIAN,
+        LANG_CATALAN,
+        LANG_CHINESE,
+        LANG_CZECH,
+        LANG_DANISH,
+        LANG_DUTCH,
+        LANG_ENGLISH,
+        LANG_FARSI,
+        LANG_FINNISH,
+        LANG_FRENCH,
+        LANG_GERMAN,
+        LANG_GREEK,
+        LANG_HINDI,
+        LANG_HUNGARIAN,
+        LANG_IRISH,
+        LANG_ITALIAN,
+        LANG_JAPANESE,
+        LANG_KOREAN,
+        LANG_NORWEGIAN,
+        LANG_PORTUGUESE,
+        LANG_ROMANIAN,
+        LANG_RUSSIAN,
+        LANG_SPANISH,
+        LANG_SWEDISH,
+        LANG_TURKISH);
 
     public static final Map<String, String> MINECRAFT_TO_LUCENE_LANG;
 

@@ -1,14 +1,16 @@
 package guideme.compiler.tags;
 
+import java.util.Set;
+
 import guideme.compiler.IndexingContext;
 import guideme.compiler.IndexingSink;
 import guideme.compiler.PageCompiler;
 import guideme.document.block.LytBlockContainer;
 import guideme.document.block.LytItemGrid;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
-import java.util.Set;
 
 public class ItemGridCompiler extends BlockTagCompiler {
+
     @Override
     public Set<String> getTagNames() {
         return Set.of("ItemGrid");
@@ -35,6 +37,5 @@ public class ItemGridCompiler extends BlockTagCompiler {
     }
 
     @Override
-    public void index(IndexingContext indexer, MdxJsxElementFields el, IndexingSink sink) {
-    }
+    public void index(IndexingContext indexer, MdxJsxElementFields el, IndexingSink sink) {}
 }

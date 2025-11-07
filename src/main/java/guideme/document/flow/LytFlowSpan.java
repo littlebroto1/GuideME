@@ -1,14 +1,16 @@
 package guideme.document.flow;
 
-import guideme.document.block.LytVisitor;
-import guideme.style.Styleable;
 import java.util.ArrayList;
 import java.util.List;
+
+import guideme.document.block.LytVisitor;
+import guideme.style.Styleable;
 
 /**
  * Attaches properties to a span of {@link LytFlowContent}, such as links or formatting.
  */
 public class LytFlowSpan extends LytFlowContent implements LytFlowParent, Styleable {
+
     private final List<LytFlowContent> children = new ArrayList<>();
 
     public List<LytFlowContent> getChildren() {

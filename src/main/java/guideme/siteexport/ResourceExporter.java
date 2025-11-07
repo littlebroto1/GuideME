@@ -1,6 +1,7 @@
 package guideme.siteexport;
 
 import java.nio.file.Path;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -8,11 +9,13 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 @ApiStatus.NonExtendable
 public interface ResourceExporter {
+
     /**
      * Ensures the data needed to show tooltips or icons for this item is exported.
      */
@@ -63,7 +66,9 @@ public interface ResourceExporter {
     Path getOutputFolder();
 
     default String getPathRelativeFromOutputFolder(Path p) {
-        return "/" + getOutputFolder().relativize(p).toString().replace('\\', '/');
+        return "/" + getOutputFolder().relativize(p)
+            .toString()
+            .replace('\\', '/');
     }
 
     /**

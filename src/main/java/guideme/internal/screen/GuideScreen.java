@@ -1,5 +1,22 @@
 package guideme.internal.screen;
 
+import java.util.List;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforgespi.language.IModInfo;
+
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import guideme.Guide;
 import guideme.GuidePage;
 import guideme.PageAnchor;
@@ -27,22 +44,9 @@ import guideme.style.TextAlignment;
 import guideme.style.TextStyle;
 import guideme.ui.GuideUiHost;
 import guideme.ui.UiPoint;
-import java.util.List;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonInfo;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.language.IModInfo;
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GuideScreen extends DocumentScreen implements GuideUiHost {
+
     private static final Logger LOG = LoggerFactory.getLogger(GuideScreen.class);
 
     private final Guide guide;
@@ -124,7 +128,8 @@ public class GuideScreen extends DocumentScreen implements GuideUiHost {
         var availableWidth = screenRect.right() - left - toolbar.getWidth() - 5;
         updateTitleLayout(left, availableWidth);
 
-        var marginTop = pageTitle.getBounds().bottom() + 4;
+        var marginTop = pageTitle.getBounds()
+            .bottom() + 4;
 
         var toolbarTop = (marginTop - toolbar.getHeight()) / 2;
         toolbar.move(screenRect.right() - toolbar.getWidth(), toolbarTop);
@@ -133,7 +138,8 @@ public class GuideScreen extends DocumentScreen implements GuideUiHost {
             left = screenRect.x() + navbar.getWidth();
         }
 
-        setDocumentRect(new LytRect(
+        setDocumentRect(
+            new LytRect(
                 left,
                 screenRect.y() + marginTop,
                 screenRect.right() - left,
@@ -192,17 +198,21 @@ public class GuideScreen extends DocumentScreen implements GuideUiHost {
             return;
         }
 
-        if (targetAnchor.flowContent() instanceof LytFlowAnchor flowAnchor && flowAnchor.getLayoutY().isPresent()) {
-            setDocumentScrollY(flowAnchor.getLayoutY().getAsInt());
+        if (targetAnchor.flowContent() instanceof LytFlowAnchor flowAnchor && flowAnchor.getLayoutY()
+            .isPresent()) {
+            setDocumentScrollY(
+                flowAnchor.getLayoutY()
+                    .getAsInt());
         } else {
-            var bounds = targetAnchor.blockNode().getBounds();
+            var bounds = targetAnchor.blockNode()
+                .getBounds();
             setDocumentScrollY(bounds.y());
         }
     }
 
     @Override
     public void scaledRender(GuiGraphics guiGraphics, RenderContext context, int mouseX, int mouseY,
-            float partialTick) {
+        float partialTick) {
         renderBlurredBackground(guiGraphics);
 
         context.fillIcon(screenRect, GuiAssets.GUIDE_BACKGROUND, SymbolicColor.GUIDE_SCREEN_BACKGROUND);
@@ -230,13 +240,21 @@ public class GuideScreen extends DocumentScreen implements GuideUiHost {
         var externalSource = getExternalSourceName();
         if (externalSource != null) {
             var paragraph = new LytParagraph();
-            paragraph.appendText(GuidebookText.ContentFrom.text().getString() + " ");
+            paragraph.appendText(
+                GuidebookText.ContentFrom.text()
+                    .getString() + " ");
             var sourceSpan = new LytFlowSpan();
 
             sourceSpan.appendText(externalSource);
-            sourceSpan.setStyle(TextStyle.builder().italic(true).build());
+            sourceSpan.setStyle(
+                TextStyle.builder()
+                    .italic(true)
+                    .build());
             paragraph.append(sourceSpan);
-            paragraph.setStyle(TextStyle.builder().alignment(TextAlignment.RIGHT).build());
+            paragraph.setStyle(
+                TextStyle.builder()
+                    .alignment(TextAlignment.RIGHT)
+                    .build());
             var layoutContext = new LayoutContext(new MinecraftFontMetrics());
             paragraph.layout(layoutContext, documentRect.x(), documentRect.bottom(), documentRect.width());
             paragraph.render(context);
@@ -260,24 +278,30 @@ public class GuideScreen extends DocumentScreen implements GuideUiHost {
             var modId = sourcePackId.substring("mod:".length());
 
             // Only show the source marker for pages that are not native to the guides mod
-            if (guide.getDefaultNamespace().equals(modId)) {
+            if (guide.getDefaultNamespace()
+                .equals(modId)) {
                 return null;
             }
 
-            return ModList.get().getModContainerById(modId)
-                    .map(ModContainer::getModInfo)
-                    .map(IModInfo::getDisplayName)
-                    .orElse(null);
+            return ModList.get()
+                .getModContainerById(modId)
+                .map(ModContainer::getModInfo)
+                .map(IModInfo::getDisplayName)
+                .orElse(null);
         }
 
         // Only show the source marker for pages that are not native to the guides mod
-        if (guide.getDefaultNamespace().equals(sourcePackId)) {
+        if (guide.getDefaultNamespace()
+            .equals(sourcePackId)) {
             return null;
         }
 
-        var pack = Minecraft.getInstance().getResourcePackRepository().getPack(sourcePackId);
+        var pack = Minecraft.getInstance()
+            .getResourcePackRepository()
+            .getPack(sourcePackId);
         if (pack != null) {
-            return pack.getDescription().getString();
+            return pack.getDescription()
+                .getString();
         }
 
         return null;
@@ -290,11 +314,7 @@ public class GuideScreen extends DocumentScreen implements GuideUiHost {
 
     private void renderTitle(LytRect documentRect, RenderContext context) {
         pageTitle.render(context);
-        var separatorRect = new LytRect(
-                screenRect.x(),
-                documentRect.y() - 1,
-                screenRect.width(),
-                1);
+        var separatorRect = new LytRect(screenRect.x(), documentRect.y() - 1, screenRect.width(), 1);
         separatorRect = separatorRect.withWidth(screenRect.width());
         context.fillRect(separatorRect, SymbolicColor.HEADER1_SEPARATOR);
     }
@@ -345,10 +365,12 @@ public class GuideScreen extends DocumentScreen implements GuideUiHost {
     }
 
     private Iterable<LytFlowContent> extractPageTitle(GuidePage page) {
-        for (var block : page.document().getBlocks()) {
+        for (var block : page.document()
+            .getBlocks()) {
             if (block instanceof LytHeading heading) {
                 if (heading.getDepth() == 1) {
-                    page.document().removeChild(heading);
+                    page.document()
+                        .removeChild(heading);
                     return heading.getContent();
                 } else {
                     break; // Any heading other than depth 1 cancels this algo
@@ -359,15 +381,9 @@ public class GuideScreen extends DocumentScreen implements GuideUiHost {
     }
 
     private ParsedGuidePage buildNotFoundPage(ResourceLocation pageId) {
-        String pageSource = "# Page not Found\n" +
-                "\n" +
-                "Page \"" + pageId + "\" could not be found.";
+        String pageSource = "# Page not Found\n" + "\n" + "Page \"" + pageId + "\" could not be found.";
 
-        return PageCompiler.parse(
-                pageId.getNamespace(),
-                "en_us",
-                pageId,
-                pageSource);
+        return PageCompiler.parse(pageId.getNamespace(), "en_us", pageId, pageSource);
     }
 
     @Override
@@ -402,7 +418,11 @@ public class GuideScreen extends DocumentScreen implements GuideUiHost {
 
         var minTitleHeight = 20;
         pageTitle.layout(context, 0, 0, availableWidth);
-        var titleY = Math.max(4, minTitleHeight - pageTitle.getBounds().height()) / 2;
+        var titleY = Math.max(
+            4,
+            minTitleHeight - pageTitle.getBounds()
+                .height())
+            / 2;
 
         pageTitle.layout(context, left + 5, titleY, availableWidth);
     }

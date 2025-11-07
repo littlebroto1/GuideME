@@ -1,12 +1,14 @@
 package guideme.document.block;
 
+import org.joml.Vector2i;
+
 import guideme.document.LytRect;
 import guideme.layout.LayoutContext;
 import guideme.render.RenderContext;
 import guideme.style.BorderStyle;
-import org.joml.Vector2i;
 
 public abstract class LytBlock extends LytNode {
+
     /**
      * Content rectangle.
      */
@@ -40,7 +42,8 @@ public abstract class LytBlock extends LytNode {
         var deltaX = point.x - bounds.x();
         var deltaY = point.y - bounds.y();
         if (deltaX != 0 || deltaY != 0) {
-            bounds = bounds.withX(point.x).withY(point.y);
+            bounds = bounds.withX(point.x)
+                .withY(point.y);
             onLayoutMoved(deltaX, deltaY);
         }
     }

@@ -2,14 +2,16 @@ package guideme.layout.flow;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
+
+import org.junit.jupiter.api.Test;
+
 import guideme.document.flow.LytFlowSpan;
 import guideme.document.flow.LytFlowText;
 import guideme.layout.FontMetrics;
 import guideme.layout.LayoutContext;
 import guideme.style.ResolvedTextStyle;
 import guideme.style.TextAlignment;
-import java.util.ArrayList;
-import org.junit.jupiter.api.Test;
 
 class LineBuilderTest {
 
@@ -17,9 +19,8 @@ class LineBuilderTest {
     void breakAtStartOfChunkAfterWhitespaceInPreviousChunk() {
         var lines = getLines(3, "A ", "BC");
 
-        assertThat(lines).extracting(this::getTextContent).containsExactly(
-                "A ",
-                "BC");
+        assertThat(lines).extracting(this::getTextContent)
+            .containsExactly("A ", "BC");
     }
 
     /**
@@ -29,9 +30,8 @@ class LineBuilderTest {
     void dontBreakInWords() {
         var lines = getLines(3, "A BC");
 
-        assertThat(lines).extracting(this::getTextContent).containsExactly(
-                "A ",
-                "BC");
+        assertThat(lines).extracting(this::getTextContent)
+            .containsExactly("A ", "BC");
     }
 
     /**
@@ -41,9 +41,8 @@ class LineBuilderTest {
     void testWhitespaceCausingLineBreakGetsRemoved() {
         var lines = getLines(1, "A B");
 
-        assertThat(lines).extracting(this::getTextContent).containsExactly(
-                "A",
-                "B");
+        assertThat(lines).extracting(this::getTextContent)
+            .containsExactly("A", "B");
     }
 
     /**
@@ -53,8 +52,8 @@ class LineBuilderTest {
     void testWhitespaceCollapsing() {
         var lines = getLines(3, "A  B");
 
-        assertThat(lines).extracting(this::getTextContent).containsExactly(
-                "A B");
+        assertThat(lines).extracting(this::getTextContent)
+            .containsExactly("A B");
     }
 
     /**
@@ -64,8 +63,8 @@ class LineBuilderTest {
     void testBreakBetweenCJKCharacters() {
         var lines = getLines(5, "A Bを変更す");
 
-        assertThat(lines).extracting(this::getTextContent).containsExactly(
-                "A Bを変", "更す");
+        assertThat(lines).extracting(this::getTextContent)
+            .containsExactly("A Bを変", "更す");
     }
 
     private static ArrayList<Line> getLines(int charsPerLine, String... textChunks) {
@@ -97,6 +96,7 @@ class LineBuilderTest {
 
     // Every character is 5 pixels wide
     record MockFontMetrics() implements FontMetrics {
+
         @Override
         public float getAdvance(int codePoint, ResolvedTextStyle style) {
             return 5;

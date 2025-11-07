@@ -1,15 +1,19 @@
 package guideme.scene.annotation;
 
-import guideme.color.ColorValue;
 import java.util.OptionalDouble;
+
 import net.minecraft.core.BlockPos;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Intersectionf;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import guideme.color.ColorValue;
+
 public final class InWorldBoxAnnotation extends InWorldAnnotation {
+
     public static final float DEFAULT_THICKNESS = 0.5f / 16f;
     private final Vector3f minCorner;
     private final Vector3f maxCorner;
@@ -29,9 +33,9 @@ public final class InWorldBoxAnnotation extends InWorldAnnotation {
 
     public static InWorldBoxAnnotation forBlock(BlockPos pos, ColorValue color) {
         return new InWorldBoxAnnotation(
-                new Vector3f(pos.getX(), pos.getY(), pos.getZ()),
-                new Vector3f(pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1),
-                color);
+            new Vector3f(pos.getX(), pos.getY(), pos.getZ()),
+            new Vector3f(pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1),
+            color);
     }
 
     /**
@@ -42,12 +46,7 @@ public final class InWorldBoxAnnotation extends InWorldAnnotation {
         var maxExtruded = new Vector3f(maxCorner).add(thickness, thickness, thickness);
         var intersection = new Vector2f();
 
-        if (Intersectionf.intersectRayAab(
-                rayOrigin,
-                rayDir,
-                minExtruded,
-                maxExtruded,
-                intersection)) {
+        if (Intersectionf.intersectRayAab(rayOrigin, rayDir, minExtruded, maxExtruded, intersection)) {
             return OptionalDouble.of(intersection.x);
         }
         return OptionalDouble.empty();

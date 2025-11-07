@@ -1,14 +1,5 @@
 package guideme.render;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import guideme.color.ColorValue;
-import guideme.color.ConstantColor;
-import guideme.color.LightDarkMode;
-import guideme.color.MutableColor;
-import guideme.document.LytRect;
-import guideme.internal.util.FluidBlitter;
-import guideme.layout.MinecraftFontMetrics;
-import guideme.style.ResolvedTextStyle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
@@ -22,7 +13,19 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.neoforge.fluids.FluidStack;
+
 import org.joml.Matrix3x2fStack;
+
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+
+import guideme.color.ColorValue;
+import guideme.color.ConstantColor;
+import guideme.color.LightDarkMode;
+import guideme.color.MutableColor;
+import guideme.document.LytRect;
+import guideme.internal.util.FluidBlitter;
+import guideme.layout.MinecraftFontMetrics;
+import guideme.style.ResolvedTextStyle;
 
 public interface RenderContext {
 
@@ -50,7 +53,7 @@ public interface RenderContext {
     int resolveColor(ColorValue ref);
 
     void fillRect(RenderPipeline pipeline, LytRect rect, ColorValue topLeft, ColorValue topRight,
-            ColorValue bottomRight, ColorValue bottomLeft);
+        ColorValue bottomRight, ColorValue bottomLeft);
 
     default void drawIcon(int x, int y, GuiSprite guiSprite) {
         drawIcon(x, y, guiSprite, ConstantColor.WHITE);
@@ -82,18 +85,25 @@ public interface RenderContext {
     }
 
     default void fillIcon(int x, int y, int width, int height, TextureAtlasSprite sprite, ColorValue color) {
-        guiGraphics().blitSprite(RenderPipelines.GUI_TEXTURED, sprite.contents().name(), x, y, width, height,
-                resolveColor(color));
+        guiGraphics().blitSprite(
+            RenderPipelines.GUI_TEXTURED,
+            sprite.contents()
+                .name(),
+            x,
+            y,
+            width,
+            height,
+            resolveColor(color));
     }
 
     default void fillTexturedRect(LytRect rect, ResourceLocation texture, ColorValue topLeft, ColorValue topRight,
-            ColorValue bottomRight, ColorValue bottomLeft) {
+        ColorValue bottomRight, ColorValue bottomLeft) {
         // Just use the entire texture by default
         fillTexturedRect(rect, texture, topLeft, topRight, bottomRight, bottomLeft, 0, 0, 1, 1);
     }
 
     void fillTexturedRect(LytRect rect, ResourceLocation textureId, ColorValue topLeft, ColorValue topRight,
-            ColorValue bottomRight, ColorValue bottomLeft, float u0, float v0, float u1, float v1);
+        ColorValue bottomRight, ColorValue bottomLeft, float u0, float v0, float u1, float v1);
 
     default void fillTexturedRect(LytRect rect, ResourceLocation textureId) {
         fillTexturedRect(rect, textureId, ConstantColor.WHITE);
@@ -112,8 +122,17 @@ public interface RenderContext {
     }
 
     default void fillTexturedRect(LytRect rect, TextureAtlasSprite sprite, ColorValue color) {
-        fillTexturedRect(rect, sprite.atlasLocation(), color, color, color, color,
-                sprite.getU0(), sprite.getV0(), sprite.getU1(), sprite.getV1());
+        fillTexturedRect(
+            rect,
+            sprite.atlasLocation(),
+            color,
+            color,
+            color,
+            color,
+            sprite.getU0(),
+            sprite.getV0(),
+            sprite.getU1(),
+            sprite.getV1());
     }
 
     void fillTriangle(Vec2 p1, Vec2 p2, Vec2 p3, ColorValue color);
@@ -124,15 +143,15 @@ public interface RenderContext {
 
     default float getAdvance(int codePoint, ResolvedTextStyle style) {
         return font().getGlyphSource(style.font())
-                .getGlyph(codePoint)
-                .info()
-                .getAdvance(style.bold());
+            .getGlyph(codePoint)
+            .info()
+            .getAdvance(style.bold());
     }
 
     default float getWidth(String text, ResolvedTextStyle style) {
         return (float) text.codePoints()
-                .mapToDouble(cp -> getAdvance(cp, style))
-                .sum();
+            .mapToDouble(cp -> getAdvance(cp, style))
+            .sum();
     }
 
     default void renderTextCenteredIn(String text, ResolvedTextStyle style, LytRect rect) {
@@ -142,8 +161,10 @@ public interface RenderContext {
         var splitLines = splitter.splitLines(text, (int) ((rect.width() - 10) / style.fontScale()), Style.EMPTY);
         var lineHeight = fontMetrics.getLineHeight(style);
         var overallHeight = splitLines.size() * lineHeight;
-        var overallWidth = (int) (splitLines.stream().mapToDouble(splitter::stringWidth).max().orElse(0f)
-                * style.fontScale());
+        var overallWidth = (int) (splitLines.stream()
+            .mapToDouble(splitter::stringWidth)
+            .max()
+            .orElse(0f) * style.fontScale());
         var textRect = new LytRect(0, 0, overallWidth, overallHeight);
         textRect = textRect.centerIn(rect);
 
@@ -156,12 +177,11 @@ public interface RenderContext {
     }
 
     default void renderText(String text, ResolvedTextStyle style, float x, float y) {
-        var effectiveStyle = Style.EMPTY
-                .withBold(style.bold())
-                .withItalic(style.italic())
-                .withUnderlined(style.underlined())
-                .withStrikethrough(style.strikethrough())
-                .withFont(style.font());
+        var effectiveStyle = Style.EMPTY.withBold(style.bold())
+            .withItalic(style.italic())
+            .withUnderlined(style.underlined())
+            .withStrikethrough(style.strikethrough())
+            .withFont(style.font());
 
         var pose = guiGraphics().pose();
 
@@ -176,11 +196,13 @@ public interface RenderContext {
         }
 
         guiGraphics().drawString(
-                font(),
-                Component.literal(text).withStyle(effectiveStyle),
-                (int) x, (int) y,
-                resolveColor(style.color()),
-                style.dropShadow());
+            font(),
+            Component.literal(text)
+                .withStyle(effectiveStyle),
+            (int) x,
+            (int) y,
+            resolveColor(style.color()),
+            style.dropShadow());
 
         if (popPose) {
             pose.popMatrix();
@@ -200,7 +222,7 @@ public interface RenderContext {
     }
 
     default void fillRect(LytRect rect, ColorValue topLeft, ColorValue topRight, ColorValue bottomRight,
-            ColorValue bottomLeft) {
+        ColorValue bottomLeft) {
         fillRect(RenderPipelines.GUI, rect, topLeft, topRight, bottomRight, bottomLeft);
     }
 
@@ -226,14 +248,14 @@ public interface RenderContext {
 
     default void renderFluid(Fluid fluid, int x, int y, int width, int height) {
         FluidBlitter.create(new FluidStack(fluid, 1))
-                .dest(x, y, width, height)
-                .blit(guiGraphics());
+            .dest(x, y, width, height)
+            .blit(guiGraphics());
     }
 
     default void renderFluid(FluidStack stack, int x, int y, int width, int height) {
         FluidBlitter.create(stack)
-                .dest(x, y, width, height)
-                .blit(guiGraphics());
+            .dest(x, y, width, height)
+            .blit(guiGraphics());
     }
 
     void renderItem(ItemStack stack, int x, int y, int z, float width, float height);

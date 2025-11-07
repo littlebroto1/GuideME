@@ -1,13 +1,5 @@
 package guideme.internal.siteexport;
 
-import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.CommandEncoder;
-import com.mojang.blaze3d.systems.GpuDevice;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
-import guideme.internal.util.Platform;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -17,12 +9,24 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PerspectiveProjectionMatrixBuffer;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
+import com.mojang.blaze3d.pipeline.TextureTarget;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.CommandEncoder;
+import com.mojang.blaze3d.systems.GpuDevice;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTexture;
+
+import guideme.internal.util.Platform;
+
 public class OffScreenRenderer implements AutoCloseable {
+
     private final NativeImage nativeImage;
     private final TextureTarget fb;
     private final GpuDevice device;
@@ -45,8 +49,14 @@ public class OffScreenRenderer implements AutoCloseable {
         var colorTextureView = Objects.requireNonNull(fb.getColorTextureView(), "colorTexture");
         depthTexture = Objects.requireNonNull(fb.getDepthTexture(), "depthTexture");
         var depthTextureView = Objects.requireNonNull(fb.getDepthTextureView(), "depthTexture");
-        commandEncoder.createRenderPass(() -> "GuideME OffScreen", colorTextureView, OptionalInt.of(0),
-                depthTextureView, OptionalDouble.of(1.0)).close();
+        commandEncoder
+            .createRenderPass(
+                () -> "GuideME OffScreen",
+                colorTextureView,
+                OptionalInt.of(0),
+                depthTextureView,
+                OptionalDouble.of(1.0))
+            .close();
     }
 
     @Override
@@ -74,13 +84,14 @@ public class OffScreenRenderer implements AutoCloseable {
     }
 
     public boolean isAnimated(Collection<TextureAtlasSprite> sprites) {
-        return sprites.stream().anyMatch(s -> s.contents().animatedTexture != null);
+        return sprites.stream()
+            .anyMatch(s -> s.contents().animatedTexture != null);
     }
 
     public byte[] captureAsWebp(Runnable r, Collection<TextureAtlasSprite> sprites, WebPExporter.Format format) {
         var animatedSprites = sprites.stream()
-                .filter(sprite -> sprite.contents().animatedTexture != null)
-                .toList();
+            .filter(sprite -> sprite.contents().animatedTexture != null)
+            .toList();
 
         // Not animated
         if (animatedSprites.isEmpty()) {
@@ -90,19 +101,27 @@ public class OffScreenRenderer implements AutoCloseable {
         // This is an oversimplification. Not all animated textures may have the same loop frequency
         // But the greatest common divisor could be so inconvenient that we're essentially looping forever.
         var maxTime = animatedSprites.stream()
-                .mapToInt(s -> s.contents().animatedTexture.frames.stream().mapToInt(SpriteContents.FrameInfo::time)
-                        .sum())
-                .max()
-                .orElse(0);
+            .mapToInt(
+                s -> s.contents().animatedTexture.frames.stream()
+                    .mapToInt(SpriteContents.FrameInfo::time)
+                    .sum())
+            .max()
+            .orElse(0);
 
-        var textureManager = Minecraft.getInstance().getTextureManager();
+        var textureManager = Minecraft.getInstance()
+            .getTextureManager();
 
         var tickers = animatedSprites.stream()
-                .collect(Collectors.groupingBy(TextureAtlasSprite::atlasLocation))
-                .entrySet().stream().collect(
-                        Collectors.toMap(
-                                Map.Entry::getKey,
-                                e -> e.getValue().stream().map(TextureAtlasSprite::createTicker).toList()));
+            .collect(Collectors.groupingBy(TextureAtlasSprite::atlasLocation))
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> e.getValue()
+                        .stream()
+                        .map(TextureAtlasSprite::createTicker)
+                        .toList()));
         for (var sprite : animatedSprites) {
             var atlas = textureManager.getTexture(sprite.atlasLocation());
             sprite.uploadFirstFrame(atlas.getTexture());

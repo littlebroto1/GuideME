@@ -1,12 +1,11 @@
 
 package guideme.internal.util;
 
-import com.mojang.blaze3d.platform.NativeImage;
-import guideme.internal.GuideMEClient;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
@@ -22,10 +21,16 @@ import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mojang.blaze3d.platform.NativeImage;
+
+import guideme.internal.GuideMEClient;
+
 public class Platform {
+
     private static final Logger LOG = LoggerFactory.getLogger(Platform.class);
 
     // This hack is used to allow tests and the guidebook to provide a recipe manager before the client loads a world
@@ -66,10 +71,9 @@ public class Platform {
         if (level != null) {
             return SlotDisplayContext.fromLevel(level);
         } else {
-            return new ContextMap.Builder()
-                    .withParameter(SlotDisplayContext.FUEL_VALUES, fuelValues())
-                    .withParameter(SlotDisplayContext.REGISTRIES, getClientRegistryAccess())
-                    .create(SlotDisplayContext.CONTEXT);
+            return new ContextMap.Builder().withParameter(SlotDisplayContext.FUEL_VALUES, fuelValues())
+                .withParameter(SlotDisplayContext.REGISTRIES, getClientRegistryAccess())
+                .create(SlotDisplayContext.CONTEXT);
         }
     }
 
@@ -86,18 +90,20 @@ public class Platform {
         if (!isRecipeTypeAvailable(RecipeType.CRAFTING) && fallbackClientRecipeManager != null) {
             return fallbackClientRecipeManager.recipeMap();
         }
-        return GuideMEClient.instance().getRecipeMap();
+        return GuideMEClient.instance()
+            .getRecipeMap();
     }
 
     public static boolean isRecipeTypeAvailable(RecipeType<?> recipeType) {
-        return GuideMEClient.instance().isRecipeTypeAvailable(recipeType);
+        return GuideMEClient.instance()
+            .isRecipeTypeAvailable(recipeType);
     }
 
     public static boolean recipeHasResult(Recipe<?> recipe, Item item) {
         for (var recipeDisplay : recipe.display()) {
             boolean hasResult = recipeDisplay.result()
-                    .resolve(Platform.getSlotDisplayContext(), SlotDisplay.ItemStackContentsFactory.INSTANCE)
-                    .anyMatch(is -> is.is(item));
+                .resolve(Platform.getSlotDisplayContext(), SlotDisplay.ItemStackContentsFactory.INSTANCE)
+                .anyMatch(is -> is.is(item));
             if (hasResult) {
                 return true;
             }

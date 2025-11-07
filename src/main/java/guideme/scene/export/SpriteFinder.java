@@ -2,19 +2,22 @@ package guideme.scene.export;
 
 import java.util.Map;
 import java.util.function.Consumer;
+
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 
 class SpriteFinder {
+
     private final Node root;
     private final TextureAtlas spriteAtlasTexture;
 
     public SpriteFinder(Map<ResourceLocation, TextureAtlasSprite> sprites, TextureAtlas spriteAtlasTexture) {
         root = new Node(0.5f, 0.5f, 0.25f);
         this.spriteAtlasTexture = spriteAtlasTexture;
-        sprites.values().forEach(root::add);
+        sprites.values()
+            .forEach(root::add);
     }
 
     public TextureAtlasSprite find(float u, float v) {
@@ -22,6 +25,7 @@ class SpriteFinder {
     }
 
     private class Node {
+
         final float midU;
         final float midV;
         final float cellRadius;
@@ -62,7 +66,7 @@ class SpriteFinder {
         }
 
         private void addInner(TextureAtlasSprite sprite, Object quadrant, int uStep, int vStep,
-                Consumer<Object> setter) {
+            Consumer<Object> setter) {
             if (quadrant == null) {
                 setter.accept(sprite);
             } else if (quadrant instanceof Node node) {

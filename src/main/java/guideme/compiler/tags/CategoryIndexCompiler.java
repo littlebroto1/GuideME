@@ -1,5 +1,7 @@
 package guideme.compiler.tags;
 
+import java.util.Set;
+
 import guideme.compiler.PageCompiler;
 import guideme.document.block.LytBlockContainer;
 import guideme.document.block.LytList;
@@ -8,9 +10,9 @@ import guideme.document.block.LytParagraph;
 import guideme.document.flow.LytFlowLink;
 import guideme.indices.CategoryIndex;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
-import java.util.Set;
 
 public class CategoryIndexCompiler extends BlockTagCompiler {
+
     @Override
     public Set<String> getTagNames() {
         return Set.of("CategoryIndex");
@@ -25,11 +27,13 @@ public class CategoryIndexCompiler extends BlockTagCompiler {
             return;
         }
 
-        var categories = compiler.getIndex(CategoryIndex.class).get(category);
+        var categories = compiler.getIndex(CategoryIndex.class)
+            .get(category);
 
         var list = new LytList(false, 0);
         for (var pageAnchor : categories) {
-            var page = compiler.getPageCollection().getParsedPage(pageAnchor.pageId());
+            var page = compiler.getPageCollection()
+                .getParsedPage(pageAnchor.pageId());
 
             var listItem = new LytListItem();
             var listItemPar = new LytParagraph();
@@ -38,7 +42,10 @@ public class CategoryIndexCompiler extends BlockTagCompiler {
             } else {
                 var link = new LytFlowLink();
                 link.setClickCallback(guideScreen -> guideScreen.navigateTo(pageAnchor));
-                link.appendText(page.getFrontmatter().navigationEntry().title());
+                link.appendText(
+                    page.getFrontmatter()
+                        .navigationEntry()
+                        .title());
                 listItemPar.append(link);
             }
             listItem.append(listItemPar);

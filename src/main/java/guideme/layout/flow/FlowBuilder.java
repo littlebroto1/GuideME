@@ -1,18 +1,21 @@
 package guideme.layout.flow;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.LytRect;
 import guideme.document.flow.LytFlowContent;
 import guideme.document.flow.LytFlowSpan;
 import guideme.layout.LayoutContext;
 import guideme.render.RenderContext;
 import guideme.style.TextAlignment;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.jetbrains.annotations.Nullable;
 
 public class FlowBuilder {
+
     private final List<Line> lines = new ArrayList<>();
 
     private final List<LytFlowContent> rootContent = new ArrayList<>();
@@ -73,7 +76,8 @@ public class FlowBuilder {
         for (var line : lines) {
             // Floating content overflows the line-box, but still belongs to the line
             // otherwise only hit-test line-elements if the line itself is hit
-            if (line.bounds().contains(x, y)) {
+            if (line.bounds()
+                .contains(x, y)) {
                 for (var el = line.firstElement(); el != null; el = el.next) {
                     if (el.bounds.contains(x, y)) {
                         return el;
@@ -86,9 +90,12 @@ public class FlowBuilder {
     }
 
     public Stream<LytRect> enumerateContentBounds(LytFlowContent content) {
-        return Stream.concat(lines.stream().flatMap(Line::elements), floats.stream())
-                .filter(el -> el.getFlowContent() == content)
-                .map(el -> el.bounds);
+        return Stream.concat(
+            lines.stream()
+                .flatMap(Line::elements),
+            floats.stream())
+            .filter(el -> el.getFlowContent() == content)
+            .map(el -> el.bounds);
     }
 
     @Nullable
@@ -127,15 +134,22 @@ public class FlowBuilder {
     public void move(int deltaX, int deltaY) {
         for (int i = 0; i < this.lines.size(); i++) {
             var line = this.lines.get(i);
-            this.lines.set(i, new Line(
-                    line.bounds().move(deltaX, deltaY),
+            this.lines.set(
+                i,
+                new Line(
+                    line.bounds()
+                        .move(deltaX, deltaY),
                     line.firstElement()));
 
             for (var el = line.firstElement(); el != null; el = el.next) {
                 el.bounds = el.bounds.move(deltaX, deltaY);
                 if (el instanceof LineBlock lineBlock) {
-                    lineBlock.getBlock().setLayoutPos(
-                            lineBlock.getBlock().getBounds().point().add(deltaX, deltaY));
+                    lineBlock.getBlock()
+                        .setLayoutPos(
+                            lineBlock.getBlock()
+                                .getBounds()
+                                .point()
+                                .add(deltaX, deltaY));
                 }
             }
         }

@@ -1,6 +1,14 @@
 package guideme.internal.siteexport.mdastpostprocess;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Multimap;
+
 import guideme.document.block.LytNode;
 import guideme.internal.siteexport.CacheBusting;
 import guideme.libs.mdast.MdAstVisitor;
@@ -12,16 +20,12 @@ import guideme.scene.LytGuidebookScene;
 import guideme.scene.SceneTagCompiler;
 import guideme.scene.export.SceneExporter;
 import guideme.siteexport.ResourceExporter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Visits all Markdown AST nodes that have a corresponding {@link LytGuidebookScene} and exports that scene.
  */
 class SceneExportVisitor implements MdAstVisitor {
+
     private static final int[] BLOCKIMAGE_SCALES = { 2, 4, 8 };
     private static final int GAMESCENE_PLACEHOLDER_SCALE = 2;
 
@@ -58,20 +62,26 @@ class SceneExportVisitor implements MdAstVisitor {
     }
 
     private void handleScene(MdAstNode node, MdxJsxElementFields elFields, String tagName, boolean isBlockImage,
-            boolean isGameScene) throws IOException {
+        boolean isGameScene) throws IOException {
         var scenes = nodeMapping.get(node)
-                .stream()
-                .map(lytNode -> lytNode instanceof LytGuidebookScene lytScene ? lytScene : null)
-                .filter(Objects::nonNull)
-                .toList();
+            .stream()
+            .map(lytNode -> lytNode instanceof LytGuidebookScene lytScene ? lytScene : null)
+            .filter(Objects::nonNull)
+            .toList();
 
         if (scenes.isEmpty()) {
-            LOG.warn("Found no layout scenes associated with element {} @ {}:{}", tagName,
-                    exporter.getCurrentPageId(), node.position());
+            LOG.warn(
+                "Found no layout scenes associated with element {} @ {}:{}",
+                tagName,
+                exporter.getCurrentPageId(),
+                node.position());
         } else {
             if (scenes.size() > 1) {
-                LOG.warn("Found multiple layout scenes associated with element {} @ {}:{}", tagName,
-                        exporter.getCurrentPageId(), node.position());
+                LOG.warn(
+                    "Found multiple layout scenes associated with element {} @ {}:{}",
+                    tagName,
+                    exporter.getCurrentPageId(),
+                    node.position());
             }
             var scene = scenes.get(0);
             var exportNamePrefix = isBlockImage ? "blockimage" : "scene";
@@ -89,7 +99,8 @@ class SceneExportVisitor implements MdAstVisitor {
                     var previousAttrs = new ArrayList<>(elFields.attributes());
 
                     elFields.setName("GameScene");
-                    elFields.attributes().clear();
+                    elFields.attributes()
+                        .clear();
                     elFields.addAttribute("background", "transparent");
 
                     var relativePath = exportScene(scene, exportName);
@@ -99,8 +110,10 @@ class SceneExportVisitor implements MdAstVisitor {
 
                     exporter.addCleanupCallback(() -> {
                         elFields.setName(previousName);
-                        elFields.attributes().clear();
-                        elFields.attributes().addAll(previousAttrs);
+                        elFields.attributes()
+                            .clear();
+                        elFields.attributes()
+                            .addAll(previousAttrs);
                     });
                 } else {
                     // Since block images are non-interactive and have no annotations, we just render them
@@ -111,7 +124,8 @@ class SceneExportVisitor implements MdAstVisitor {
                         if (imageContent != null) {
                             imagePath = CacheBusting.writeAsset(imagePath, imageContent);
                             var relativeImagePath = exporter.getPathRelativeFromOutputFolder(imagePath);
-                            elFields.attributes().add(new MdxJsxAttribute("src@" + scale, relativeImagePath));
+                            elFields.attributes()
+                                .add(new MdxJsxAttribute("src@" + scale, relativeImagePath));
                             exporter.addCleanupCallback(() -> elFields.removeAttribute("src@" + scale));
                         }
                     }
@@ -134,7 +148,7 @@ class SceneExportVisitor implements MdAstVisitor {
     }
 
     private void addPlaceholder(MdxJsxElementFields elFields, LytGuidebookScene scene, String exportName)
-            throws IOException {
+        throws IOException {
         // For GameScenes, we create a placeholder PNG to show in place of the WebGL scene
         // while that is still loading.
         var imagePath = exporter.getPageSpecificPathForWriting(exportName + ".png");
@@ -142,7 +156,8 @@ class SceneExportVisitor implements MdAstVisitor {
         if (imageContent != null) {
             imagePath = CacheBusting.writeAsset(imagePath, imageContent);
             var relativeImagePath = exporter.getPathRelativeFromOutputFolder(imagePath);
-            elFields.attributes().add(new MdxJsxAttribute("placeholder", relativeImagePath));
+            elFields.attributes()
+                .add(new MdxJsxAttribute("placeholder", relativeImagePath));
             exporter.addCleanupCallback(() -> elFields.removeAttribute("placeholder"));
         }
     }

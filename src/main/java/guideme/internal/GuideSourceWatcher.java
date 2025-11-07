@@ -1,14 +1,5 @@
 package guideme.internal;
 
-import com.google.common.base.Stopwatch;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import guideme.GuidePageChange;
-import guideme.compiler.PageCompiler;
-import guideme.compiler.ParsedGuidePage;
-import guideme.internal.util.LangUtil;
-import io.methvin.watcher.DirectoryChangeEvent;
-import io.methvin.watcher.DirectoryChangeListener;
-import io.methvin.watcher.DirectoryWatcher;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -24,13 +15,27 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.ModList;
+
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Stopwatch;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import guideme.GuidePageChange;
+import guideme.compiler.PageCompiler;
+import guideme.compiler.ParsedGuidePage;
+import guideme.internal.util.LangUtil;
+import io.methvin.watcher.DirectoryChangeEvent;
+import io.methvin.watcher.DirectoryChangeListener;
+import io.methvin.watcher.DirectoryWatcher;
+
 class GuideSourceWatcher implements AutoCloseable {
+
     private static final Logger LOG = LoggerFactory.getLogger(GuideSourceWatcher.class);
 
     private final String defaultLanguage;
@@ -51,8 +56,7 @@ class GuideSourceWatcher implements AutoCloseable {
     private final DirectoryWatcher sourceWatcher;
 
     // Queued changes that come in from a separate thread
-    private record PageLangKey(String sourceLang, ResourceLocation pageId) {
-    }
+    private record PageLangKey(String sourceLang, ResourceLocation pageId) {}
 
     private final Map<PageLangKey, ParsedGuidePage> changedPages = new HashMap<>();
     private final Set<PageLangKey> deletedPages = new HashSet<>();
@@ -64,17 +68,17 @@ class GuideSourceWatcher implements AutoCloseable {
         // The namespace does not necessarily *need* to be a mod id, but if it is, the source pack needs to
         // follow the specific mod-id format. Otherwise we assume it's a resource pack where namespace == pack id,
         // which is also not 100% correct.
-        this.sourcePackId = ModList.get().isLoaded(namespace) ? "mod:" + namespace : namespace;
+        this.sourcePackId = ModList.get()
+            .isLoaded(namespace) ? "mod:" + namespace : namespace;
         this.defaultLanguage = defaultLanguage;
         this.sourceFolder = sourceFolder;
         if (!Files.isDirectory(sourceFolder)) {
-            throw new RuntimeException("Cannot find the specified folder with guidebook sources: "
-                    + sourceFolder);
+            throw new RuntimeException("Cannot find the specified folder with guidebook sources: " + sourceFolder);
         }
         LOG.info("Watching guidebook sources in {}", sourceFolder);
 
-        watchExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
-                .setDaemon(true)
+        watchExecutor = Executors.newSingleThreadExecutor(
+            new ThreadFactoryBuilder().setDaemon(true)
                 .setNameFormat("GuideMELiveReloadWatcher%d")
                 .build());
 
@@ -83,10 +87,10 @@ class GuideSourceWatcher implements AutoCloseable {
         DirectoryWatcher watcher;
         try {
             watcher = DirectoryWatcher.builder()
-                    .path(sourceFolder)
-                    .fileHashing(false)
-                    .listener(new Listener())
-                    .build();
+                .path(sourceFolder)
+                .fileHashing(false)
+                .listener(new Listener())
+                .build();
         } catch (IOException e) {
             LOG.error("Failed to watch for changes in the guidebook sources at {}", sourceFolder, e);
             watcher = null;
@@ -109,6 +113,7 @@ class GuideSourceWatcher implements AutoCloseable {
         var pagesToLoad = new HashMap<ResourceLocation, Path>();
         try {
             Files.walkFileTree(sourceFolder, new FileVisitor<>() {
+
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
                     return FileVisitResult.CONTINUE;
@@ -143,33 +148,33 @@ class GuideSourceWatcher implements AutoCloseable {
 
         LOG.info("Loading {} guidebook pages", pagesToLoad.size());
         var loadedPages = pagesToLoad.entrySet()
-                .stream()
-                .map(entry -> {
-                    var pageId = entry.getKey();
-                    var path = entry.getValue();
+            .stream()
+            .map(entry -> {
+                var pageId = entry.getKey();
+                var path = entry.getValue();
 
-                    if (LangUtil.getLangFromPageId(pageId, validLanguages) != null) {
-                        return null; // Skip translated pages
-                    }
-                    var translatedPage = pagesToLoad.get(LangUtil.getTranslatedAsset(pageId, currentLanguage));
-                    String language;
-                    if (translatedPage != null) {
-                        language = currentLanguage;
-                        path = translatedPage;
-                    } else {
-                        language = defaultLanguage;
-                    }
+                if (LangUtil.getLangFromPageId(pageId, validLanguages) != null) {
+                    return null; // Skip translated pages
+                }
+                var translatedPage = pagesToLoad.get(LangUtil.getTranslatedAsset(pageId, currentLanguage));
+                String language;
+                if (translatedPage != null) {
+                    language = currentLanguage;
+                    path = translatedPage;
+                } else {
+                    language = defaultLanguage;
+                }
 
-                    try (var in = Files.newInputStream(path)) {
-                        return PageCompiler.parse(sourcePackId, language, pageId, in);
+                try (var in = Files.newInputStream(path)) {
+                    return PageCompiler.parse(sourcePackId, language, pageId, in);
 
-                    } catch (Exception e) {
-                        LOG.error("Failed to reload guidebook page {}", path, e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toList();
+                } catch (Exception e) {
+                    LOG.error("Failed to reload guidebook page {}", path, e);
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .toList();
 
         LOG.info("Loaded {} pages from {} in {}", loadedPages.size(), sourceFolder, stopwatch);
 
@@ -220,6 +225,7 @@ class GuideSourceWatcher implements AutoCloseable {
     }
 
     private class Listener implements DirectoryChangeListener {
+
         @Override
         public void onEvent(DirectoryChangeEvent event) {
             if (event.isDirectory()) {
@@ -270,7 +276,9 @@ class GuideSourceWatcher implements AutoCloseable {
         }
 
         // If a language specific page is deleted, make it fall back to the default language page instead
-        var defaultLangPath = sourceFolder.resolve(pageKey.pageId().toString());
+        var defaultLangPath = sourceFolder.resolve(
+            pageKey.pageId()
+                .toString());
         if (!defaultLangPath.equals(path)) {
             try (var in = Files.newInputStream(defaultLangPath)) {
                 var page = PageCompiler.parse(sourcePackId, defaultLanguage, pageKey.pageId(), in);
@@ -290,7 +298,8 @@ class GuideSourceWatcher implements AutoCloseable {
     @Nullable
     private ResourceLocation getPageId(Path path) {
         var relativePath = sourceFolder.relativize(path);
-        var relativePathStr = relativePath.toString().replace('\\', '/');
+        var relativePathStr = relativePath.toString()
+            .replace('\\', '/');
         if (!relativePathStr.endsWith(".md")) {
             return null;
         }

@@ -1,13 +1,17 @@
 package guideme.internal.item;
 
-import com.mojang.serialization.MapCodec;
-import guideme.internal.GuideME;
 import java.util.List;
+
 import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.resources.ResourceLocation;
 
+import com.mojang.serialization.MapCodec;
+
+import guideme.internal.GuideME;
+
 public class GuideItemDispatchUnbaked implements ItemModel.Unbaked {
+
     public static final ResourceLocation ID = GuideME.makeId("guide");
 
     public static final MapCodec<GuideItemDispatchUnbaked> CODEC = MapCodec.unit(new GuideItemDispatchUnbaked());

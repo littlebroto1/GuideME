@@ -1,12 +1,8 @@
 package guideme.render;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import guideme.color.ColorValue;
-import guideme.color.LightDarkMode;
-import guideme.document.LytRect;
-import guideme.internal.GuideMEClient;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.render.TextureSetup;
@@ -14,17 +10,23 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
+
 import org.joml.Matrix3x2f;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+
+import guideme.color.ColorValue;
+import guideme.color.LightDarkMode;
+import guideme.document.LytRect;
+import guideme.internal.GuideMEClient;
+
 public final class SimpleRenderContext implements RenderContext {
+
     private final List<LytRect> viewportStack = new ArrayList<>();
     private final GuiGraphics guiGraphics;
     private final LightDarkMode lightDarkMode;
 
-    public SimpleRenderContext(
-            LytRect viewport,
-            GuiGraphics guiGraphics,
-            LightDarkMode lightDarkMode) {
+    public SimpleRenderContext(LytRect viewport, GuiGraphics guiGraphics, LightDarkMode lightDarkMode) {
         this.viewportStack.add(viewport);
         this.guiGraphics = guiGraphics;
         this.lightDarkMode = lightDarkMode;
@@ -39,8 +41,12 @@ public final class SimpleRenderContext implements RenderContext {
     }
 
     private static LytRect getDefaultViewport() {
-        var width = Minecraft.getInstance().getWindow().getGuiScaledWidth();
-        var height = Minecraft.getInstance().getWindow().getGuiScaledHeight();
+        var width = Minecraft.getInstance()
+            .getWindow()
+            .getGuiScaledWidth();
+        var height = Minecraft.getInstance()
+            .getWindow()
+            .getGuiScaledHeight();
         return new LytRect(0, 0, width, height);
     }
 
@@ -51,10 +57,10 @@ public final class SimpleRenderContext implements RenderContext {
 
     @Override
     public void fillRect(RenderPipeline pipeline, LytRect rect, ColorValue topLeft, ColorValue topRight,
-            ColorValue bottomRight,
-            ColorValue bottomLeft) {
+        ColorValue bottomRight, ColorValue bottomLeft) {
 
-        guiGraphics.submitGuiElementRenderState(new GradientColoredRectangleRenderState(
+        guiGraphics.submitGuiElementRenderState(
+            new GradientColoredRectangleRenderState(
                 pipeline,
                 TextureSetup.noTexture(),
                 new Matrix3x2f(poseStack()),
@@ -71,10 +77,14 @@ public final class SimpleRenderContext implements RenderContext {
 
     @Override
     public void fillTexturedRect(LytRect rect, ResourceLocation textureId, ColorValue topLeft, ColorValue topRight,
-            ColorValue bottomRight, ColorValue bottomLeft, float u0, float v0, float u1, float v1) {
+        ColorValue bottomRight, ColorValue bottomLeft, float u0, float v0, float u1, float v1) {
 
-        var textureView = Minecraft.getInstance().getTextureManager().getTexture(textureId).getTextureView();
-        guiGraphics.submitGuiElementRenderState(new GradientBlitRenderState(
+        var textureView = Minecraft.getInstance()
+            .getTextureManager()
+            .getTexture(textureId)
+            .getTextureView();
+        guiGraphics.submitGuiElementRenderState(
+            new GradientBlitRenderState(
                 RenderPipelines.GUI_TEXTURED,
                 TextureSetup.singleTexture(textureView),
                 new Matrix3x2f(poseStack()),
@@ -95,7 +105,8 @@ public final class SimpleRenderContext implements RenderContext {
 
     @Override
     public void fillTriangle(Vec2 p1, Vec2 p2, Vec2 p3, ColorValue color) {
-        guiGraphics.submitGuiElementRenderState(new FillTriangleRenderState(
+        guiGraphics.submitGuiElementRenderState(
+            new FillTriangleRenderState(
                 RenderPipelines.GUI,
                 TextureSetup.noTexture(),
                 new Matrix3x2f(poseStack()),

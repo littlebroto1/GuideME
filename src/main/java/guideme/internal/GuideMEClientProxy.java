@@ -1,11 +1,8 @@
 package guideme.internal;
 
-import guideme.Guide;
-import guideme.Guides;
-import guideme.PageAnchor;
-import guideme.compiler.ParsedGuidePage;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -14,27 +11,39 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
+
 import org.jetbrains.annotations.Nullable;
 
+import guideme.Guide;
+import guideme.Guides;
+import guideme.PageAnchor;
+import guideme.compiler.ParsedGuidePage;
+
 class GuideMEClientProxy extends GuideMEServerProxy {
+
     @Override
     public void addGuideTooltip(ResourceLocation guideId, Item.TooltipContext context, TooltipDisplay tooltipDisplay,
-            Consumer<Component> lineConsumer,
-            TooltipFlag tooltipFlag) {
+        Consumer<Component> lineConsumer, TooltipFlag tooltipFlag) {
         var guide = GuideRegistry.getById(guideId);
         if (guide == null) {
-            lineConsumer.accept(GuidebookText.ItemInvalidGuideId.text().withStyle(ChatFormatting.RED));
+            lineConsumer.accept(
+                GuidebookText.ItemInvalidGuideId.text()
+                    .withStyle(ChatFormatting.RED));
             return;
         }
 
-        guide.getItemSettings().tooltipLines().forEach(lineConsumer);
+        guide.getItemSettings()
+            .tooltipLines()
+            .forEach(lineConsumer);
     }
 
     @Override
     public @Nullable Component getGuideDisplayName(ResourceLocation guideId) {
         var guide = GuideRegistry.getById(guideId);
         if (guide != null) {
-            return guide.getItemSettings().displayName().orElse(null);
+            return guide.getItemSettings()
+                .displayName()
+                .orElse(null);
         }
 
         return null;
@@ -45,8 +54,8 @@ class GuideMEClientProxy extends GuideMEServerProxy {
         if (player == Minecraft.getInstance().player) {
             var guide = Guides.getById(id);
             if (guide == null) {
-                Minecraft.getInstance().gui.setOverlayMessage(GuidebookText.ItemInvalidGuideId.text(id.toString()),
-                        false);
+                Minecraft.getInstance().gui
+                    .setOverlayMessage(GuidebookText.ItemInvalidGuideId.text(id.toString()), false);
                 return false;
             } else {
                 return GuideMEClient.openGuideAtPreviousPage(guide, guide.getStartPage());
@@ -61,8 +70,8 @@ class GuideMEClientProxy extends GuideMEServerProxy {
         if (player == Minecraft.getInstance().player) {
             var guide = Guides.getById(id);
             if (guide == null) {
-                Minecraft.getInstance().gui.setOverlayMessage(GuidebookText.ItemInvalidGuideId.text(id.toString()),
-                        false);
+                Minecraft.getInstance().gui
+                    .setOverlayMessage(GuidebookText.ItemInvalidGuideId.text(id.toString()), false);
                 return false;
             } else {
                 if (anchor == null) {
@@ -77,7 +86,9 @@ class GuideMEClientProxy extends GuideMEServerProxy {
 
     @Override
     public Stream<ResourceLocation> getAvailableGuides() {
-        return Guides.getAll().stream().map(Guide::getId);
+        return Guides.getAll()
+            .stream()
+            .map(Guide::getId);
     }
 
     @Override
@@ -87,6 +98,8 @@ class GuideMEClientProxy extends GuideMEServerProxy {
             return Stream.empty();
         }
 
-        return guide.getPages().stream().map(ParsedGuidePage::getId);
+        return guide.getPages()
+            .stream()
+            .map(ParsedGuidePage::getId);
     }
 }

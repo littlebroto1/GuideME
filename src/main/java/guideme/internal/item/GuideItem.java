@@ -1,9 +1,7 @@
 package guideme.internal.item;
 
-import guideme.internal.GuideME;
-import guideme.internal.GuideMEProxy;
-import guideme.internal.GuidebookText;
 import java.util.function.Consumer;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,11 +13,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
+
 import org.jetbrains.annotations.Nullable;
 
+import guideme.internal.GuideME;
+import guideme.internal.GuideMEProxy;
+import guideme.internal.GuidebookText;
+
 public class GuideItem extends Item {
+
     public static final ResourceLocation ID = GuideME.makeId("guide");
-    public static final ResourceLocation BASE_MODEL_ID = ID.withPrefix("item/").withSuffix("_base");
+    public static final ResourceLocation BASE_MODEL_ID = ID.withPrefix("item/")
+        .withSuffix("_base");
 
     public static final Properties PROPERTIES = new Properties();
 
@@ -31,7 +36,8 @@ public class GuideItem extends Item {
     public Component getName(ItemStack stack) {
         var guideId = getGuideId(stack);
         if (guideId != null) {
-            var name = GuideMEProxy.instance().getGuideDisplayName(guideId);
+            var name = GuideMEProxy.instance()
+                .getGuideDisplayName(guideId);
             if (name != null) {
                 return name;
             }
@@ -41,14 +47,11 @@ public class GuideItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay,
-            Consumer<Component> appendLine, TooltipFlag tooltipFlag) {
+        Consumer<Component> appendLine, TooltipFlag tooltipFlag) {
         var guideId = getGuideId(stack);
         if (guideId != null) {
-            GuideMEProxy.instance().addGuideTooltip(
-                    guideId,
-                    context, tooltipDisplay,
-                    appendLine,
-                    tooltipFlag);
+            GuideMEProxy.instance()
+                .addGuideTooltip(guideId, context, tooltipDisplay, appendLine, tooltipFlag);
         }
     }
 
@@ -65,7 +68,8 @@ public class GuideItem extends Item {
         }
 
         if (level.isClientSide()) {
-            if (GuideMEProxy.instance().openGuide(player, guideId)) {
+            if (GuideMEProxy.instance()
+                .openGuide(player, guideId)) {
                 return InteractionResult.CONSUME;
             }
         }

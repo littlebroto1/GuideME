@@ -1,5 +1,12 @@
 package guideme.internal.extensions;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+
+import net.minecraft.world.item.crafting.RecipeType;
+
 import guideme.compiler.TagCompiler;
 import guideme.compiler.tags.ATagCompiler;
 import guideme.compiler.tags.BoxFlowDirection;
@@ -34,20 +41,15 @@ import guideme.scene.element.IsometricCameraElementCompiler;
 import guideme.scene.element.SceneBlockElementCompiler;
 import guideme.scene.element.SceneElementTagCompiler;
 import guideme.scene.element.SceneRemoveBlocksElementCompiler;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
-import net.minecraft.world.item.crafting.RecipeType;
 
 public final class DefaultExtensions {
-    private static final List<Registration<?>> EXTENSIONS = List.of(
-            new Registration<>(TagCompiler.EXTENSION_POINT, DefaultExtensions::tagCompilers),
-            new Registration<>(SceneElementTagCompiler.EXTENSION_POINT, DefaultExtensions::sceneElementTagCompilers),
-            new Registration<>(RecipeTypeMappingSupplier.EXTENSION_POINT, DefaultExtensions::vanillaRecipeTypes));
 
-    private DefaultExtensions() {
-    }
+    private static final List<Registration<?>> EXTENSIONS = List.of(
+        new Registration<>(TagCompiler.EXTENSION_POINT, DefaultExtensions::tagCompilers),
+        new Registration<>(SceneElementTagCompiler.EXTENSION_POINT, DefaultExtensions::sceneElementTagCompilers),
+        new Registration<>(RecipeTypeMappingSupplier.EXTENSION_POINT, DefaultExtensions::vanillaRecipeTypes));
+
+    private DefaultExtensions() {}
 
     public static void addAll(ExtensionCollection.Builder builder, Set<ExtensionPoint<?>> disabledExtensionPoints) {
         for (var registration : EXTENSIONS) {
@@ -56,7 +58,7 @@ public final class DefaultExtensions {
     }
 
     private static <T extends Extension> void add(ExtensionCollection.Builder builder,
-            Set<ExtensionPoint<?>> disabledExtensionPoints, Registration<T> registration) {
+        Set<ExtensionPoint<?>> disabledExtensionPoints, Registration<T> registration) {
         if (disabledExtensionPoints.contains(registration.extensionPoint)) {
             return;
         }
@@ -68,51 +70,49 @@ public final class DefaultExtensions {
 
     private static List<TagCompiler> tagCompilers() {
         return List.of(
-                new DivTagCompiler(),
-                new ATagCompiler(),
-                new ColorTagCompiler(),
-                new ItemLinkCompiler(),
-                new FloatingImageCompiler(),
-                new BreakCompiler(),
-                new RecipeCompiler(),
-                new ItemGridCompiler(),
-                new CategoryIndexCompiler(),
-                new BlockImageTagCompiler(),
-                new ItemImageTagCompiler(),
-                new BoxTagCompiler(BoxFlowDirection.ROW),
-                new BoxTagCompiler(BoxFlowDirection.COLUMN),
-                new SceneTagCompiler(),
-                new SubPagesCompiler(),
-                new CommandLinkCompiler(),
-                new PlayerNameTagCompiler(),
-                new KeyBindTagCompiler());
+            new DivTagCompiler(),
+            new ATagCompiler(),
+            new ColorTagCompiler(),
+            new ItemLinkCompiler(),
+            new FloatingImageCompiler(),
+            new BreakCompiler(),
+            new RecipeCompiler(),
+            new ItemGridCompiler(),
+            new CategoryIndexCompiler(),
+            new BlockImageTagCompiler(),
+            new ItemImageTagCompiler(),
+            new BoxTagCompiler(BoxFlowDirection.ROW),
+            new BoxTagCompiler(BoxFlowDirection.COLUMN),
+            new SceneTagCompiler(),
+            new SubPagesCompiler(),
+            new CommandLinkCompiler(),
+            new PlayerNameTagCompiler(),
+            new KeyBindTagCompiler());
     }
 
     private static List<SceneElementTagCompiler> sceneElementTagCompilers() {
         return List.of(
-                new EntityElementCompiler(),
-                new SceneBlockElementCompiler(),
-                new ImportStructureElementCompiler(),
-                new IsometricCameraElementCompiler(),
-                new BlockAnnotationElementCompiler(),
-                new BoxAnnotationElementCompiler(),
-                new LineAnnotationElementCompiler(),
-                new DiamondAnnotationElementCompiler(),
-                new BlockAnnotationTemplateElementCompiler(),
-                new SceneRemoveBlocksElementCompiler());
+            new EntityElementCompiler(),
+            new SceneBlockElementCompiler(),
+            new ImportStructureElementCompiler(),
+            new IsometricCameraElementCompiler(),
+            new BlockAnnotationElementCompiler(),
+            new BoxAnnotationElementCompiler(),
+            new LineAnnotationElementCompiler(),
+            new DiamondAnnotationElementCompiler(),
+            new BlockAnnotationTemplateElementCompiler(),
+            new SceneRemoveBlocksElementCompiler());
     }
 
     private static List<RecipeTypeMappingSupplier> vanillaRecipeTypes() {
-        return List.of(
-                mappings -> {
-                    mappings.addStreamFactory(RecipeType.CRAFTING, VanillaRecipes::createCrafting);
-                    mappings.add(RecipeType.BLASTING, VanillaRecipes::createBlasting);
-                    mappings.add(RecipeType.SMELTING, VanillaRecipes::createSmelting);
-                    mappings.add(RecipeType.SMITHING, VanillaRecipes::createSmithing);
-                });
+        return List.of(mappings -> {
+            mappings.addStreamFactory(RecipeType.CRAFTING, VanillaRecipes::createCrafting);
+            mappings.add(RecipeType.BLASTING, VanillaRecipes::createBlasting);
+            mappings.add(RecipeType.SMELTING, VanillaRecipes::createSmelting);
+            mappings.add(RecipeType.SMITHING, VanillaRecipes::createSmithing);
+        });
     }
 
-    private record Registration<T extends Extension>(ExtensionPoint<T> extensionPoint,
-            Supplier<Collection<T>> factory) {
-    }
+    private record Registration<T extends Extension> (ExtensionPoint<T> extensionPoint,
+        Supplier<Collection<T>> factory) {}
 }

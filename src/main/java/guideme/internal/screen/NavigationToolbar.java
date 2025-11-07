@@ -1,15 +1,19 @@
 package guideme.internal.screen;
 
-import guideme.Guide;
-import guideme.PageAnchor;
-import guideme.internal.GuideMEClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
 import net.minecraft.client.gui.components.AbstractWidget;
+
 import org.jetbrains.annotations.Nullable;
 
+import guideme.Guide;
+import guideme.PageAnchor;
+import guideme.internal.GuideMEClient;
+
 public class NavigationToolbar {
+
     private static final int GAP = 5;
 
     @Nullable
@@ -31,35 +35,23 @@ public class NavigationToolbar {
     public NavigationToolbar(@Nullable Guide guide) {
         this.guide = guide;
 
-        searchButton = new GuideIconButton(
-                0,
-                0,
-                GuideIconButton.Role.SEARCH,
-                this::startSearch);
-        backButton = new GuideIconButton(
-                0,
-                0,
-                GuideIconButton.Role.BACK,
-                () -> GuideNavigation.navigateBack(guide));
+        searchButton = new GuideIconButton(0, 0, GuideIconButton.Role.SEARCH, this::startSearch);
+        backButton = new GuideIconButton(0, 0, GuideIconButton.Role.BACK, () -> GuideNavigation.navigateBack(guide));
         forwardButton = new GuideIconButton(
-                0,
-                0,
-                GuideIconButton.Role.FORWARD,
-                () -> GuideNavigation.navigateForward(guide));
+            0,
+            0,
+            GuideIconButton.Role.FORWARD,
+            () -> GuideNavigation.navigateForward(guide));
         toggleFullWidthButton = new GuideIconButton(
-                0,
-                0,
-                GuideIconButton.Role.OPEN_FULL_WIDTH_VIEW,
-                this::toggleFullWidth);
-        closeButton = new GuideIconButton(
-                0,
-                0,
-                GuideIconButton.Role.CLOSE,
-                () -> {
-                    if (closeCallback != null) {
-                        closeCallback.run();
-                    }
-                });
+            0,
+            0,
+            GuideIconButton.Role.OPEN_FULL_WIDTH_VIEW,
+            this::toggleFullWidth);
+        closeButton = new GuideIconButton(0, 0, GuideIconButton.Role.CLOSE, () -> {
+            if (closeCallback != null) {
+                closeCallback.run();
+            }
+        });
 
         update();
     }
@@ -67,7 +59,8 @@ public class NavigationToolbar {
     public void update() {
         updateLayout();
 
-        if (GuideMEClient.instance().isFullWidthLayout()) {
+        if (GuideMEClient.instance()
+            .isFullWidthLayout()) {
             toggleFullWidthButton.setRole(GuideIconButton.Role.CLOSE_FULL_WIDTH_VIEW);
         } else {
             toggleFullWidthButton.setRole(GuideIconButton.Role.OPEN_FULL_WIDTH_VIEW);
@@ -75,8 +68,10 @@ public class NavigationToolbar {
 
         if (guide != null) {
             var history = GlobalInMemoryHistory.get(guide);
-            backButton.active = history.peekBack().isPresent();
-            forwardButton.active = history.peekForward().isPresent();
+            backButton.active = history.peekBack()
+                .isPresent();
+            forwardButton.active = history.peekForward()
+                .isPresent();
         }
     }
 
@@ -112,7 +107,10 @@ public class NavigationToolbar {
     }
 
     private void toggleFullWidth() {
-        GuideMEClient.instance().setFullWidthLayout(!GuideMEClient.instance().isFullWidthLayout());
+        GuideMEClient.instance()
+            .setFullWidthLayout(
+                !GuideMEClient.instance()
+                    .isFullWidthLayout());
     }
 
     private void startSearch() {

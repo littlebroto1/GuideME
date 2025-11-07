@@ -7,6 +7,7 @@ import guideme.style.ResolvedTextStyle;
  * high.
  */
 public class MockFontMetrics implements FontMetrics {
+
     @Override
     public float getAdvance(int codePoint, ResolvedTextStyle style) {
         return 10;

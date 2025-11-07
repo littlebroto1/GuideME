@@ -1,5 +1,11 @@
 package guideme.layout.flow;
 
+import java.text.BreakIterator;
+import java.util.List;
+import java.util.function.Consumer;
+
+import org.jetbrains.annotations.Nullable;
+
 import guideme.document.DefaultStyles;
 import guideme.document.LytRect;
 import guideme.document.flow.InlineBlockAlignment;
@@ -11,16 +17,13 @@ import guideme.document.flow.LytFlowText;
 import guideme.layout.LayoutContext;
 import guideme.style.ResolvedTextStyle;
 import guideme.style.TextAlignment;
-import java.text.BreakIterator;
-import java.util.List;
-import java.util.function.Consumer;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Does inline-flow layout similar to how it is described here:
  * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flow_Layout/Block_and_Inline_Layout_in_Normal_Flow
  */
 class LineBuilder implements Consumer<LytFlowContent> {
+
     private final LayoutContext context;
     private final List<Line> lines;
     // Contains any floating elements we construct as part of processing flow content
@@ -35,13 +38,8 @@ class LineBuilder implements Consumer<LytFlowContent> {
     private LineElement openLineElement;
     private final TextAlignment alignment;
 
-    public LineBuilder(LayoutContext context,
-            int x,
-            int y,
-            int availableWidth,
-            List<Line> lines,
-            List<LineBlock> floats,
-            TextAlignment alignment) {
+    public LineBuilder(LayoutContext context, int x, int y, int availableWidth, List<Line> lines,
+        List<LineBlock> floats, TextAlignment alignment) {
         this.floats = floats;
         this.alignment = alignment;
         this.context = context;
@@ -81,7 +79,7 @@ class LineBuilder implements Consumer<LytFlowContent> {
         if (flowContent instanceof LytFlowBreak flowBreak) {
             if (flowBreak.isClearLeft() || flowBreak.isClearRight()) {
                 context.clearFloats(flowBreak.isClearLeft(), flowBreak.isClearRight())
-                        .ifPresent(floatBottom -> lineBoxY = Math.max(lineBoxY, floatBottom));
+                    .ifPresent(floatBottom -> lineBoxY = Math.max(lineBoxY, floatBottom));
             }
         }
     }
@@ -105,7 +103,8 @@ class LineBuilder implements Consumer<LytFlowContent> {
         if (inlineBlock.getAlignment() == InlineBlockAlignment.FLOAT_LEFT) {
             // Float it to the left of the actual text content.
             // endLine will take care of moving any existing text in the line
-            el.bounds = el.bounds.withX(getInnerLeftEdge() + marginLeft).withY(lineBoxY + marginTop);
+            el.bounds = el.bounds.withX(getInnerLeftEdge() + marginLeft)
+                .withY(lineBoxY + marginTop);
             // Update the layout of the contained block to update its absolute position
             block.layout(context, el.bounds.x(), el.bounds.y(), size.width());
             el.floating = true;
@@ -115,7 +114,7 @@ class LineBuilder implements Consumer<LytFlowContent> {
         } else if (inlineBlock.getAlignment() == InlineBlockAlignment.FLOAT_RIGHT) {
             // Float it to the right the actual text content.
             el.bounds = el.bounds.withX(getInnerRightEdge() - el.bounds.width() + marginRight)
-                    .withY(lineBoxY + marginTop);
+                .withY(lineBoxY + marginTop);
             // Update the layout of the contained block to update its absolute position
             block.layout(context, el.bounds.x(), el.bounds.y(), size.width());
             el.floating = true;
@@ -187,11 +186,7 @@ class LineBuilder implements Consumer<LytFlowContent> {
             if (!run.isEmpty()) {
                 var el = new LineTextRun(run.toString(), style, hoverStyle);
                 el.flowContent = flowContent;
-                el.bounds = new LytRect(
-                        innerX,
-                        0,
-                        Math.round(width),
-                        context.getLineHeight(style));
+                el.bounds = new LytRect(innerX, 0, Math.round(width), context.getLineHeight(style));
                 appendToOpenLine(el);
                 innerX += el.bounds.width();
                 remainingLineWidth -= el.bounds.width();
@@ -227,7 +222,8 @@ class LineBuilder implements Consumer<LytFlowContent> {
 
             // Handle explicit line breaks
             if (codePoint == '\n') {
-                if (style.whiteSpace().isCollapseSegmentBreaks()) {
+                if (style.whiteSpace()
+                    .isCollapseSegmentBreaks()) {
                     codePoint = ' ';
                 } else {
                     consumer.visitRun(lineBuffer, curLineWidth, true);
@@ -240,7 +236,8 @@ class LineBuilder implements Consumer<LytFlowContent> {
 
             if (Character.isWhitespace(codePoint)) {
                 // Skip if the last one was a space already
-                if (lastCharWasWhitespace && style.whiteSpace().isCollapseWhitespace()) {
+                if (lastCharWasWhitespace && style.whiteSpace()
+                    .isCollapseWhitespace()) {
                     continue; // White space collapsing
                 }
                 lastCharWasWhitespace = true;
@@ -273,8 +270,8 @@ class LineBuilder implements Consumer<LytFlowContent> {
                         widthAtBreakOpportunity += context.getAdvance(lineBuffer.charAt(j), style) * fontScale;
                     }
 
-                    consumer.visitRun(lineBuffer.subSequence(0, precedingBreakOpportunity), widthAtBreakOpportunity,
-                            true);
+                    consumer
+                        .visitRun(lineBuffer.subSequence(0, precedingBreakOpportunity), widthAtBreakOpportunity, true);
                     curLineWidth -= widthAtBreakOpportunity;
                     lineBuffer.delete(0, precedingBreakOpportunity);
                     if (!lineBuffer.isEmpty() && Character.isWhitespace(lineBuffer.charAt(0))) {
@@ -336,7 +333,8 @@ class LineBuilder implements Consumer<LytFlowContent> {
             el.bounds = el.bounds.move(xTranslation, lineBoxY);
             // Ensure that inline blocks update their blocks absolute position
             if (el instanceof LineBlock lineBlock) {
-                lineBlock.getBlock().layout(context, el.bounds.x(), el.bounds.y(), el.bounds.width());
+                lineBlock.getBlock()
+                    .layout(context, el.bounds.x(), el.bounds.y(), el.bounds.width());
             }
 
             actualRight = Math.max(actualRight, el.bounds.right());
@@ -347,7 +345,8 @@ class LineBuilder implements Consumer<LytFlowContent> {
         lines.add(line);
 
         // Advance vertically
-        lineBoxY += line.bounds().height();
+        lineBoxY += line.bounds()
+            .height();
 
         // Close out any floats that are above the fold
         context.clearFloatsAbove(lineBoxY);
@@ -367,12 +366,14 @@ class LineBuilder implements Consumer<LytFlowContent> {
 
     // Absolute X coord of the beginning of the text area of the current line box
     private int getInnerLeftEdge() {
-        return context.getLeftFloatRightEdge().orElse(lineBoxX);
+        return context.getLeftFloatRightEdge()
+            .orElse(lineBoxX);
     }
 
     // Absolute X coord of the end of the text area of the current line box
     private int getInnerRightEdge() {
-        return context.getRightFloatLeftEdge().orElse(this.lineBoxX + lineBoxWidth);
+        return context.getRightFloatLeftEdge()
+            .orElse(this.lineBoxX + lineBoxWidth);
     }
 
     private void appendToOpenLine(LineElement el) {
@@ -392,14 +393,18 @@ class LineBuilder implements Consumer<LytFlowContent> {
     }
 
     public LytRect getBounds() {
-        var width = lines.stream().mapToInt(l -> l.bounds().width()).max().orElse(0);
-        return new LytRect(
-                lineBoxX, startY,
-                width, lineBoxY - startY);
+        var width = lines.stream()
+            .mapToInt(
+                l -> l.bounds()
+                    .width())
+            .max()
+            .orElse(0);
+        return new LytRect(lineBoxX, startY, width, lineBoxY - startY);
     }
 
     @FunctionalInterface
     interface LineConsumer {
+
         void visitRun(CharSequence run, float width, boolean end);
     }
 }

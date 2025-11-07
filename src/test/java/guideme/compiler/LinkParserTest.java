@@ -5,25 +5,30 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-import guideme.PageAnchor;
-import guideme.PageCollection;
-import guideme.extensions.ExtensionCollection;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.resources.ResourceLocation;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import guideme.PageAnchor;
+import guideme.PageCollection;
+import guideme.extensions.ExtensionCollection;
+
 @MockitoSettings
 class LinkParserTest {
+
     private final List<PageAnchor> anchors = new ArrayList<>();
     private final List<URI> external = new ArrayList<>();
     private final List<String> errors = new ArrayList<>();
 
     private final LinkParser.Visitor visitor = new LinkParser.Visitor() {
+
         @Override
         public void handlePage(PageAnchor page) {
             anchors.add(page);
@@ -47,8 +52,12 @@ class LinkParserTest {
         when(pageCollection.pageExists(ResourceLocation.parse("ns:other/page.md"))).thenReturn(true);
         when(pageCollection.pageExists(ResourceLocation.parse("ns2:abc/def.md"))).thenReturn(true);
         when(pageCollection.pageExists(ResourceLocation.parse("ns_2:abc/def.md"))).thenReturn(true);
-        compiler = new PageCompiler(pageCollection, ExtensionCollection.empty(), "pack",
-                ResourceLocation.parse("ns:subfolder/page.md"), "");
+        compiler = new PageCompiler(
+            pageCollection,
+            ExtensionCollection.empty(),
+            "pack",
+            ResourceLocation.parse("ns:subfolder/page.md"),
+            "");
     }
 
     @Test

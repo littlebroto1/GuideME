@@ -1,20 +1,24 @@
 package guideme.scene.element;
 
+import java.util.Set;
+import java.util.function.Function;
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+
+import org.joml.Vector3f;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import guideme.compiler.PageCompiler;
 import guideme.compiler.tags.MdxAttrs;
 import guideme.document.LytErrorSink;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
 import guideme.scene.GuidebookScene;
-import java.util.Set;
-import java.util.function.Function;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
-import org.joml.Vector3f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class EntityElementCompiler implements SceneElementTagCompiler {
+
     private static final Logger LOG = LoggerFactory.getLogger(EntityElementCompiler.class);
 
     @Override
@@ -23,10 +27,7 @@ public class EntityElementCompiler implements SceneElementTagCompiler {
     }
 
     @Override
-    public void compile(GuidebookScene scene,
-            PageCompiler compiler,
-            LytErrorSink errorSink,
-            MdxJsxElementFields el) {
+    public void compile(GuidebookScene scene, PageCompiler compiler, LytErrorSink errorSink, MdxJsxElementFields el) {
         var entityId = MdxAttrs.getString(compiler, errorSink, el, "id", null);
         if (entityId == null) {
             errorSink.appendError(compiler, "Missing attribute 'id'", el);
@@ -36,8 +37,8 @@ public class EntityElementCompiler implements SceneElementTagCompiler {
         var data = MdxAttrs.getCompoundTag(compiler, errorSink, el, "data", new CompoundTag());
         data.putString("id", entityId);
 
-        var entity = EntityType.loadEntityRecursive(data, scene.getLevel(), EntitySpawnReason.LOAD,
-                Function.identity());
+        var entity = EntityType
+            .loadEntityRecursive(data, scene.getLevel(), EntitySpawnReason.LOAD, Function.identity());
         if (entity == null) {
             errorSink.appendError(compiler, "Failed to load entity '" + entityId, el);
             return;
@@ -55,7 +56,8 @@ public class EntityElementCompiler implements SceneElementTagCompiler {
         entity.setYHeadRot(entity.getYRot());
         entity.setYBodyRot(entity.getYRot());
 
-        scene.getLevel().addEntity(entity);
+        scene.getLevel()
+            .addEntity(entity);
         entity.tick();
     }
 }

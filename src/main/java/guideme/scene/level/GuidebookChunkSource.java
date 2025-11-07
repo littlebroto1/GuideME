@@ -1,17 +1,21 @@
 package guideme.scene.level;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.util.function.BooleanSupplier;
+
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.lighting.LevelLightEngine;
+
 import org.jetbrains.annotations.Nullable;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+
 class GuidebookChunkSource extends ChunkSource {
+
     private final GuidebookLevel level;
 
     private final Long2ObjectMap<GuidebookChunk> chunks = new Long2ObjectOpenHashMap<>();
@@ -36,8 +40,7 @@ class GuidebookChunkSource extends ChunkSource {
     }
 
     @Override
-    public void tick(BooleanSupplier booleanSupplier, boolean bl) {
-    }
+    public void tick(BooleanSupplier booleanSupplier, boolean bl) {}
 
     @Override
     public String gatherStats() {

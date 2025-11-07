@@ -1,16 +1,19 @@
 package guideme.compiler.tags;
 
+import java.util.Set;
+
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+
 import guideme.compiler.PageCompiler;
 import guideme.document.flow.LytFlowParent;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
-import java.util.Set;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 
 /**
  * This tag compiles to the current binding for a key binding.
  */
 public class KeyBindTagCompiler extends FlowTagCompiler {
+
     @Override
     public Set<String> getTagNames() {
         return Set.of("KeyBind");

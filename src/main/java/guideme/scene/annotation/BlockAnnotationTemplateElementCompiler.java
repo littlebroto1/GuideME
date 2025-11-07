@@ -1,13 +1,14 @@
 package guideme.scene.annotation;
 
+import java.util.Objects;
+import java.util.Set;
+
 import guideme.compiler.PageCompiler;
 import guideme.compiler.tags.MdxAttrs;
 import guideme.document.LytErrorSink;
 import guideme.libs.mdast.mdx.model.MdxJsxElementFields;
 import guideme.scene.GuidebookScene;
 import guideme.scene.element.SceneElementTagCompiler;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  * This tag allows annotations to be applied to any blockstate currently in the scene.
@@ -15,6 +16,7 @@ import java.util.Set;
  * It supports any annotation type that compiles down to a {@link InWorldBoxAnnotation}.
  */
 public class BlockAnnotationTemplateElementCompiler implements SceneElementTagCompiler {
+
     @Override
     public Set<String> getTagNames() {
         return Set.of("BlockAnnotationTemplate");
@@ -38,10 +40,12 @@ public class BlockAnnotationTemplateElementCompiler implements SceneElementTagCo
                 }
 
                 // Instantiate the template for every position matching the predicate
-                var it = scene.getFilledBlocks().iterator();
+                var it = scene.getFilledBlocks()
+                    .iterator();
                 while (it.hasNext()) {
                     var position = it.next();
-                    var state = scene.getLevel().getBlockState(position);
+                    var state = scene.getLevel()
+                        .getBlockState(position);
                     if (predicate.test(state)) {
                         childCompiler.compileTemplate(scene, compiler, errorSink, childEl, position);
                     }

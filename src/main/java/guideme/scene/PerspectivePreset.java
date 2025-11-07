@@ -6,6 +6,7 @@ import net.minecraft.util.StringRepresentable;
  * Camera pre-sets to easily change the orientation of a scene.
  */
 public enum PerspectivePreset implements StringRepresentable {
+
     /**
      * An isometric camera where the northeast corner of blocks faces forward.
      */

@@ -1,6 +1,7 @@
 package guideme;
 
 import net.minecraft.resources.ResourceLocation;
+
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
  * @param anchor ID of an anchor in the page.
  */
 public record PageAnchor(ResourceLocation pageId, @Nullable String anchor) {
+
     public static PageAnchor page(ResourceLocation pageId) {
         return new PageAnchor(pageId, null);
     }

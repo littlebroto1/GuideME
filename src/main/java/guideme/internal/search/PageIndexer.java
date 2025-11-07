@@ -1,6 +1,15 @@
 
 package guideme.internal.search;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.minecraft.resources.ResourceLocation;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import guideme.PageCollection;
 import guideme.compiler.IndexingContext;
 import guideme.compiler.IndexingSink;
@@ -28,14 +37,9 @@ import guideme.libs.mdast.model.MdAstRoot;
 import guideme.libs.mdast.model.MdAstStrong;
 import guideme.libs.mdast.model.MdAstText;
 import guideme.libs.mdast.model.MdAstThematicBreak;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import net.minecraft.resources.ResourceLocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class PageIndexer implements IndexingContext {
+
     private static final Logger LOG = LoggerFactory.getLogger(PageIndexer.class);
 
     private final PageCollection pages;
